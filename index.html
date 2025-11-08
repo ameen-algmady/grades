@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة درجات الطلاب</title>
+    
+    <!-- إعدادات PWA -->
+    <meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="إدارة الدرجات">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192x192.png">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- إضافة مكتبة jsQR لقراءة QR كود -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .login-section, .main-section {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #fff;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            margin: 5px 0;
+            width: 100%;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .search-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        th, td {
+            padding: 10px 8px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+            word-break: break-word;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .student-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-section {
+            border-bottom: 2px solid var(--light-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .form-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: auto;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+        
+        .install-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: auto;
+            padding: 8px 12px;
+            font-size: 12px;
+            background-color: var(--success-color);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+        
+        .sync-btn {
+            background-color: var(--success-color);
+        }
+        
+        .teacher-info {
+            background: linear-gradient(135deg, var(--light-color), #fff);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .student-name {
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: color 0.3s;
+            font-weight: bold;
+            font-size: 14px;
+            display: block;
+            padding: 5px 0;
+        }
+        
+        .student-name:hover {
+            color: var(--secondary-color);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 95%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            background: #f0f0f0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .barcode-section {
+            text-align: center;
+            margin: 15px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            border: 2px dashed #ccc;
+        }
+        
+        .barcode-input-container {
+            position: relative;
+            margin: 0 auto 15px;
+        }
+        
+        .barcode-input {
+            width: 100%;
+            padding: 15px 50px 15px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .barcode-input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .barcode-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 24px;
+            cursor: pointer;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+        }
+        
+        /* تصميم ماسح QR كود */
+        .scanner-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #scanner-area {
+            width: 100%;
+            height: 60%;
+            background: black;
+            position: relative;
+        }
+        
+        #interactive {
+            width: 100%;
+            height: 100%;
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #interactive video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .scanner-controls {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .scanner-guide {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            padding: 15px 25px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 10px;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        .scanner-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+            border: 3px solid #4CAF50;
+            background: transparent;
+            box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.5);
+        }
+
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: #4CAF50;
+            top: 20%;
+            animation: scan 2s linear infinite;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        @keyframes scan {
+            0% { top: 20%; }
+            50% { top: 80%; }
+            100% { top: 20%; }
+        }
+
+        .offline-notice {
+            background-color: #fff3cd;
+            border: 2px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .pending-changes {
+            background-color: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .edit-btn {
+            background-color: var(--warning-color);
+            padding: 8px 12px;
+            font-size: 12px;
+            width: auto;
+            margin: 2px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        
+        .action-buttons button {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .result-cell {
+            font-weight: bold;
+            text-align: center;
+            font-size: 13px;
+            padding: 8px 5px;
+        }
+        
+        .result-excellent {
+            color: var(--success-color);
+            background-color: rgba(46, 204, 113, 0.1);
+        }
+        
+        .result-good {
+            color: var(--primary-color);
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .result-average {
+            color: var(--warning-color);
+            background-color: rgba(243, 156, 18, 0.1);
+        }
+        
+        .result-poor {
+            color: var(--danger-color);
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        .floating-save-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            }
+        }
+
+        .floating-save-btn:hover {
+            animation: none;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.8);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 5px;
+            }
+            
+            header {
+                padding: 0.8rem;
+                font-size: 14px;
+            }
+            
+            .login-section, .main-section {
+                padding: 10px;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px 4px;
+            }
+            
+            .student-name {
+                font-size: 13px;
+            }
+            
+            button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .modal-content {
+                margin: 2% auto;
+                padding: 15px;
+                width: 98%;
+            }
+            
+            .scanner-frame {
+                width: 80%;
+                height: 40%;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                max-width: 95%;
+            }
+            
+            .search-section {
+                flex-direction: row;
+            }
+            
+            .search-section > * {
+                flex: 1;
+            }
+            
+            .student-form {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .form-section {
+                grid-column: 1 / -1;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            .student-name {
+                font-size: 15px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 1200px;
+            }
+            
+            .student-form {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>نظام إدارة درجات الطلاب</h1>
+            <button id="logoutBtn" class="logout-btn btn-danger hidden">تسجيل الخروج</button>
+            <button id="installBtn" class="install-btn hidden">📱 تثبيت التطبيق</button>
+        </header>
+        
+        <!-- حالة الاتصال -->
+        <div id="onlineStatus" class="offline-notice hidden">
+            ⚠️ أنت غير متصل بالإنترنت. سيتم حفظ التغييرات محلياً حتى يتوفر الاتصال.
+        </div>
+        
+        <!-- التغييرات المعلقة -->
+        <div id="pendingChanges" class="pending-changes hidden">
+            ⚠️ لديك <span id="pendingCount">0</span> تغيير معلق. سيتم المزامنة عند توفر الاتصال.
+        </div>
+        
+        <!-- قسم تسجيل الدخول -->
+        <section id="loginSection" class="login-section">
+            <h2>تسجيل الدخول</h2>
+            <div class="form-group">
+                <label for="teacherId">المعرف:</label>
+                <input type="text" id="teacherId" placeholder="أدخل المعرف الخاص بك">
+                <small style="color: #666;">جرب: ameen</small>
+            </div>
+            <button id="loginBtn">دخول</button>
+            <button id="testConnectionBtn" type="button" class="btn-warning">اختبار الاتصال بالجدول</button>
+        </section>
+        
+        <!-- القسم الرئيسي -->
+        <section id="mainSection" class="main-section hidden">
+            <div class="action-buttons">
+                <button id="syncBtn" class="sync-btn">🔄 مزامنة البيانات</button>
+                <button id="syncPendingBtn" class="btn-warning">📤 مزامنة المعلقة</button>
+            </div>
+            
+            <div id="teacherInfo" class="teacher-info hidden">
+                <strong>👨‍🏫 المعلم:</strong> <span id="currentTeacher"></span> | 
+                <strong>👥 عدد الطلاب:</strong> <span id="studentsCount">0</span>
+            </div>
+            
+            <h2>🎓 إدارة درجات الطلاب</h2>
+            
+            <!-- قسم البحث -->
+            <div class="search-section">
+                <div class="form-group">
+                    <label for="classFilter">🏫 تصفية حسب الشعبة:</label>
+                    <select id="classFilter">
+                        <option value="">جميع الشعب</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nameSearch">📝 البحث بالاسم:</label>
+                    <input type="text" id="nameSearch" placeholder="أدخل جزء من الاسم">
+                </div>
+                
+                <div class="form-group">
+                    <label>📷 مسح QR كود:</label>
+                    <div class="barcode-section">
+                        <div class="barcode-input-container">
+                            <input type="text" id="manualBarcodeInput" class="barcode-input" placeholder="أدخل QR كود يدوياً">
+                            <span class="barcode-icon material-icons" onclick="clearBarcode()">
+                                qr_code_scanner
+                            </span>
+                        </div>
+                        <button id="openScannerBtn" class="btn-success">
+                            📷 فتح ماسح QR كود
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- حالة التحميل -->
+            <div id="loading" class="loading hidden">
+                <p>⏳ جاري تحميل البيانات...</p>
+            </div>
+            
+            <!-- جدول الطلاب -->
+            <div id="studentsTableContainer" style="overflow-x: auto;">
+                <table id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th>📋 QR كود</th>
+                            <th>👤 اسم الطالب</th>
+                            <th>🏫 الشعبة</th>
+                            <th>⭐ محصلة 1</th>
+                            <th>⭐ محصلة 2</th>
+                            <th>⭐ محصلة 3</th>
+                            <th>⚙️ الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <!-- سيتم ملء هذا القسم بالبيانات -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- نافذة التعديل المنبثقة -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3>✏️ تعديل درجات الطالب: <span id="currentStudentName"></span></h3>
+                <form id="studentForm" class="student-form">
+                    <input type="hidden" id="editStudentId">
+                    <input type="hidden" id="editStudentBarcode">
+                    
+                    <!-- الترم الأول -->
+                    <div class="form-section">
+                        <h4>📘 الترم الأول</h4>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAttendance1">📊 مواظبة 1:</label>
+                        <input type="number" id="editAttendance1" min="0" max="20" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="editOral1">🗣️ شفهي 1:</label>
+                        <input type="number" id="editOral1" min="0" max="20" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="editHomework1">📚 واجبات 1:</label>
+                        <input type="number" id="editHomework1" min="0" max="20" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="editWritten1">✍️ تحريري 1:</label>
+                        <input type="number" id="editWritten1" min="0" max="20" step="0.5">
+                    </div>
+                    
+                    <!-- الترم الثاني -->
+                    <div class="form-section">
+                        <h4>📗 الترم الثاني</h4>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAttendance2">📊 مواظبة 2:</label>
+                        <input type="number" id="editAttendance2" min="0" max="20" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="editOral2">🗣️ شفهي 2:</label>
+                        <input type="number" id="editOral2" min="0" max="20" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="editHomework2">📚 واجبات 2:</label>
+                        <input type="number" id="editHomework2" min="0" max="20" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="editWritten2">✍️ تحريري 2:</label>
+                        <input type="number" id="editWritten2" min="0" max="20" step="0.5">
+                    </div>
+                    
+                    <!-- الترم الثالث -->
+                    <div class="form-section">
+                        <h4>📙 الترم الثالث</h4>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAttendance3">📊 مواظبة 3:</label>
+                        <input type="number" id="editAttendance3" min="0" max="20" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="editOral3">🗣️ شفهي 3:</label>
+                        <input type="number" id="editOral3" min="0" max="20" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="editHomework3">📚 واجبات 3:</label>
+                        <input type="number" id="editHomework3" min="0" max="20" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="editWritten3">✍️ تحريري 3:</label>
+                        <input type="number" id="editWritten3" min="0" max="20" step="0.5">
+                    </div>
+                    
+                    <div class="form-section">
+                        <button type="submit" class="btn-success">💾 حفظ التغييرات</button>
+                        <button type="button" id="cancelEditBtn" class="btn-danger">❌ إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- زر حفظ متحرك -->
+        <button id="floatingSaveBtn" class="floating-save-btn">
+            💾 حفظ التغييرات
+        </button>
+        
+        <!-- ماسح QR كود -->
+        <div id="scannerContainer" class="scanner-container">
+            <div class="scanner-guide">
+                📷 وجه الكاميرا نحو QR كود
+            </div>
+            
+            <div id="scanner-area">
+                <div class="scanner-overlay">
+                    <div class="scanner-frame">
+                        <div class="scanner-line"></div>
+                    </div>
+                </div>
+                <div id="interactive"></div>
+            </div>
+
+            <div class="scanner-controls">
+                <button id="closeScannerBtn" class="btn-danger">❌ إغلاق الماسح</button>
+                <button id="switchCameraBtn" class="btn-warning">🔄 تبديل الكاميرا</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- تسجيل Service Worker -->
+    <script>
+        // تسجيل Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker مسجل بنجاح: ', registration.scope);
+                        
+                        // التحقق من وجود تحديثات
+                        registration.addEventListener('updatefound', function() {
+                            const newWorker = registration.installing;
+                            console.log('🔄 تم العثور على تحديث جديد');
+                            
+                            newWorker.addEventListener('statechange', function() {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('📱 التطبيق جاهز للتحديث');
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch(function(error) {
+                        console.log('❌ فشل في تسجيل Service Worker: ', error);
+                    });
+            });
+
+            // الاستماع للتحديثات
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', function() {
+                if (!refreshing) {
+                    refreshing = true;
+                    console.log('🔄 جاري تحديث التطبيق...');
+                    window.location.reload();
+                }
+            });
+        }
+
+        function showUpdateNotification() {
+            if (confirm('يوجد تحديث جديد للتطبيق. هل تريد تحديثه الآن؟')) {
+                if (navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({action: 'skipWaiting'});
+                }
+            }
+        }
+    </script>
+
+    <script>
+        // العناصر الرئيسية في الصفحة
+        const loginSection = document.getElementById('loginSection');
+        const mainSection = document.getElementById('mainSection');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const installBtn = document.getElementById('installBtn');
+        const syncBtn = document.getElementById('syncBtn');
+        const syncPendingBtn = document.getElementById('syncPendingBtn');
+        const testConnectionBtn = document.getElementById('testConnectionBtn');
+        const teacherIdInput = document.getElementById('teacherId');
+        const classFilter = document.getElementById('classFilter');
+        const nameSearch = document.getElementById('nameSearch');
+        const studentsTableBody = document.getElementById('studentsTableBody');
+        const loadingDiv = document.getElementById('loading');
+        const teacherInfoDiv = document.getElementById('teacherInfo');
+        const currentTeacherSpan = document.getElementById('currentTeacher');
+        const studentsCountSpan = document.getElementById('studentsCount');
+        const onlineStatusDiv = document.getElementById('onlineStatus');
+        const pendingChangesDiv = document.getElementById('pendingChanges');
+        const pendingCountSpan = document.getElementById('pendingCount');
+
+        // عناصر QR كود والماسح
+        const manualBarcodeInput = document.getElementById('manualBarcodeInput');
+        const openScannerBtn = document.getElementById('openScannerBtn');
+        const scannerContainer = document.getElementById('scannerContainer');
+        const closeScannerBtn = document.getElementById('closeScannerBtn');
+        const switchCameraBtn = document.getElementById('switchCameraBtn');
+
+        // عناصر النافذة المنبثقة
+        const editModal = document.getElementById('editModal');
+        const closeModal = document.querySelector('.close-modal');
+        const currentStudentNameSpan = document.getElementById('currentStudentName');
+        const studentForm = document.getElementById('studentForm');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+        // زر الحفظ المتحرك
+        const floatingSaveBtn = document.getElementById('floatingSaveBtn');
+
+        // المتغيرات العامة
+        let currentTeacherId = '';
+        let filteredStudents = [];
+        let currentEditingStudent = null;
+        let pendingChanges = [];
+        let isScannerActive = false;
+        let currentCamera = 'environment'; // الكاميرا الخلفية افتراضياً
+        let scannerStream = null;
+        let deferredPrompt;
+
+        // ========== إدارة تثبيت PWA ==========
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden');
+            
+            installBtn.addEventListener('click', () => {
+                installBtn.classList.add('hidden');
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('✅ تم قبول تثبيت التطبيق');
+                    } else {
+                        console.log('❌ تم رفض تثبيت التطبيق');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('🎉 تم تثبيت التطبيق بنجاح!');
+            installBtn.classList.add('hidden');
+            deferredPrompt = null;
+        });
+
+        // ========== دوال الماسح الضوئي مع jsQR ==========
+        function clearBarcode() {
+            manualBarcodeInput.value = '';
+            manualBarcodeInput.focus();
+            renderStudentsTable(filteredStudents);
+        }
+
+        // دالة فتح ماسح QR كود
+        function openBarcodeScanner() {
+            scannerContainer.style.display = 'flex';
+            
+            // إنشاء عنصر فيديو
+            const video = document.createElement('video');
+            const canvasElement = document.getElementById('interactive');
+            const canvas = canvasElement.getContext('2d');
+            
+            // تنظيف المحتوى السابق
+            canvasElement.innerHTML = '';
+            canvasElement.appendChild(video);
+            
+            // إعدادات الكاميرا
+            const constraints = {
+                video: {
+                    facingMode: currentCamera,
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+            
+            // تشغيل الكاميرا
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(function(stream) {
+                    scannerStream = stream;
+                    video.srcObject = stream;
+                    video.setAttribute("playsinline", true);
+                    video.play();
+                    
+                    requestAnimationFrame(tick);
+                    
+                    function tick() {
+                        if (video.readyState === video.HAVE_ENOUGH_DATA && isScannerActive) {
+                            canvasElement.hidden = false;
+                            
+                            // رسم الفيديو على الكانفاس
+                            canvasElement.width = video.videoWidth;
+                            canvasElement.height = video.videoHeight;
+                            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                            
+                            // الحصول على بيانات الصورة
+                            const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                            
+                            // محاولة قراءة QR code
+                            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                                inversionAttempts: "dontInvert",
+                            });
+                            
+                            // إذا تم العثور على QR code
+                            if (code) {
+                                console.log('✅ تم العثور على QR code:', code.data);
+                                handleBarcodeScan(code.data);
+                                return; // التوقف عن المسح
+                            }
+                        }
+                        
+                        if (isScannerActive) {
+                            requestAnimationFrame(tick);
+                        }
+                    }
+                    
+                    isScannerActive = true;
+                })
+                .catch(function(err) {
+                    console.error('خطأ في تشغيل الكاميرا:', err);
+                    alert('❌ فشل في تشغيل الكاميرا: ' + err.message);
+                    closeBarcodeScanner();
+                });
+        }
+
+        function handleBarcodeScan(barcode) {
+            // إيقاف الماسح
+            closeBarcodeScanner();
+            
+            // تعبئة الحقل
+            manualBarcodeInput.value = barcode;
+            
+            // البحث عن الطالب
+            searchByBarcode(barcode);
+            
+            // إشعار المستخدم
+            setTimeout(() => {
+                alert('✅ تم قراءة QR كود: ' + barcode);
+            }, 100);
+        }
+
+        // دالة تبديل الكاميرا
+        function switchCamera() {
+            closeBarcodeScanner();
+            currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+            setTimeout(openBarcodeScanner, 500);
+        }
+
+        // دالة إغلاق ماسح QR كود
+        function closeBarcodeScanner() {
+            scannerContainer.style.display = 'none';
+            isScannerActive = false;
+            
+            if (scannerStream) {
+                scannerStream.getTracks().forEach(track => track.stop());
+                scannerStream = null;
+            }
+        }
+
+        // ========== الدوال الأساسية ==========
+        function getResultClass(result) {
+            const value = parseFloat(result) || 0;
+            if (value >= 4.5) return 'result-excellent';
+            if (value >= 3.5) return 'result-good';
+            if (value >= 2.5) return 'result-average';
+            return 'result-poor';
+        }
+
+        function populateClassFilter() {
+            const classes = [...new Set(filteredStudents.map(student => student.class))].sort();
+            classFilter.innerHTML = '<option value="">جميع الشعب</option>';
+            classes.forEach(className => {
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                classFilter.appendChild(option);
+            });
+        }
+
+        function filterStudents() {
+            const classValue = classFilter.value;
+            const nameValue = nameSearch.value.trim().toLowerCase();
+            
+            let filtered = filteredStudents;
+            
+            if (classValue) {
+                filtered = filtered.filter(student => student.class === classValue);
+            }
+            
+            if (nameValue) {
+                filtered = filtered.filter(student => 
+                    student.name.toLowerCase().includes(nameValue)
+                );
+            }
+            
+            renderStudentsTable(filtered);
+        }
+
+        function checkOnlineStatus() {
+            const isOnline = navigator.onLine;
+            if (!isOnline) {
+                onlineStatusDiv.classList.remove('hidden');
+            } else {
+                onlineStatusDiv.classList.add('hidden');
+            }
+            return isOnline;
+        }
+
+        function updatePendingChangesDisplay() {
+            if (pendingChanges.length > 0) {
+                pendingCountSpan.textContent = pendingChanges.length;
+                pendingChangesDiv.classList.remove('hidden');
+            } else {
+                pendingChangesDiv.classList.add('hidden');
+            }
+        }
+
+        function loadPendingChanges() {
+            const savedChanges = localStorage.getItem('pendingChanges');
+            if (savedChanges) {
+                pendingChanges = JSON.parse(savedChanges);
+                updatePendingChangesDisplay();
+            }
+        }
+
+        function savePendingChanges() {
+            localStorage.setItem('pendingChanges', JSON.stringify(pendingChanges));
+            updatePendingChangesDisplay();
+        }
+
+        function syncPendingChanges() {
+            if (pendingChanges.length === 0) {
+                alert('لا توجد تغييرات معلقة للمزامنة');
+                return;
+            }
+
+            if (!checkOnlineStatus()) {
+                alert('⚠️ لا يوجد اتصال بالإنترنت. يرجى الاتصال أولاً.');
+                return;
+            }
+
+            showLoading(true);
+            let syncedCount = 0;
+            let errorCount = 0;
+
+            pendingChanges.forEach((change, index) => {
+                if (!change.studentId) {
+                    console.error('بيانات غير مكتملة: لا يوجد studentId', change);
+                    errorCount++;
+                    return;
+                }
+
+                google.script.run
+                    .withSuccessHandler(() => {
+                        syncedCount++;
+                        if (syncedCount + errorCount === pendingChanges.length) {
+                            showLoading(false);
+                            if (errorCount === 0) {
+                                pendingChanges = [];
+                                savePendingChanges();
+                                alert(`✅ تمت مزامنة ${syncedCount} تغيير بنجاح`);
+                                loadStudentsForTeacher();
+                            } else {
+                                alert(`⚠️ تمت مزامنة ${syncedCount} تغيير، وفشل ${errorCount}`);
+                            }
+                        }
+                    })
+                    .withFailureHandler((error) => {
+                        console.error('خطأ في المزامنة:', error);
+                        errorCount++;
+                        if (syncedCount + errorCount === pendingChanges.length) {
+                            showLoading(false);
+                            alert(`⚠️ تمت مزامنة ${syncedCount} تغيير، وفشل ${errorCount}`);
+                        }
+                    })
+                    .apiUpdateStudent(change);
+            });
+        }
+
+        function calculateTotals() {
+            const attendance1 = parseFloat(document.getElementById('editAttendance1').value) || 0;
+            const oral1 = parseFloat(document.getElementById('editOral1').value) || 0;
+            const homework1 = parseFloat(document.getElementById('editHomework1').value) || 0;
+            const written1 = parseFloat(document.getElementById('editWritten1').value) || 0;
+            
+            const total1 = attendance1 + oral1 + homework1 + written1;
+            const result1 = total1 / 5;
+            
+            console.log('المجموع 1:', total1, 'المحصلة 1:', result1);
+        }
+
+        function toggleFloatingSaveButton(show) {
+            if (show) {
+                floatingSaveBtn.style.display = 'flex';
+            } else {
+                floatingSaveBtn.style.display = 'none';
+            }
+        }
+
+        // ========== مستمعات الأحداث ==========
+        window.addEventListener('online', () => {
+            checkOnlineStatus();
+            if (pendingChanges.length > 0) {
+                setTimeout(syncPendingChanges, 1000);
+            }
+        });
+        
+        window.addEventListener('offline', () => {
+            checkOnlineStatus();
+        });
+
+        // أحداث الماسح الضوئي
+        openScannerBtn.addEventListener('click', openBarcodeScanner);
+        closeScannerBtn.addEventListener('click', closeBarcodeScanner);
+        switchCameraBtn.addEventListener('click', switchCamera);
+
+        // أحداث الفلترة
+        classFilter.addEventListener('change', filterStudents);
+        nameSearch.addEventListener('input', filterStudents);
+
+        // زر الحفظ المتحرك
+        floatingSaveBtn.addEventListener('click', function() {
+            studentForm.dispatchEvent(new Event('submit'));
+        });
+
+        // التحقق الأولي من الاتصال
+        checkOnlineStatus();
+        loadPendingChanges();
+
+        // دالة تسجيل الدخول
+        loginBtn.addEventListener('click', function() {
+            const teacherId = teacherIdInput.value.trim();
+            if (teacherId) {
+                currentTeacherId = teacherId;
+                loginSection.classList.add('hidden');
+                mainSection.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+                currentTeacherSpan.textContent = teacherId;
+                loadStudentsForTeacher();
+            } else {
+                alert('يرجى إدخال المعرف');
+            }
+        });
+
+        // دالة تسجيل الخروج
+        logoutBtn.addEventListener('click', function() {
+            currentTeacherId = '';
+            loginSection.classList.remove('hidden');
+            mainSection.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+            teacherIdInput.value = '';
+            teacherInfoDiv.classList.add('hidden');
+            toggleFloatingSaveButton(false);
+        });
+
+        // دالة مزامنة البيانات
+        syncBtn.addEventListener('click', function() {
+            loadStudentsForTeacher();
+        });
+
+        // دالة مزامنة التغييرات المعلقة
+        syncPendingBtn.addEventListener('click', syncPendingChanges);
+
+        // اختبار الاتصال بالجدول
+        testConnectionBtn.addEventListener('click', function() {
+            showLoading(true);
+            google.script.run
+                .withSuccessHandler(function(response) {
+                    showLoading(false);
+                    if (response.success) {
+                        alert('✅ ' + response.message + 
+                              '\nاسم الورقة: ' + response.sheetName + 
+                              '\nعدد الصفوف: ' + response.totalRows +
+                              '\nعدد الأعمدة: ' + response.totalColumns);
+                    } else {
+                        alert('❌ ' + response.error);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    showLoading(false);
+                    alert('❌ فشل في الاتصال: ' + error);
+                })
+                .debugSheetInfo();
+        });
+
+        // تحميل الطلاب المرتبطين بالمعلم الحالي
+        function loadStudentsForTeacher() {
+            showLoading(true);
+            teacherInfoDiv.classList.add('hidden');
+            
+            if (checkOnlineStatus()) {
+                google.script.run
+                    .withSuccessHandler(function(response) {
+                        showLoading(false);
+                        if (response.success) {
+                            filteredStudents = response.data.map((student, index) => {
+                                if (!student.id) {
+                                    student.id = `student_${currentTeacherId}_${index}_${Date.now()}`;
+                                }
+                                return student;
+                            });
+                            
+                            populateClassFilter();
+                            renderStudentsTable(filteredStudents);
+                            studentsCountSpan.textContent = filteredStudents.length;
+                            teacherInfoDiv.classList.remove('hidden');
+                            
+                            localStorage.setItem('cachedStudents', JSON.stringify(filteredStudents));
+                            localStorage.setItem('cacheTimestamp', Date.now());
+                            localStorage.setItem('currentTeacherId', currentTeacherId);
+                            
+                            if (filteredStudents.length === 0) {
+                                studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بيانات للعرض</td></tr>';
+                            }
+                        } else {
+                            loadCachedData();
+                        }
+                    })
+                    .withFailureHandler(function(error) {
+                        showLoading(false);
+                        loadCachedData();
+                    })
+                    .apiGetStudents(currentTeacherId);
+            } else {
+                loadCachedData();
+            }
+        }
+
+        // تحميل البيانات المخزنة محلياً
+        function loadCachedData() {
+            const cachedData = localStorage.getItem('cachedStudents');
+            const cacheTimestamp = localStorage.getItem('cacheTimestamp');
+            const cachedTeacherId = localStorage.getItem('currentTeacherId');
+            
+            if (cachedData && cacheTimestamp && cachedTeacherId === currentTeacherId) {
+                const cacheAge = Date.now() - parseInt(cacheTimestamp);
+                const maxCacheAge = 24 * 60 * 60 * 1000;
+                
+                if (cacheAge < maxCacheAge) {
+                    filteredStudents = JSON.parse(cachedData);
+                    populateClassFilter();
+                    renderStudentsTable(filteredStudents);
+                    studentsCountSpan.textContent = filteredStudents.length;
+                    teacherInfoDiv.classList.remove('hidden');
+                    showLoading(false);
+                    
+                    alert('⚠️ يتم عرض البيانات المخزنة محلياً. سيتم تحديثها عند توفر الاتصال.');
+                    return;
+                }
+            }
+            
+            studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بيانات متاحة. يرجى الاتصال بالإنترنت.</td></tr>';
+            showLoading(false);
+        }
+
+        // عرض جدول الطلاب
+        function renderStudentsTable(students) {
+            studentsTableBody.innerHTML = '';
+            
+            if (students.length === 0) {
+                studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بيانات للعرض</td></tr>';
+                return;
+            }
+            
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                
+                const result1Class = getResultClass(student.result1);
+                const result2Class = getResultClass(student.result2);
+                const result3Class = getResultClass(student.result3);
+                
+                row.innerHTML = `
+                    <td>${student.barcode}</td>
+                    <td>
+                        <span class="student-name" data-id="${student.id}">
+                            ${student.name}
+                        </span>
+                    </td>
+                    <td>${student.class}</td>
+                    <td class="result-cell ${result1Class}">${student.result1 || '0.0'}</td>
+                    <td class="result-cell ${result2Class}">${student.result2 || '0.0'}</td>
+                    <td class="result-cell ${result3Class}">${student.result3 || '0.0'}</td>
+                    <td>
+                        <button class="edit-btn" data-id="${student.id}">تعديل</button>
+                    </td>
+                `;
+                studentsTableBody.appendChild(row);
+            });
+            
+            // إضافة مستمعات الأحداث لأسماء الطلاب
+            document.querySelectorAll('.student-name').forEach(nameElement => {
+                nameElement.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    openEditModal(studentId);
+                });
+            });
+            
+            // إضافة مستمعات الأحداث لأزرار التعديل
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    openEditModal(studentId);
+                });
+            });
+        }
+
+        // البحث بالباركود
+        manualBarcodeInput.addEventListener('input', function() {
+            const barcode = this.value.trim();
+            if (barcode.length >= 3) {
+                searchByBarcode(barcode);
+            } else if (barcode.length === 0) {
+                renderStudentsTable(filteredStudents);
+            }
+        });
+
+        function searchByBarcode(barcode) {
+            const filtered = filteredStudents.filter(student => 
+                student.barcode && student.barcode.includes(barcode)
+            );
+            
+            if (filtered.length === 0) {
+                studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لم يتم العثور على طالب بهذا QR كود</td></tr>';
+            } else if (filtered.length === 1) {
+                renderStudentsTable(filtered);
+                setTimeout(() => {
+                    openEditModal(filtered[0].id);
+                    manualBarcodeInput.value = '';
+                }, 500);
+            } else {
+                renderStudentsTable(filtered);
+            }
+        }
+
+        // فتح نافذة التعديل
+        function openEditModal(studentId) {
+            const student = filteredStudents.find(s => s.id === studentId);
+            if (student) {
+                currentEditingStudent = student;
+                
+                document.getElementById('editStudentId').value = student.id;
+                document.getElementById('editStudentBarcode').value = student.barcode || '';
+                currentStudentNameSpan.textContent = student.name;
+                
+                document.getElementById('editAttendance1').value = student.attendance1 || '';
+                document.getElementById('editOral1').value = student.oral1 || '';
+                document.getElementById('editHomework1').value = student.homework1 || '';
+                document.getElementById('editWritten1').value = student.written1 || '';
+                
+                document.getElementById('editAttendance2').value = student.attendance2 || '';
+                document.getElementById('editOral2').value = student.oral2 || '';
+                document.getElementById('editHomework2').value = student.homework2 || '';
+                document.getElementById('editWritten2').value = student.written2 || '';
+                
+                document.getElementById('editAttendance3').value = student.attendance3 || '';
+                document.getElementById('editOral3').value = student.oral3 || '';
+                document.getElementById('editHomework3').value = student.homework3 || '';
+                document.getElementById('editWritten3').value = student.written3 || '';
+                
+                const inputs = [
+                    'editAttendance1', 'editOral1', 'editHomework1', 'editWritten1',
+                    'editAttendance2', 'editOral2', 'editHomework2', 'editWritten2',
+                    'editAttendance3', 'editOral3', 'editHomework3', 'editWritten3'
+                ];
+                
+                inputs.forEach(inputId => {
+                    const inputElement = document.getElementById(inputId);
+                    inputElement.removeEventListener('input', calculateTotals);
+                    inputElement.addEventListener('input', calculateTotals);
+                });
+                
+                editModal.style.display = 'block';
+                toggleFloatingSaveButton(true);
+            }
+        }
+
+        // إغلاق النافذة
+        closeModal.addEventListener('click', function() {
+            editModal.style.display = 'none';
+            toggleFloatingSaveButton(false);
+        });
+
+        cancelEditBtn.addEventListener('click', function() {
+            editModal.style.display = 'none';
+            currentEditingStudent = null;
+            toggleFloatingSaveButton(false);
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === editModal) {
+                editModal.style.display = 'none';
+                toggleFloatingSaveButton(false);
+            }
+        });
+
+        // حفظ التغييرات
+        studentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('editStudentId').value;
+            if (!studentId) {
+                alert('❌ خطأ: لم يتم تحديد الطالب');
+                return;
+            }
+            
+            const studentData = {
+                studentId: studentId,
+                teacherId: currentTeacherId,
+                barcode: document.getElementById('editStudentBarcode').value,
+                name: currentEditingStudent ? currentEditingStudent.name : '',
+                attendance1: document.getElementById('editAttendance1').value || '',
+                oral1: document.getElementById('editOral1').value || '',
+                homework1: document.getElementById('editHomework1').value || '',
+                written1: document.getElementById('editWritten1').value || '',
+                attendance2: document.getElementById('editAttendance2').value || '',
+                oral2: document.getElementById('editOral2').value || '',
+                homework2: document.getElementById('editHomework2').value || '',
+                written2: document.getElementById('editWritten2').value || '',
+                attendance3: document.getElementById('editAttendance3').value || '',
+                oral3: document.getElementById('editOral3').value || '',
+                homework3: document.getElementById('editHomework3').value || '',
+                written3: document.getElementById('editWritten3').value || ''
+            };
+            
+            console.log('بيانات الطالب المرسلة:', studentData);
+            
+            if (checkOnlineStatus()) {
+                showLoading(true);
+                google.script.run
+                    .withSuccessHandler(function(response) {
+                        showLoading(false);
+                        if (response.success) {
+                            editModal.style.display = 'none';
+                            toggleFloatingSaveButton(false);
+                            loadStudentsForTeacher();
+                            alert('✅ ' + response.message);
+                        } else {
+                            alert('❌ خطأ في حفظ البيانات: ' + response.error);
+                        }
+                    })
+                    .withFailureHandler(function(error) {
+                        showLoading(false);
+                        alert('❌ فشل في حفظ البيانات: ' + error);
+                    })
+                    .apiUpdateStudent(studentData);
+            } else {
+                studentData.teacherId = currentTeacherId;
+                pendingChanges.push(studentData);
+                savePendingChanges();
+                editModal.style.display = 'none';
+                toggleFloatingSaveButton(false);
+                alert('⚠️ تم حفظ التغييرات محلياً. سيتم المزامنة عند توفر الاتصال.');
+            }
+        });
+
+        // إظهار/إخفاء التحميل
+        function showLoading(show) {
+            if (show) {
+                loadingDiv.classList.remove('hidden');
+            } else {
+                loadingDiv.classList.add('hidden');
+            }
+        }
+
+        // إدخال تلقائي للمعرف للاختبار
+        teacherIdInput.value = 'ameen';
+    </script>
+</body>
+</html>
