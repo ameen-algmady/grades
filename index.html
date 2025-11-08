@@ -855,6 +855,16 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzO0oetEDZdyHZHK028q
 // المتغيرات العامة
 let currentTeacherId = '';
 let filteredStudents = [];
+let cache = {
+    data: null,
+    timestamp: 0,
+    ttl: 300000 // 5 دقائق
+};
+
+// ========== دوال التحقق ==========
+function validateTeacherId(teacherId) {
+    return /^[a-zA-Z0-9_\-]+$/.test(teacherId) && teacherId.length >= 3;
+}
 
 // ========== دوال الاتصال باستخدام JSONP ==========
 function callGoogleScript(action, data = {}) {
@@ -925,10 +935,10 @@ function callGoogleScript(action, data = {}) {
 }
 
 // ========== دوال الواجهة ==========
-function showLoading(show) {
+function showLoading(show, message = '⏳ جاري تحميل البيانات...') {
     if (show) {
         loadingDiv.classList.remove('hidden');
-        loadingDiv.innerHTML = '<p>⏳ جاري تحميل البيانات...</p>';
+        loadingDiv.innerHTML = `<p>${message}</p>`;
     } else {
         loadingDiv.classList.add('hidden');
     }
@@ -936,9 +946,194 @@ function showLoading(show) {
 
 function showError(message) {
     loadingDiv.classList.remove('hidden');
-    loadingDiv.innerHTML = `<p style="color: red;">❌ ${message}</p>`;
+    loadingDiv.innerHTML = `
+        <div style="color: red; text-align: center; padding: 10px;">
+            <p>❌ ${message}</p>
+            <button onclick="retryLastAction()" style="margin: 5px; padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                إعادة المحاولة
+            </button>
+        </div>
+    `;
 }
 
+function showSuccess(message) {
+    loadingDiv.classList.remove('hidden');
+    loadingDiv.innerHTML = `<p style="color: green;">✅ ${message}</p>`;
+    setTimeout(() => loadingDiv.classList.add('hidden'), 3000);
+}
+
+// ========== إحصائيات النتائج ==========
+function calculateStatistics(students) {
+    const stats = {
+        total: students.length,
+        excellent: 0,
+        good: 0,
+        average: 0,
+        poor: 0
+    };
+    
+    students.forEach(student => {
+        const avg = (parseFloat(student.result1 || 0) + 
+                    parseFloat(student.result2 || 0) + 
+                    parseFloat(student.result3 || 0)) / 3;
+        
+        if (avg >= 4.5) stats.excellent++;
+        else if (avg >= 3.5) stats.good++;
+        else if (avg >= 2.5) stats.average++;
+        else stats.poor++;
+    });
+    
+    return stats;
+}
+
+function displayStatistics(students) {
+    const stats = calculateStatistics(students);
+    const statsHTML = `
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0; border-right: 4px solid #3498db;">
+            <h4 style="margin: 0 0 10px 0; color: #2c3e50;">📊 إحصائيات النتائج:</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                <div style="text-align: center; padding: 8px; background: white; border-radius: 5px;">
+                    <div style="color: #27ae60; font-weight: bold;">${stats.excellent}</div>
+                    <div style="font-size: 12px; color: #666;">ممتاز</div>
+                </div>
+                <div style="text-align: center; padding: 8px; background: white; border-radius: 5px;">
+                    <div style="color: #3498db; font-weight: bold;">${stats.good}</div>
+                    <div style="font-size: 12px; color: #666;">جيد</div>
+                </div>
+                <div style="text-align: center; padding: 8px; background: white; border-radius: 5px;">
+                    <div style="color: #f39c12; font-weight: bold;">${stats.average}</div>
+                    <div style="font-size: 12px; color: #666;">متوسط</div>
+                </div>
+                <div style="text-align: center; padding: 8px; background: white; border-radius: 5px;">
+                    <div style="color: #e74c3c; font-weight: bold;">${stats.poor}</div>
+                    <div style="font-size: 12px; color: #666;">ضعيف</div>
+                </div>
+                <div style="text-align: center; padding: 8px; background: #3498db; color: white; border-radius: 5px;">
+                    <div style="font-weight: bold;">${stats.total}</div>
+                    <div style="font-size: 12px;">المجموع</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // إضافة الإحصائيات قبل الجدول
+    const existingStats = document.getElementById('statsContainer');
+    if (existingStats) {
+        existingStats.innerHTML = statsHTML;
+    } else {
+        const statsContainer = document.createElement('div');
+        statsContainer.id = 'statsContainer';
+        statsContainer.innerHTML = statsHTML;
+        teacherInfoDiv.parentNode.insertBefore(statsContainer, teacherInfoDiv.nextSibling);
+    }
+}
+
+// ========== البحث والترتيب ==========
+function addSearchFunctionality() {
+    const searchContainer = document.createElement('div');
+    searchContainer.style.cssText = 'margin: 15px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;';
+    
+    searchContainer.innerHTML = `
+        <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو الباركود..." 
+               style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; flex: 1; min-width: 200px;">
+        <select id="sortSelect" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px;">
+            <option value="name">ترتيب بالأسم</option>
+            <option value="barcode">ترتيب بالباركود</option>
+            <option value="class">ترتيب بالفصل</option>
+            <option value="result1">ترتيب بالنتيجة 1</option>
+            <option value="result2">ترتيب بالنتيجة 2</option>
+            <option value="result3">ترتيب بالنتيجة 3</option>
+        </select>
+        <button id="exportBtn" style="padding: 8px 15px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            📄 تصدير البيانات
+        </button>
+    `;
+    
+    teacherInfoDiv.parentNode.insertBefore(searchContainer, teacherInfoDiv.nextSibling);
+    
+    // مستمعات البحث والترتيب
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        filterAndSortStudents();
+    });
+    
+    document.getElementById('sortSelect').addEventListener('change', function() {
+        filterAndSortStudents();
+    });
+    
+    document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+}
+
+function filterAndSortStudents() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const sortBy = document.getElementById('sortSelect').value;
+    
+    let filtered = filteredStudents.filter(student => 
+        (student.name?.toLowerCase().includes(searchTerm) ||
+         student.barcode?.toLowerCase().includes(searchTerm) ||
+         student.class?.toLowerCase().includes(searchTerm))
+    );
+    
+    // الترتيب
+    filtered.sort((a, b) => {
+        let aVal = a[sortBy] || '';
+        let bVal = b[sortBy] || '';
+        
+        if (sortBy.includes('result')) {
+            aVal = parseFloat(aVal) || 0;
+            bVal = parseFloat(bVal) || 0;
+            return bVal - aVal; // ترتيب تنازلي للنتائج
+        }
+        
+        return aVal.toString().localeCompare(bVal.toString());
+    });
+    
+    renderStudentsTable(filtered);
+    displayStatistics(filtered);
+}
+
+// ========== تصدير البيانات ==========
+function exportToExcel() {
+    const students = filteredStudents;
+    if (students.length === 0) {
+        alert('لا توجد بيانات للتصدير');
+        return;
+    }
+    
+    let csvContent = "data:text/csv;charset=utf-8,\ufeff";
+    
+    // العنوان
+    csvContent += `نتائج الطلاب للمعلم ${currentTeacherId}\n\n`;
+    
+    // الرأس
+    csvContent += "الباركود,الاسم,الفصل,النتيجة 1,النتيجة 2,النتيجة 3\n";
+    
+    // البيانات
+    students.forEach(student => {
+        const row = [
+            student.barcode || '',
+            student.name || '',
+            student.class || '',
+            student.result1 || '0.0',
+            student.result2 || '0.0',
+            student.result3 || '0.0'
+        ].map(field => `"${field}"`).join(',');
+        
+        csvContent += row + '\n';
+    });
+    
+    // إنشاء الرابط وتنزيل الملف
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `طلاب_${currentTeacherId}_${new Date().toLocaleDateString('ar-EG')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showSuccess('تم تصدير البيانات بنجاح');
+}
+
+// ========== عرض الجدول ==========
 function renderStudentsTable(students) {
     studentsTableBody.innerHTML = '';
     
@@ -946,14 +1141,14 @@ function renderStudentsTable(students) {
         studentsTableBody.innerHTML = `
             <tr>
                 <td colspan="7" style="text-align: center; color: #666; padding: 20px;">
-                    📝 لا توجد بيانات للعرض للمعلم ${currentTeacherId}
+                    📝 لا توجد بيانات للعرض
                 </td>
             </tr>
         `;
         return;
     }
     
-    students.forEach(student => {
+    students.forEach((student, index) => {
         const row = document.createElement('tr');
         
         function getResultClass(result) {
@@ -971,7 +1166,7 @@ function renderStudentsTable(students) {
         row.innerHTML = `
             <td>${student.barcode || '---'}</td>
             <td>
-                <span class="student-name" data-id="${student.id}">
+                <span class="student-name" data-id="${student.id}" onclick="showStudentDetails('${student.id}')">
                     ${student.name || 'بدون اسم'}
                 </span>
             </td>
@@ -980,15 +1175,181 @@ function renderStudentsTable(students) {
             <td class="result-cell ${result2Class}">${student.result2 || '0.0'}</td>
             <td class="result-cell ${result3Class}">${student.result3 || '0.0'}</td>
             <td>
-                <button class="edit-btn" data-id="${student.id}">تعديل</button>
+                <button class="edit-btn" data-id="${student.id}" onclick="openEditModal('${student.id}')">تعديل</button>
             </td>
         `;
         studentsTableBody.appendChild(row);
     });
 }
 
+// ========== تفاصيل الطالب ==========
+function showStudentDetails(studentId) {
+    const student = filteredStudents.find(s => s.id === studentId);
+    if (!student) return;
+    
+    const avg = ((parseFloat(student.result1 || 0) + 
+                 parseFloat(student.result2 || 0) + 
+                 parseFloat(student.result3 || 0)) / 3).toFixed(2);
+    
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); display: flex; justify-content: center;
+        align-items: center; z-index: 1000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #2c3e50;">📋 تفاصيل الطالب</h3>
+                <button onclick="this.closest('div').parentElement.parentElement.remove()" 
+                        style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666;">✕</button>
+            </div>
+            
+            <div style="display: grid; gap: 12px;">
+                <div><strong>الاسم:</strong> ${student.name || '---'}</div>
+                <div><strong>الباركود:</strong> ${student.barcode || '---'}</div>
+                <div><strong>الفصل:</strong> ${student.class || '---'}</div>
+                <hr>
+                <div><strong>النتيجة 1:</strong> <span class="result-cell ${getResultClass(student.result1)}">${student.result1 || '0.0'}</span></div>
+                <div><strong>النتيجة 2:</strong> <span class="result-cell ${getResultClass(student.result2)}">${student.result2 || '0.0'}</span></div>
+                <div><strong>النتيجة 3:</strong> <span class="result-cell ${getResultClass(student.result3)}">${student.result3 || '0.0'}</span></div>
+                <hr>
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                    <strong>المعدل:</strong> <span style="font-size: 18px; font-weight: bold; color: #e74c3c;">${avg}</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: left;">
+                <button onclick="this.closest('div').parentElement.parentElement.remove()" 
+                        style="padding: 8px 15px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// ========== تعديل النتائج ==========
+function openEditModal(studentId) {
+    const student = filteredStudents.find(s => s.id === studentId);
+    if (!student) return;
+    
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); display: flex; justify-content: center;
+        align-items: center; z-index: 1000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 400px;">
+            <h3 style="margin: 0 0 20px 0; color: #2c3e50;">✏️ تعديل نتائج الطالب</h3>
+            <p style="margin: 0 0 15px 0; font-weight: bold; color: #3498db;">${student.name}</p>
+            
+            <div style="display: grid; gap: 10px; margin-bottom: 20px;">
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">النتيجة 1:</label>
+                    <input type="number" step="0.1" min="0" max="5" id="editResult1" 
+                           value="${student.result1 || '0'}" 
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">النتيجة 2:</label>
+                    <input type="number" step="0.1" min="0" max="5" id="editResult2" 
+                           value="${student.result2 || '0'}" 
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">النتيجة 3:</label>
+                    <input type="number" step="0.1" min="0" max="5" id="editResult3" 
+                           value="${student.result3 || '0'}" 
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="saveStudentChanges('${studentId}')" 
+                        style="padding: 8px 15px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    💾 حفظ
+                </button>
+                <button onclick="this.closest('div').parentElement.parentElement.remove()" 
+                        style="padding: 8px 15px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+async function saveStudentChanges(studentId) {
+    const result1 = document.getElementById('editResult1').value;
+    const result2 = document.getElementById('editResult2').value;
+    const result3 = document.getElementById('editResult3').value;
+    
+    // التحقق من القيم
+    if ([result1, result2, result3].some(val => val < 0 || val > 5)) {
+        alert('يجب أن تكون النتائج بين 0 و 5');
+        return;
+    }
+    
+    showLoading(true, '💾 جاري حفظ التعديلات...');
+    
+    try {
+        const result = await callGoogleScript('updateStudent', {
+            studentId: studentId,
+            result1: result1,
+            result2: result2,
+            result3: result3,
+            teacherId: currentTeacherId
+        });
+        
+        showLoading(false);
+        
+        if (result.success) {
+            // تحديث البيانات المحلية
+            const studentIndex = filteredStudents.findIndex(s => s.id === studentId);
+            if (studentIndex !== -1) {
+                filteredStudents[studentIndex].result1 = result1;
+                filteredStudents[studentIndex].result2 = result2;
+                filteredStudents[studentIndex].result3 = result3;
+            }
+            
+            // إغلاق المودال وتحديث الجدول
+            document.querySelector('div[style*="position: fixed"]').remove();
+            renderStudentsTable(filteredStudents);
+            displayStatistics(filteredStudents);
+            showSuccess('تم حفظ التعديلات بنجاح');
+            
+        } else {
+            alert('فشل في حفظ التعديلات: ' + (result.error || 'خطأ غير معروف'));
+        }
+        
+    } catch (error) {
+        showLoading(false);
+        alert('حدث خطأ أثناء الحفظ: ' + error.message);
+    }
+}
+
 // ========== دوال إدارة البيانات ==========
 async function loadStudentsForTeacher() {
+    const now = Date.now();
+    
+    // استخدام البيانات المخزنة إذا كانت حديثة
+    if (cache.data && cache.teacherId === currentTeacherId && (now - cache.timestamp) < cache.ttl) {
+        filteredStudents = cache.data;
+        renderStudentsTable(filteredStudents);
+        displayStatistics(filteredStudents);
+        studentsCountSpan.textContent = filteredStudents.length;
+        currentTeacherSpan.textContent = currentTeacherId;
+        teacherInfoDiv.classList.remove('hidden');
+        return;
+    }
+    
     showLoading(true);
     teacherInfoDiv.classList.add('hidden');
     
@@ -1004,7 +1365,13 @@ async function loadStudentsForTeacher() {
         if (result.success && result.data) {
             filteredStudents = result.data;
             
+            // تخزين في الكاش
+            cache.data = result.data;
+            cache.timestamp = Date.now();
+            cache.teacherId = currentTeacherId;
+            
             renderStudentsTable(filteredStudents);
+            displayStatistics(filteredStudents);
             studentsCountSpan.textContent = filteredStudents.length;
             currentTeacherSpan.textContent = currentTeacherId;
             teacherInfoDiv.classList.remove('hidden');
@@ -1023,17 +1390,37 @@ async function loadStudentsForTeacher() {
     }
 }
 
+// ========== إعادة المحاولة ==========
+function retryLastAction() {
+    if (currentTeacherId) {
+        loadStudentsForTeacher();
+    } else {
+        loadingDiv.classList.add('hidden');
+    }
+}
+
 // ========== مستمعات الأحداث ==========
 loginBtn.addEventListener('click', async function() {
     const teacherId = teacherIdInput.value.trim();
-    if (teacherId) {
-        currentTeacherId = teacherId;
-        loginSection.classList.add('hidden');
-        mainSection.classList.remove('hidden');
-        logoutBtn.classList.remove('hidden');
-        await loadStudentsForTeacher();
-    } else {
+    if (!teacherId) {
         alert('يرجى إدخال المعرف');
+        return;
+    }
+    
+    if (!validateTeacherId(teacherId)) {
+        alert('المعرف غير صالح. يجب أن يحتوي على أحرف وأرقام فقط ويكون 3 أحرف على الأقل');
+        return;
+    }
+    
+    currentTeacherId = teacherId;
+    loginSection.classList.add('hidden');
+    mainSection.classList.remove('hidden');
+    logoutBtn.classList.remove('hidden');
+    await loadStudentsForTeacher();
+    
+    // إضافة خواص البحث بعد التحميل الأول
+    if (!document.getElementById('searchInput')) {
+        addSearchFunctionality();
     }
 });
 
@@ -1044,11 +1431,17 @@ logoutBtn.addEventListener('click', function() {
     logoutBtn.classList.add('hidden');
     teacherIdInput.value = '';
     teacherInfoDiv.classList.add('hidden');
+    
+    // إخفاء الإحصائيات
+    const statsContainer = document.getElementById('statsContainer');
+    if (statsContainer) {
+        statsContainer.remove();
+    }
 });
 
 // اختبار الاتصال
 testConnectionBtn.addEventListener('click', async function() {
-    showLoading(true);
+    showLoading(true, '🔍 جاري اختبار الاتصال...');
     const result = await callGoogleScript('testConnection');
     showLoading(false);
     
@@ -1062,7 +1455,7 @@ testConnectionBtn.addEventListener('click', async function() {
 // إدخال تلقائي للاختبار
 teacherIdInput.value = 'ameen';
 
-// إضافة CSS للنتائج
+// ========== إضافة CSS محسن ==========
 const style = document.createElement('style');
 style.textContent = `
     .result-cell {
@@ -1071,32 +1464,45 @@ style.textContent = `
         font-size: 13px;
         padding: 8px 5px;
         border-radius: 5px;
+        transition: all 0.3s ease;
     }
     
     .result-excellent {
         color: #27ae60;
         background-color: rgba(39, 174, 96, 0.1);
+        border: 1px solid rgba(39, 174, 96, 0.3);
     }
     
     .result-good {
         color: #3498db;
         background-color: rgba(52, 152, 219, 0.1);
+        border: 1px solid rgba(52, 152, 219, 0.3);
     }
     
     .result-average {
         color: #f39c12;
         background-color: rgba(243, 156, 18, 0.1);
+        border: 1px solid rgba(243, 156, 18, 0.3);
     }
     
     .result-poor {
         color: #e74c3c;
         background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
     }
     
     .student-name {
         color: #3498db;
         cursor: pointer;
         font-weight: bold;
+        transition: color 0.3s ease;
+        padding: 5px;
+        border-radius: 3px;
+    }
+    
+    .student-name:hover {
+        color: #2980b9;
+        background-color: rgba(52, 152, 219, 0.1);
     }
     
     .edit-btn {
@@ -1107,15 +1513,61 @@ style.textContent = `
         border-radius: 4px;
         cursor: pointer;
         font-size: 12px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .edit-btn:hover {
+        background-color: #e67e22;
     }
     
     .hidden {
         display: none !important;
     }
+    
+    /* تحسينات للجدول */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+    }
+    
+    th {
+        background-color: #34495e;
+        color: white;
+        padding: 12px 8px;
+        text-align: right;
+        font-weight: bold;
+    }
+    
+    td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #ecf0f1;
+        text-align: right;
+    }
+    
+    tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    /* تحسينات للشاشات الصغيرة */
+    @media (max-width: 768px) {
+        table {
+            font-size: 12px;
+        }
+        
+        th, td {
+            padding: 6px 4px;
+        }
+        
+        .edit-btn {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+    }
 `;
 document.head.appendChild(style);
 
-// اختبار اتصال تلقائي
+// ========== اختبار اتصال تلقائي ==========
 async function testAutoConnection() {
     console.log('🧪 اختبار اتصال تلقائي...');
     const result = await callGoogleScript('testConnection');
@@ -1129,7 +1581,7 @@ async function testAutoConnection() {
 // تشغيل الاختبار بعد تحميل الصفحة
 setTimeout(testAutoConnection, 1000);
 
-console.log('🚀 التطبيق جاهز - باستخدام JSONP');
+console.log('🚀 التطبيق جاهز - النسخة المحسنة');
 </script>
 </body>
 </html>
