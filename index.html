@@ -836,215 +836,123 @@
 
     <!-- JavaScript الرئيسي -->
     <script>
-        // العناصر الرئيسية في الصفحة
-        const loginSection = document.getElementById('loginSection');
-        const mainSection = document.getElementById('mainSection');
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const installBtn = document.getElementById('installBtn');
-        const syncBtn = document.getElementById('syncBtn');
-        const syncPendingBtn = document.getElementById('syncPendingBtn');
-        const testConnectionBtn = document.getElementById('testConnectionBtn');
-        const teacherIdInput = document.getElementById('teacherId');
-        const classFilter = document.getElementById('classFilter');
-        const nameSearch = document.getElementById('nameSearch');
-        const studentsTableBody = document.getElementById('studentsTableBody');
-        const loadingDiv = document.getElementById('loading');
-        const teacherInfoDiv = document.getElementById('teacherInfo');
-        const currentTeacherSpan = document.getElementById('currentTeacher');
-        const studentsCountSpan = document.getElementById('studentsCount');
-        const onlineStatusDiv = document.getElementById('onlineStatus');
-        const pendingChangesDiv = document.getElementById('pendingChanges');
-        const pendingCountSpan = document.getElementById('pendingCount');
+// العناصر الرئيسية في الصفحة
+const loginSection = document.getElementById('loginSection');
+const mainSection = document.getElementById('mainSection');
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const teacherIdInput = document.getElementById('teacherId');
+const studentsTableBody = document.getElementById('studentsTableBody');
+const loadingDiv = document.getElementById('loading');
+const teacherInfoDiv = document.getElementById('teacherInfo');
+const currentTeacherSpan = document.getElementById('currentTeacher');
+const studentsCountSpan = document.getElementById('studentsCount');
+const testConnectionBtn = document.getElementById('testConnectionBtn');
 
-        // عناصر QR كود والماسح
-        const manualBarcodeInput = document.getElementById('manualBarcodeInput');
-        const openScannerBtn = document.getElementById('openScannerBtn');
-        const scannerContainer = document.getElementById('scannerContainer');
-        const closeScannerBtn = document.getElementById('closeScannerBtn');
-        const switchCameraBtn = document.getElementById('switchCameraBtn');
+// رابط Google Apps Script
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwanwhapxe-TJWJXAFxbEzlnONbwsORG-gtcJeU8WfB92FS10Nzz6AFyHRoPFdQY78U/exec';
 
-        // عناصر النافذة المنبثقة
-        const editModal = document.getElementById('editModal');
-        const closeModal = document.querySelector('.close-modal');
-        const currentStudentNameSpan = document.getElementById('currentStudentName');
-        const studentForm = document.getElementById('studentForm');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
+// المتغيرات العامة
+let currentTeacherId = '';
+let filteredStudents = [];
 
-        // زر الحفظ المتحرك
-        const floatingSaveBtn = document.getElementById('floatingSaveBtn');
-
-        // المتغيرات العامة
-        let currentTeacherId = '';
-        let filteredStudents = [];
-        let currentEditingStudent = null;
-        let pendingChanges = [];
-        let isScannerActive = false;
-        let currentCamera = 'environment';
-        let scannerStream = null;
-        let deferredPrompt;
-
-        // رابط Google Apps Script - تم تحديثه بالرابط الحقيقي
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwanwhapxe-TJWJXAFxbEzlnONbwsORG-gtcJeU8WfB92FS10Nzz6AFyHRoPFdQY78U/exec';
-
-        // ========== دوال الاتصال بـ Google Apps Script ==========
-        async function callGoogleScript(action, data = {}) {
-            try {
-                const url = `${SCRIPT_URL}?action=${action}`;
-                const options = {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                };
-
-                // إذا كان هناك بيانات، أضفها إلى body
-                if (Object.keys(data).length > 0) {
-                    options.body = JSON.stringify(data);
+// ========== دوال الاتصال باستخدام XMLHttpRequest (يدعم CORS أفضل) ==========
+function callGoogleScript(action, data = {}) {
+    return new Promise((resolve, reject) => {
+        console.log(`🔄 جاري استدعاء: ${action}`, data);
+        
+        const xhr = new XMLHttpRequest();
+        const url = `${SCRIPT_URL}?action=${action}`;
+        
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        xhr.timeout = 30000; // 30 ثانية timeout
+        
+        xhr.onload = function() {
+            console.log('📡 حالة الاستجابة:', xhr.status, xhr.statusText);
+            
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const result = JSON.parse(xhr.responseText);
+                    console.log(`✅ استجابة ${action}:`, result);
+                    resolve(result);
+                } catch (error) {
+                    console.error('❌ خطأ في تحليل JSON:', error);
+                    resolve({
+                        success: false,
+                        error: 'خطأ في تحليل الاستجابة: ' + error.message
+                    });
                 }
-
-                console.log(`📡 جاري الاتصال بـ: ${action}`, data);
-                
-                const response = await fetch(url, options);
-                
-                if (!response.ok) {
-                    throw new Error(`خطأ في الاستجابة: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                console.log(`✅ استجابة ${action}:`, result);
-                return result;
-            } catch (error) {
-                console.error(`❌ خطأ في الاتصال بـ ${action}:`, error);
-                return {
+            } else {
+                resolve({
                     success: false,
-                    error: error.message
-                };
-            }
-        }
-
-        // ========== إدارة تثبيت PWA ==========
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.classList.remove('hidden');
-            
-            installBtn.addEventListener('click', () => {
-                installBtn.classList.add('hidden');
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('✅ تم قبول تثبيت التطبيق');
-                    } else {
-                        console.log('❌ تم رفض تثبيت التطبيق');
-                    }
-                    deferredPrompt = null;
+                    error: `خطأ في الخادم: ${xhr.status} ${xhr.statusText}`
                 });
+            }
+        };
+        
+        xhr.onerror = function() {
+            console.error(`❌ خطأ في الاتصال بـ ${action}`);
+            resolve({
+                success: false,
+                error: 'فشل في الاتصال بالخادم. تأكد من اتصال الإنترنت.'
             });
-        });
-
-        window.addEventListener('appinstalled', () => {
-            console.log('🎉 تم تثبيت التطبيق بنجاح!');
-            installBtn.classList.add('hidden');
-            deferredPrompt = null;
-        });
-
-        // ========== دوال الماسح الضوئي مع jsQR ==========
-        function clearBarcode() {
-            manualBarcodeInput.value = '';
-            manualBarcodeInput.focus();
-            renderStudentsTable(filteredStudents);
+        };
+        
+        xhr.ontimeout = function() {
+            console.error(`❌ انتهى الوقت لـ ${action}`);
+            resolve({
+                success: false,
+                error: 'انتهى وقت الانتظار. حاول مرة أخرى.'
+            });
+        };
+        
+        // إرسال البيانات
+        if (Object.keys(data).length > 0) {
+            xhr.send(JSON.stringify(data));
+        } else {
+            xhr.send();
         }
+    });
+}
 
-        function openBarcodeScanner() {
-            scannerContainer.style.display = 'flex';
-            
-            const video = document.createElement('video');
-            const canvasElement = document.getElementById('interactive');
-            const canvas = canvasElement.getContext('2d');
-            
-            canvasElement.innerHTML = '';
-            canvasElement.appendChild(video);
-            
-            const constraints = {
-                video: {
-                    facingMode: currentCamera,
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            };
-            
-            navigator.mediaDevices.getUserMedia(constraints)
-                .then(function(stream) {
-                    scannerStream = stream;
-                    video.srcObject = stream;
-                    video.setAttribute("playsinline", true);
-                    video.play();
-                    
-                    requestAnimationFrame(tick);
-                    
-                    function tick() {
-                        if (video.readyState === video.HAVE_ENOUGH_DATA && isScannerActive) {
-                            canvasElement.hidden = false;
-                            
-                            canvasElement.width = video.videoWidth;
-                            canvasElement.height = video.videoHeight;
-                            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-                            
-                            const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-                            
-                            const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                                inversionAttempts: "dontInvert",
-                            });
-                            
-                            if (code) {
-                                console.log('✅ تم العثور على QR code:', code.data);
-                                handleBarcodeScan(code.data);
-                                return;
-                            }
-                        }
-                        
-                        if (isScannerActive) {
-                            requestAnimationFrame(tick);
-                        }
-                    }
-                    
-                    isScannerActive = true;
-                })
-                .catch(function(err) {
-                    console.error('خطأ في تشغيل الكاميرا:', err);
-                    alert('❌ فشل في تشغيل الكاميرا: ' + err.message);
-                    closeBarcodeScanner();
-                });
-        }
+// ========== دوال الواجهة ==========
+function showLoading(show) {
+    if (show) {
+        loadingDiv.classList.remove('hidden');
+        loadingDiv.innerHTML = '<p>⏳ جاري تحميل البيانات...</p>';
+    } else {
+        loadingDiv.classList.add('hidden');
+    }
+}
 
-        function handleBarcodeScan(barcode) {
-            closeBarcodeScanner();
-            manualBarcodeInput.value = barcode;
-            searchByBarcode(barcode);
-            
-            setTimeout(() => {
-                alert('✅ تم قراءة QR كود: ' + barcode);
-            }, 100);
-        }
+function showError(message) {
+    loadingDiv.classList.remove('hidden');
+    loadingDiv.innerHTML = `<p style="color: red;">❌ ${message}</p>`;
+}
 
-        function switchCamera() {
-            closeBarcodeScanner();
-            currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
-            setTimeout(openBarcodeScanner, 500);
-        }
-
-        function closeBarcodeScanner() {
-            scannerContainer.style.display = 'none';
-            isScannerActive = false;
-            
-            if (scannerStream) {
-                scannerStream.getTracks().forEach(track => track.stop());
-                scannerStream = null;
-            }
-        }
-
-        // ========== الدوال الأساسية ==========
+function renderStudentsTable(students) {
+    studentsTableBody.innerHTML = '';
+    
+    if (students.length === 0) {
+        studentsTableBody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; color: #666; padding: 20px;">
+                    📝 لا توجد بيانات للعرض. تأكد من:
+                    <br>1. وجود بيانات للمعلم في الجدول
+                    <br>2. صحة معرف المعلم
+                    <br>3. اتصال الإنترنت
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    students.forEach(student => {
+        const row = document.createElement('tr');
+        
+        // دوال مساعدة لتحديد لون المحصلة
         function getResultClass(result) {
             const value = parseFloat(result) || 0;
             if (value >= 4.5) return 'result-excellent';
@@ -1053,472 +961,178 @@
             return 'result-poor';
         }
 
-        function populateClassFilter() {
-            const classes = [...new Set(filteredStudents.map(student => student.class))].sort();
-            classFilter.innerHTML = '<option value="">جميع الشعب</option>';
-            classes.forEach(className => {
-                const option = document.createElement('option');
-                option.value = className;
-                option.textContent = className;
-                classFilter.appendChild(option);
-            });
-        }
+        const result1Class = getResultClass(student.result1);
+        const result2Class = getResultClass(student.result2);
+        const result3Class = getResultClass(student.result3);
+        
+        row.innerHTML = `
+            <td>${student.barcode || '---'}</td>
+            <td>
+                <span class="student-name" data-id="${student.id}">
+                    ${student.name || 'بدون اسم'}
+                </span>
+            </td>
+            <td>${student.class || '---'}</td>
+            <td class="result-cell ${result1Class}">${student.result1 || '0.0'}</td>
+            <td class="result-cell ${result2Class}">${student.result2 || '0.0'}</td>
+            <td class="result-cell ${result3Class}">${student.result3 || '0.0'}</td>
+            <td>
+                <button class="edit-btn" data-id="${student.id}">تعديل</button>
+            </td>
+        `;
+        studentsTableBody.appendChild(row);
+    });
+}
 
-        function filterStudents() {
-            const classValue = classFilter.value;
-            const nameValue = nameSearch.value.trim().toLowerCase();
-            
-            let filtered = filteredStudents;
-            
-            if (classValue) {
-                filtered = filtered.filter(student => student.class === classValue);
-            }
-            
-            if (nameValue) {
-                filtered = filtered.filter(student => 
-                    student.name.toLowerCase().includes(nameValue)
-                );
-            }
-            
-            renderStudentsTable(filtered);
-        }
-
-        function checkOnlineStatus() {
-            const isOnline = navigator.onLine;
-            if (!isOnline) {
-                onlineStatusDiv.classList.remove('hidden');
-            } else {
-                onlineStatusDiv.classList.add('hidden');
-            }
-            return isOnline;
-        }
-
-        function updatePendingChangesDisplay() {
-            if (pendingChanges.length > 0) {
-                pendingCountSpan.textContent = pendingChanges.length;
-                pendingChangesDiv.classList.remove('hidden');
-            } else {
-                pendingChangesDiv.classList.add('hidden');
-            }
-        }
-
-        function loadPendingChanges() {
-            const savedChanges = localStorage.getItem('pendingChanges');
-            if (savedChanges) {
-                pendingChanges = JSON.parse(savedChanges);
-                updatePendingChangesDisplay();
-            }
-        }
-
-        function savePendingChanges() {
-            localStorage.setItem('pendingChanges', JSON.stringify(pendingChanges));
-            updatePendingChangesDisplay();
-        }
-
-        async function syncPendingChanges() {
-            if (pendingChanges.length === 0) {
-                alert('لا توجد تغييرات معلقة للمزامنة');
-                return;
-            }
-
-            if (!checkOnlineStatus()) {
-                alert('⚠️ لا يوجد اتصال بالإنترنت. يرجى الاتصال أولاً.');
-                return;
-            }
-
-            showLoading(true);
-            let syncedCount = 0;
-            let errorCount = 0;
-
-            for (const change of pendingChanges) {
-                if (!change.studentId) {
-                    console.error('بيانات غير مكتملة: لا يوجد studentId', change);
-                    errorCount++;
-                    continue;
-                }
-
-                const result = await callGoogleScript('updateStudent', change);
-                
-                if (result.success) {
-                    syncedCount++;
-                } else {
-                    errorCount++;
-                }
-            }
-
-            showLoading(false);
-            
-            if (errorCount === 0) {
-                pendingChanges = [];
-                savePendingChanges();
-                alert(`✅ تمت مزامنة ${syncedCount} تغيير بنجاح`);
-                loadStudentsForTeacher();
-            } else {
-                alert(`⚠️ تمت مزامنة ${syncedCount} تغيير، وفشل ${errorCount}`);
-            }
-        }
-
-        function calculateTotals() {
-            const attendance1 = parseFloat(document.getElementById('editAttendance1').value) || 0;
-            const oral1 = parseFloat(document.getElementById('editOral1').value) || 0;
-            const homework1 = parseFloat(document.getElementById('editHomework1').value) || 0;
-            const written1 = parseFloat(document.getElementById('editWritten1').value) || 0;
-            
-            const total1 = attendance1 + oral1 + homework1 + written1;
-            const result1 = total1 / 5;
-            
-            console.log('المجموع 1:', total1, 'المحصلة 1:', result1);
-        }
-
-        function toggleFloatingSaveButton(show) {
-            if (show) {
-                floatingSaveBtn.style.display = 'flex';
-            } else {
-                floatingSaveBtn.style.display = 'none';
-            }
-        }
-
-        // ========== مستمعات الأحداث ==========
-        window.addEventListener('online', () => {
-            checkOnlineStatus();
-            if (pendingChanges.length > 0) {
-                setTimeout(syncPendingChanges, 1000);
-            }
+// ========== دوال إدارة البيانات ==========
+async function loadStudentsForTeacher() {
+    showLoading(true);
+    teacherInfoDiv.classList.add('hidden');
+    
+    try {
+        console.log('🔍 جاري تحميل بيانات الطلاب للمعلم:', currentTeacherId);
+        
+        const result = await callGoogleScript('getStudents', {
+            teacherId: currentTeacherId
         });
         
-        window.addEventListener('offline', () => {
-            checkOnlineStatus();
-        });
-
-        openScannerBtn.addEventListener('click', openBarcodeScanner);
-        closeScannerBtn.addEventListener('click', closeBarcodeScanner);
-        switchCameraBtn.addEventListener('click', switchCamera);
-
-        classFilter.addEventListener('change', filterStudents);
-        nameSearch.addEventListener('input', filterStudents);
-
-        floatingSaveBtn.addEventListener('click', function() {
-            studentForm.dispatchEvent(new Event('submit'));
-        });
-
-        checkOnlineStatus();
-        loadPendingChanges();
-
-        // دالة تسجيل الدخول
-        loginBtn.addEventListener('click', async function() {
-            const teacherId = teacherIdInput.value.trim();
-            if (teacherId) {
-                currentTeacherId = teacherId;
-                loginSection.classList.add('hidden');
-                mainSection.classList.remove('hidden');
-                logoutBtn.classList.remove('hidden');
-                currentTeacherSpan.textContent = teacherId;
-                await loadStudentsForTeacher();
-            } else {
-                alert('يرجى إدخال المعرف');
-            }
-        });
-
-        logoutBtn.addEventListener('click', function() {
-            currentTeacherId = '';
-            loginSection.classList.remove('hidden');
-            mainSection.classList.add('hidden');
-            logoutBtn.classList.add('hidden');
-            teacherIdInput.value = '';
-            teacherInfoDiv.classList.add('hidden');
-            toggleFloatingSaveButton(false);
-        });
-
-        syncBtn.addEventListener('click', function() {
-            loadStudentsForTeacher();
-        });
-
-        syncPendingBtn.addEventListener('click', syncPendingChanges);
-
-        testConnectionBtn.addEventListener('click', async function() {
-            showLoading(true);
-            const result = await callGoogleScript('testConnection');
-            showLoading(false);
+        showLoading(false);
+        
+        if (result.success && result.data) {
+            filteredStudents = result.data;
             
-            if (result.success) {
-                alert('✅ ' + result.message + 
-                      '\nاسم الورقة: ' + result.sheetName + 
-                      '\nعدد الصفوف: ' + result.lastRow +
-                      '\nعدد الأعمدة: ' + result.lastCol);
-            } else {
-                alert('❌ ' + result.error);
-            }
-        });
-
-        // تحميل الطلاب المرتبطين بالمعلم الحالي
-        async function loadStudentsForTeacher() {
-            showLoading(true);
-            teacherInfoDiv.classList.add('hidden');
+            renderStudentsTable(filteredStudents);
+            studentsCountSpan.textContent = filteredStudents.length;
+            currentTeacherSpan.textContent = currentTeacherId;
+            teacherInfoDiv.classList.remove('hidden');
             
-            if (checkOnlineStatus()) {
-                const result = await callGoogleScript('getStudents', {
-                    teacherId: currentTeacherId
-                });
-                
-                showLoading(false);
-                
-                if (result.success) {
-                    filteredStudents = result.data.map((student, index) => {
-                        if (!student.id) {
-                            student.id = `student_${currentTeacherId}_${index}_${Date.now()}`;
-                        }
-                        return student;
-                    });
-                    
-                    populateClassFilter();
-                    renderStudentsTable(filteredStudents);
-                    studentsCountSpan.textContent = filteredStudents.length;
-                    teacherInfoDiv.classList.remove('hidden');
-                    
-                    localStorage.setItem('cachedStudents', JSON.stringify(filteredStudents));
-                    localStorage.setItem('cacheTimestamp', Date.now());
-                    localStorage.setItem('currentTeacherId', currentTeacherId);
-                    
-                    if (filteredStudents.length === 0) {
-                        studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بيانات للعرض</td></tr>';
-                    }
-                } else {
-                    loadCachedData();
-                }
-            } else {
-                loadCachedData();
-            }
+            console.log(`✅ تم تحميل ${filteredStudents.length} طالب`);
+            
+        } else {
+            showError(result.error || 'فشل في تحميل البيانات');
+            console.error('❌ خطأ في تحميل البيانات:', result);
         }
+        
+    } catch (error) {
+        showLoading(false);
+        showError('خطأ غير متوقع: ' + error.message);
+        console.error('❌ خطأ غير متوقع:', error);
+    }
+}
 
-        function loadCachedData() {
-            const cachedData = localStorage.getItem('cachedStudents');
-            const cacheTimestamp = localStorage.getItem('cacheTimestamp');
-            const cachedTeacherId = localStorage.getItem('currentTeacherId');
-            
-            if (cachedData && cacheTimestamp && cachedTeacherId === currentTeacherId) {
-                const cacheAge = Date.now() - parseInt(cacheTimestamp);
-                const maxCacheAge = 24 * 60 * 60 * 1000;
-                
-                if (cacheAge < maxCacheAge) {
-                    filteredStudents = JSON.parse(cachedData);
-                    populateClassFilter();
-                    renderStudentsTable(filteredStudents);
-                    studentsCountSpan.textContent = filteredStudents.length;
-                    teacherInfoDiv.classList.remove('hidden');
-                    showLoading(false);
-                    
-                    alert('⚠️ يتم عرض البيانات المخزنة محلياً. سيتم تحديثها عند توفر الاتصال.');
-                    return;
-                }
-            }
-            
-            studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بيانات متاحة. يرجى الاتصال بالإنترنت.</td></tr>';
-            showLoading(false);
-        }
+// ========== مستمعات الأحداث ==========
+loginBtn.addEventListener('click', async function() {
+    const teacherId = teacherIdInput.value.trim();
+    if (teacherId) {
+        currentTeacherId = teacherId;
+        loginSection.classList.add('hidden');
+        mainSection.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        await loadStudentsForTeacher();
+    } else {
+        alert('يرجى إدخال المعرف');
+    }
+});
 
-        // عرض جدول الطلاب
-        function renderStudentsTable(students) {
-            studentsTableBody.innerHTML = '';
-            
-            if (students.length === 0) {
-                studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بيانات للعرض</td></tr>';
-                return;
-            }
-            
-            students.forEach(student => {
-                const row = document.createElement('tr');
-                
-                const result1Class = getResultClass(student.result1);
-                const result2Class = getResultClass(student.result2);
-                const result3Class = getResultClass(student.result3);
-                
-                row.innerHTML = `
-                    <td>${student.barcode}</td>
-                    <td>
-                        <span class="student-name" data-id="${student.id}">
-                            ${student.name}
-                        </span>
-                    </td>
-                    <td>${student.class}</td>
-                    <td class="result-cell ${result1Class}">${student.result1 || '0.0'}</td>
-                    <td class="result-cell ${result2Class}">${student.result2 || '0.0'}</td>
-                    <td class="result-cell ${result3Class}">${student.result3 || '0.0'}</td>
-                    <td>
-                        <button class="edit-btn" data-id="${student.id}">تعديل</button>
-                    </td>
-                `;
-                studentsTableBody.appendChild(row);
-            });
-            
-            document.querySelectorAll('.student-name').forEach(nameElement => {
-                nameElement.addEventListener('click', function() {
-                    const studentId = this.getAttribute('data-id');
-                    openEditModal(studentId);
-                });
-            });
-            
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const studentId = this.getAttribute('data-id');
-                    openEditModal(studentId);
-                });
-            });
-        }
+logoutBtn.addEventListener('click', function() {
+    currentTeacherId = '';
+    loginSection.classList.remove('hidden');
+    mainSection.classList.add('hidden');
+    logoutBtn.classList.add('hidden');
+    teacherIdInput.value = '';
+    teacherInfoDiv.classList.add('hidden');
+});
 
-        // البحث بالباركود
-        manualBarcodeInput.addEventListener('input', function() {
-            const barcode = this.value.trim();
-            if (barcode.length >= 3) {
-                searchByBarcode(barcode);
-            } else if (barcode.length === 0) {
-                renderStudentsTable(filteredStudents);
-            }
-        });
+// اختبار الاتصال
+testConnectionBtn.addEventListener('click', async function() {
+    showLoading(true);
+    const result = await callGoogleScript('testConnection');
+    showLoading(false);
+    
+    if (result.success) {
+        alert(`✅ ${result.message}\n📊 الورقة: ${result.sheetName}\n📈 الصفوف: ${result.lastRow}\n📋 الأعمدة: ${result.lastCol}`);
+    } else {
+        alert(`❌ ${result.error}`);
+    }
+});
 
-        function searchByBarcode(barcode) {
-            const filtered = filteredStudents.filter(student => 
-                student.barcode && student.barcode.includes(barcode)
-            );
-            
-            if (filtered.length === 0) {
-                studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لم يتم العثور على طالب بهذا QR كود</td></tr>';
-            } else if (filtered.length === 1) {
-                renderStudentsTable(filtered);
-                setTimeout(() => {
-                    openEditModal(filtered[0].id);
-                    manualBarcodeInput.value = '';
-                }, 500);
-            } else {
-                renderStudentsTable(filtered);
-            }
-        }
+// إدخال تلقائي للاختبار
+teacherIdInput.value = 'ameen';
 
-        // فتح نافذة التعديل
-        function openEditModal(studentId) {
-            const student = filteredStudents.find(s => s.id === studentId);
-            if (student) {
-                currentEditingStudent = student;
-                
-                document.getElementById('editStudentId').value = student.id;
-                document.getElementById('editStudentBarcode').value = student.barcode || '';
-                currentStudentNameSpan.textContent = student.name;
-                
-                document.getElementById('editAttendance1').value = student.attendance1 || '';
-                document.getElementById('editOral1').value = student.oral1 || '';
-                document.getElementById('editHomework1').value = student.homework1 || '';
-                document.getElementById('editWritten1').value = student.written1 || '';
-                
-                document.getElementById('editAttendance2').value = student.attendance2 || '';
-                document.getElementById('editOral2').value = student.oral2 || '';
-                document.getElementById('editHomework2').value = student.homework2 || '';
-                document.getElementById('editWritten2').value = student.written2 || '';
-                
-                document.getElementById('editAttendance3').value = student.attendance3 || '';
-                document.getElementById('editOral3').value = student.oral3 || '';
-                document.getElementById('editHomework3').value = student.homework3 || '';
-                document.getElementById('editWritten3').value = student.written3 || '';
-                
-                const inputs = [
-                    'editAttendance1', 'editOral1', 'editHomework1', 'editWritten1',
-                    'editAttendance2', 'editOral2', 'editHomework2', 'editWritten2',
-                    'editAttendance3', 'editOral3', 'editHomework3', 'editWritten3'
-                ];
-                
-                inputs.forEach(inputId => {
-                    const inputElement = document.getElementById(inputId);
-                    inputElement.removeEventListener('input', calculateTotals);
-                    inputElement.addEventListener('input', calculateTotals);
-                });
-                
-                editModal.style.display = 'block';
-                toggleFloatingSaveButton(true);
-            }
-        }
+// إضافة CSS للنتائج
+const style = document.createElement('style');
+style.textContent = `
+    .result-cell {
+        font-weight: bold;
+        text-align: center;
+        font-size: 13px;
+        padding: 8px 5px;
+        border-radius: 5px;
+    }
+    
+    .result-excellent {
+        color: #27ae60;
+        background-color: rgba(39, 174, 96, 0.1);
+    }
+    
+    .result-good {
+        color: #3498db;
+        background-color: rgba(52, 152, 219, 0.1);
+    }
+    
+    .result-average {
+        color: #f39c12;
+        background-color: rgba(243, 156, 18, 0.1);
+    }
+    
+    .result-poor {
+        color: #e74c3c;
+        background-color: rgba(231, 76, 60, 0.1);
+    }
+    
+    .student-name {
+        color: #3498db;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    
+    .edit-btn {
+        background-color: #f39c12;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    
+    .hidden {
+        display: none !important;
+    }
+`;
+document.head.appendChild(style);
 
-        // إغلاق النافذة
-        closeModal.addEventListener('click', function() {
-            editModal.style.display = 'none';
-            toggleFloatingSaveButton(false);
-        });
+// اختبار اتصال تلقائي عند التحميل
+async function quickTest() {
+    console.log('🧪 بدء الاختبار السريع...');
+    
+    // اختبار الاتصال
+    const testResult = await callGoogleScript('testConnection');
+    console.log('اختبار الاتصال:', testResult);
+    
+    if (testResult.success) {
+        console.log('✅ الاتصال بالجدول ناجح');
+    } else {
+        console.log('❌ فشل الاتصال بالجدول:', testResult.error);
+    }
+}
 
-        cancelEditBtn.addEventListener('click', function() {
-            editModal.style.display = 'none';
-            currentEditingStudent = null;
-            toggleFloatingSaveButton(false);
-        });
+// تشغيل الاختبار تلقائياً بعد تحميل الصفحة
+window.addEventListener('load', function() {
+    setTimeout(quickTest, 1000);
+});
 
-        window.addEventListener('click', function(event) {
-            if (event.target === editModal) {
-                editModal.style.display = 'none';
-                toggleFloatingSaveButton(false);
-            }
-        });
-
-        // حفظ التغييرات
-        studentForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const studentId = document.getElementById('editStudentId').value;
-            if (!studentId) {
-                alert('❌ خطأ: لم يتم تحديد الطالب');
-                return;
-            }
-            
-            const studentData = {
-                studentId: studentId,
-                teacherId: currentTeacherId,
-                barcode: document.getElementById('editStudentBarcode').value,
-                name: currentEditingStudent ? currentEditingStudent.name : '',
-                attendance1: document.getElementById('editAttendance1').value || '',
-                oral1: document.getElementById('editOral1').value || '',
-                homework1: document.getElementById('editHomework1').value || '',
-                written1: document.getElementById('editWritten1').value || '',
-                attendance2: document.getElementById('editAttendance2').value || '',
-                oral2: document.getElementById('editOral2').value || '',
-                homework2: document.getElementById('editHomework2').value || '',
-                written2: document.getElementById('editWritten2').value || '',
-                attendance3: document.getElementById('editAttendance3').value || '',
-                oral3: document.getElementById('editOral3').value || '',
-                homework3: document.getElementById('editHomework3').value || '',
-                written3: document.getElementById('editWritten3').value || ''
-            };
-            
-            console.log('بيانات الطالب المرسلة:', studentData);
-            
-            if (checkOnlineStatus()) {
-                showLoading(true);
-                const result = await callGoogleScript('updateStudent', studentData);
-                showLoading(false);
-                
-                if (result.success) {
-                    editModal.style.display = 'none';
-                    toggleFloatingSaveButton(false);
-                    await loadStudentsForTeacher();
-                    alert('✅ ' + result.message);
-                } else {
-                    alert('❌ خطأ في حفظ البيانات: ' + result.error);
-                }
-            } else {
-                studentData.teacherId = currentTeacherId;
-                pendingChanges.push(studentData);
-                savePendingChanges();
-                editModal.style.display = 'none';
-                toggleFloatingSaveButton(false);
-                alert('⚠️ تم حفظ التغييرات محلياً. سيتم المزامنة عند توفر الاتصال.');
-            }
-        });
-
-        // إظهار/إخفاء التحميل
-        function showLoading(show) {
-            if (show) {
-                loadingDiv.classList.remove('hidden');
-            } else {
-                loadingDiv.classList.add('hidden');
-            }
-        }
-
-        // إدخال تلقائي للمعرف للاختبار
-        teacherIdInput.value = 'ameen';
-    </script>
+console.log('🚀 التطبيق جاهز للاستخدام - نسخة XMLHttpRequest');
+</script>
 </body>
 </html>
