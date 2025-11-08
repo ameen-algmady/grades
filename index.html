@@ -856,37 +856,72 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzO0oetEDZdyHZHK028q
 let currentTeacherId = '';
 let filteredStudents = [];
 
-// ========== دوال الاتصال المحسنة ==========
-async function callGoogleScript(action, data = {}) {
-    try {
+// ========== دوال الاتصال باستخدام JSONP ==========
+function callGoogleScript(action, data = {}) {
+    return new Promise((resolve) => {
         console.log(`🔄 جاري استدعاء: ${action}`, data);
         
-        const url = `${SCRIPT_URL}?action=${action}`;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        });
+        // إنشاء callback فريد
+        const callbackName = 'callback_' + Math.random().toString(36).substr(2, 9);
         
-        console.log('📡 حالة الاستجابة:', response.status, response.statusText);
+        // إعداد بيانات URL
+        let url = `${SCRIPT_URL}?action=${action}&callback=${callbackName}`;
         
-        if (!response.ok) {
-            throw new Error(`خطأ في الخادم: ${response.status} ${response.statusText}`);
+        // إضافة البيانات كمعلمات URL (لـ GET)
+        if (Object.keys(data).length > 0) {
+            const params = new URLSearchParams();
+            for (const key in data) {
+                if (data[key] !== undefined && data[key] !== null) {
+                    params.append(key, data[key]);
+                }
+            }
+            url += '&' + params.toString();
         }
         
-        const result = await response.json();
-        console.log(`✅ استجابة ${action}:`, result);
-        return result;
-        
-    } catch (error) {
-        console.error(`❌ خطأ في الاتصال بـ ${action}:`, error);
-        return {
-            success: false,
-            error: error.message
+        // تعريف دالة الcallback
+        window[callbackName] = function(response) {
+            // تنظيف
+            delete window[callbackName];
+            document.body.removeChild(script);
+            
+            console.log(`✅ استجابة ${action}:`, response);
+            resolve(response);
         };
-    }
+        
+        // إنشاء عنصر script
+        const script = document.createElement('script');
+        script.src = url;
+        
+        // معالجة الأخطاء
+        script.onerror = function() {
+            delete window[callbackName];
+            document.body.removeChild(script);
+            console.error(`❌ خطأ في الاتصال بـ ${action}`);
+            resolve({
+                success: false,
+                error: 'فشل في الاتصال بالخادم'
+            });
+        };
+        
+        // إضافة timeout
+        setTimeout(() => {
+            if (window[callbackName]) {
+                delete window[callbackName];
+                if (document.body.contains(script)) {
+                    document.body.removeChild(script);
+                }
+                console.error(`❌ انتهى الوقت لـ ${action}`);
+                resolve({
+                    success: false,
+                    error: 'انتهى وقت الانتظار'
+                });
+            }
+        }, 15000);
+        
+        // إرسال الطلب
+        document.body.appendChild(script);
+        
+    });
 }
 
 // ========== دوال الواجهة ==========
@@ -911,7 +946,7 @@ function renderStudentsTable(students) {
         studentsTableBody.innerHTML = `
             <tr>
                 <td colspan="7" style="text-align: center; color: #666; padding: 20px;">
-                    📝 لا توجد بيانات للعرض
+                    📝 لا توجد بيانات للعرض للمعلم ${currentTeacherId}
                 </td>
             </tr>
         `;
@@ -1080,7 +1115,21 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-console.log('🚀 التطبيق جاهز للاستخدام - الاتصال ناجح!');
+// اختبار اتصال تلقائي
+async function testAutoConnection() {
+    console.log('🧪 اختبار اتصال تلقائي...');
+    const result = await callGoogleScript('testConnection');
+    if (result.success) {
+        console.log('✅ الاتصال ناجح:', result);
+    } else {
+        console.log('❌ فشل الاتصال:', result);
+    }
+}
+
+// تشغيل الاختبار بعد تحميل الصفحة
+setTimeout(testAutoConnection, 1000);
+
+console.log('🚀 التطبيق جاهز - باستخدام JSONP');
 </script>
 </body>
 </html>
