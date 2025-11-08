@@ -11,11 +11,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="إدارة الدرجات">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon-192x192.png">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <!-- لا حاجة لأيقونات الآن -->
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- إضافة مكتبة jsQR لقراءة QR كود -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <style>
         :root {
@@ -821,53 +819,22 @@
         </div>
     </div>
 
-    <!-- تسجيل Service Worker -->
+    <!-- Service Worker -->
     <script>
-        // تسجيل Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('service-worker.js')
                     .then(function(registration) {
-                        console.log('✅ Service Worker مسجل بنجاح: ', registration.scope);
-                        
-                        // التحقق من وجود تحديثات
-                        registration.addEventListener('updatefound', function() {
-                            const newWorker = registration.installing;
-                            console.log('🔄 تم العثور على تحديث جديد');
-                            
-                            newWorker.addEventListener('statechange', function() {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    console.log('📱 التطبيق جاهز للتحديث');
-                                    showUpdateNotification();
-                                }
-                            });
-                        });
+                        console.log('✅ Service Worker مسجل بنجاح');
                     })
                     .catch(function(error) {
-                        console.log('❌ فشل في تسجيل Service Worker: ', error);
+                        console.log('❌ فشل في تسجيل Service Worker');
                     });
             });
-
-            // الاستماع للتحديثات
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', function() {
-                if (!refreshing) {
-                    refreshing = true;
-                    console.log('🔄 جاري تحديث التطبيق...');
-                    window.location.reload();
-                }
-            });
-        }
-
-        function showUpdateNotification() {
-            if (confirm('يوجد تحديث جديد للتطبيق. هل تريد تحديثه الآن؟')) {
-                if (navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.controller.postMessage({action: 'skipWaiting'});
-                }
-            }
         }
     </script>
 
+    <!-- JavaScript الرئيسي -->
     <script>
         // العناصر الرئيسية في الصفحة
         const loginSection = document.getElementById('loginSection');
@@ -913,9 +880,48 @@
         let currentEditingStudent = null;
         let pendingChanges = [];
         let isScannerActive = false;
-        let currentCamera = 'environment'; // الكاميرا الخلفية افتراضياً
+        let currentCamera = 'environment';
         let scannerStream = null;
         let deferredPrompt;
+
+        // رابط Google Apps Script - تم تحديثه بالرابط الحقيقي
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwanwhapxe-TJWJXAFxbEzlnONbwsORG-gtcJeU8WfB92FS10Nzz6AFyHRoPFdQY78U/exec';
+
+        // ========== دوال الاتصال بـ Google Apps Script ==========
+        async function callGoogleScript(action, data = {}) {
+            try {
+                const url = `${SCRIPT_URL}?action=${action}`;
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                // إذا كان هناك بيانات، أضفها إلى body
+                if (Object.keys(data).length > 0) {
+                    options.body = JSON.stringify(data);
+                }
+
+                console.log(`📡 جاري الاتصال بـ: ${action}`, data);
+                
+                const response = await fetch(url, options);
+                
+                if (!response.ok) {
+                    throw new Error(`خطأ في الاستجابة: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log(`✅ استجابة ${action}:`, result);
+                return result;
+            } catch (error) {
+                console.error(`❌ خطأ في الاتصال بـ ${action}:`, error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
 
         // ========== إدارة تثبيت PWA ==========
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -950,20 +956,16 @@
             renderStudentsTable(filteredStudents);
         }
 
-        // دالة فتح ماسح QR كود
         function openBarcodeScanner() {
             scannerContainer.style.display = 'flex';
             
-            // إنشاء عنصر فيديو
             const video = document.createElement('video');
             const canvasElement = document.getElementById('interactive');
             const canvas = canvasElement.getContext('2d');
             
-            // تنظيف المحتوى السابق
             canvasElement.innerHTML = '';
             canvasElement.appendChild(video);
             
-            // إعدادات الكاميرا
             const constraints = {
                 video: {
                     facingMode: currentCamera,
@@ -972,7 +974,6 @@
                 }
             };
             
-            // تشغيل الكاميرا
             navigator.mediaDevices.getUserMedia(constraints)
                 .then(function(stream) {
                     scannerStream = stream;
@@ -986,24 +987,20 @@
                         if (video.readyState === video.HAVE_ENOUGH_DATA && isScannerActive) {
                             canvasElement.hidden = false;
                             
-                            // رسم الفيديو على الكانفاس
                             canvasElement.width = video.videoWidth;
                             canvasElement.height = video.videoHeight;
                             canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
                             
-                            // الحصول على بيانات الصورة
                             const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
                             
-                            // محاولة قراءة QR code
                             const code = jsQR(imageData.data, imageData.width, imageData.height, {
                                 inversionAttempts: "dontInvert",
                             });
                             
-                            // إذا تم العثور على QR code
                             if (code) {
                                 console.log('✅ تم العثور على QR code:', code.data);
                                 handleBarcodeScan(code.data);
-                                return; // التوقف عن المسح
+                                return;
                             }
                         }
                         
@@ -1022,29 +1019,21 @@
         }
 
         function handleBarcodeScan(barcode) {
-            // إيقاف الماسح
             closeBarcodeScanner();
-            
-            // تعبئة الحقل
             manualBarcodeInput.value = barcode;
-            
-            // البحث عن الطالب
             searchByBarcode(barcode);
             
-            // إشعار المستخدم
             setTimeout(() => {
                 alert('✅ تم قراءة QR كود: ' + barcode);
             }, 100);
         }
 
-        // دالة تبديل الكاميرا
         function switchCamera() {
             closeBarcodeScanner();
             currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
             setTimeout(openBarcodeScanner, 500);
         }
 
-        // دالة إغلاق ماسح QR كود
         function closeBarcodeScanner() {
             scannerContainer.style.display = 'none';
             isScannerActive = false;
@@ -1126,7 +1115,7 @@
             updatePendingChangesDisplay();
         }
 
-        function syncPendingChanges() {
+        async function syncPendingChanges() {
             if (pendingChanges.length === 0) {
                 alert('لا توجد تغييرات معلقة للمزامنة');
                 return;
@@ -1141,38 +1130,32 @@
             let syncedCount = 0;
             let errorCount = 0;
 
-            pendingChanges.forEach((change, index) => {
+            for (const change of pendingChanges) {
                 if (!change.studentId) {
                     console.error('بيانات غير مكتملة: لا يوجد studentId', change);
                     errorCount++;
-                    return;
+                    continue;
                 }
 
-                google.script.run
-                    .withSuccessHandler(() => {
-                        syncedCount++;
-                        if (syncedCount + errorCount === pendingChanges.length) {
-                            showLoading(false);
-                            if (errorCount === 0) {
-                                pendingChanges = [];
-                                savePendingChanges();
-                                alert(`✅ تمت مزامنة ${syncedCount} تغيير بنجاح`);
-                                loadStudentsForTeacher();
-                            } else {
-                                alert(`⚠️ تمت مزامنة ${syncedCount} تغيير، وفشل ${errorCount}`);
-                            }
-                        }
-                    })
-                    .withFailureHandler((error) => {
-                        console.error('خطأ في المزامنة:', error);
-                        errorCount++;
-                        if (syncedCount + errorCount === pendingChanges.length) {
-                            showLoading(false);
-                            alert(`⚠️ تمت مزامنة ${syncedCount} تغيير، وفشل ${errorCount}`);
-                        }
-                    })
-                    .apiUpdateStudent(change);
-            });
+                const result = await callGoogleScript('updateStudent', change);
+                
+                if (result.success) {
+                    syncedCount++;
+                } else {
+                    errorCount++;
+                }
+            }
+
+            showLoading(false);
+            
+            if (errorCount === 0) {
+                pendingChanges = [];
+                savePendingChanges();
+                alert(`✅ تمت مزامنة ${syncedCount} تغيير بنجاح`);
+                loadStudentsForTeacher();
+            } else {
+                alert(`⚠️ تمت مزامنة ${syncedCount} تغيير، وفشل ${errorCount}`);
+            }
         }
 
         function calculateTotals() {
@@ -1207,26 +1190,22 @@
             checkOnlineStatus();
         });
 
-        // أحداث الماسح الضوئي
         openScannerBtn.addEventListener('click', openBarcodeScanner);
         closeScannerBtn.addEventListener('click', closeBarcodeScanner);
         switchCameraBtn.addEventListener('click', switchCamera);
 
-        // أحداث الفلترة
         classFilter.addEventListener('change', filterStudents);
         nameSearch.addEventListener('input', filterStudents);
 
-        // زر الحفظ المتحرك
         floatingSaveBtn.addEventListener('click', function() {
             studentForm.dispatchEvent(new Event('submit'));
         });
 
-        // التحقق الأولي من الاتصال
         checkOnlineStatus();
         loadPendingChanges();
 
         // دالة تسجيل الدخول
-        loginBtn.addEventListener('click', function() {
+        loginBtn.addEventListener('click', async function() {
             const teacherId = teacherIdInput.value.trim();
             if (teacherId) {
                 currentTeacherId = teacherId;
@@ -1234,13 +1213,12 @@
                 mainSection.classList.remove('hidden');
                 logoutBtn.classList.remove('hidden');
                 currentTeacherSpan.textContent = teacherId;
-                loadStudentsForTeacher();
+                await loadStudentsForTeacher();
             } else {
                 alert('يرجى إدخال المعرف');
             }
         });
 
-        // دالة تسجيل الخروج
         logoutBtn.addEventListener('click', function() {
             currentTeacherId = '';
             loginSection.classList.remove('hidden');
@@ -1251,80 +1229,67 @@
             toggleFloatingSaveButton(false);
         });
 
-        // دالة مزامنة البيانات
         syncBtn.addEventListener('click', function() {
             loadStudentsForTeacher();
         });
 
-        // دالة مزامنة التغييرات المعلقة
         syncPendingBtn.addEventListener('click', syncPendingChanges);
 
-        // اختبار الاتصال بالجدول
-        testConnectionBtn.addEventListener('click', function() {
+        testConnectionBtn.addEventListener('click', async function() {
             showLoading(true);
-            google.script.run
-                .withSuccessHandler(function(response) {
-                    showLoading(false);
-                    if (response.success) {
-                        alert('✅ ' + response.message + 
-                              '\nاسم الورقة: ' + response.sheetName + 
-                              '\nعدد الصفوف: ' + response.totalRows +
-                              '\nعدد الأعمدة: ' + response.totalColumns);
-                    } else {
-                        alert('❌ ' + response.error);
-                    }
-                })
-                .withFailureHandler(function(error) {
-                    showLoading(false);
-                    alert('❌ فشل في الاتصال: ' + error);
-                })
-                .debugSheetInfo();
+            const result = await callGoogleScript('testConnection');
+            showLoading(false);
+            
+            if (result.success) {
+                alert('✅ ' + result.message + 
+                      '\nاسم الورقة: ' + result.sheetName + 
+                      '\nعدد الصفوف: ' + result.lastRow +
+                      '\nعدد الأعمدة: ' + result.lastCol);
+            } else {
+                alert('❌ ' + result.error);
+            }
         });
 
         // تحميل الطلاب المرتبطين بالمعلم الحالي
-        function loadStudentsForTeacher() {
+        async function loadStudentsForTeacher() {
             showLoading(true);
             teacherInfoDiv.classList.add('hidden');
             
             if (checkOnlineStatus()) {
-                google.script.run
-                    .withSuccessHandler(function(response) {
-                        showLoading(false);
-                        if (response.success) {
-                            filteredStudents = response.data.map((student, index) => {
-                                if (!student.id) {
-                                    student.id = `student_${currentTeacherId}_${index}_${Date.now()}`;
-                                }
-                                return student;
-                            });
-                            
-                            populateClassFilter();
-                            renderStudentsTable(filteredStudents);
-                            studentsCountSpan.textContent = filteredStudents.length;
-                            teacherInfoDiv.classList.remove('hidden');
-                            
-                            localStorage.setItem('cachedStudents', JSON.stringify(filteredStudents));
-                            localStorage.setItem('cacheTimestamp', Date.now());
-                            localStorage.setItem('currentTeacherId', currentTeacherId);
-                            
-                            if (filteredStudents.length === 0) {
-                                studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بيانات للعرض</td></tr>';
-                            }
-                        } else {
-                            loadCachedData();
+                const result = await callGoogleScript('getStudents', {
+                    teacherId: currentTeacherId
+                });
+                
+                showLoading(false);
+                
+                if (result.success) {
+                    filteredStudents = result.data.map((student, index) => {
+                        if (!student.id) {
+                            student.id = `student_${currentTeacherId}_${index}_${Date.now()}`;
                         }
-                    })
-                    .withFailureHandler(function(error) {
-                        showLoading(false);
-                        loadCachedData();
-                    })
-                    .apiGetStudents(currentTeacherId);
+                        return student;
+                    });
+                    
+                    populateClassFilter();
+                    renderStudentsTable(filteredStudents);
+                    studentsCountSpan.textContent = filteredStudents.length;
+                    teacherInfoDiv.classList.remove('hidden');
+                    
+                    localStorage.setItem('cachedStudents', JSON.stringify(filteredStudents));
+                    localStorage.setItem('cacheTimestamp', Date.now());
+                    localStorage.setItem('currentTeacherId', currentTeacherId);
+                    
+                    if (filteredStudents.length === 0) {
+                        studentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بيانات للعرض</td></tr>';
+                    }
+                } else {
+                    loadCachedData();
+                }
             } else {
                 loadCachedData();
             }
         }
 
-        // تحميل البيانات المخزنة محلياً
         function loadCachedData() {
             const cachedData = localStorage.getItem('cachedStudents');
             const cacheTimestamp = localStorage.getItem('cacheTimestamp');
@@ -1385,7 +1350,6 @@
                 studentsTableBody.appendChild(row);
             });
             
-            // إضافة مستمعات الأحداث لأسماء الطلاب
             document.querySelectorAll('.student-name').forEach(nameElement => {
                 nameElement.addEventListener('click', function() {
                     const studentId = this.getAttribute('data-id');
@@ -1393,7 +1357,6 @@
                 });
             });
             
-            // إضافة مستمعات الأحداث لأزرار التعديل
             document.querySelectorAll('.edit-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const studentId = this.getAttribute('data-id');
@@ -1492,7 +1455,7 @@
         });
 
         // حفظ التغييرات
-        studentForm.addEventListener('submit', function(e) {
+        studentForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const studentId = document.getElementById('editStudentId').value;
@@ -1524,23 +1487,17 @@
             
             if (checkOnlineStatus()) {
                 showLoading(true);
-                google.script.run
-                    .withSuccessHandler(function(response) {
-                        showLoading(false);
-                        if (response.success) {
-                            editModal.style.display = 'none';
-                            toggleFloatingSaveButton(false);
-                            loadStudentsForTeacher();
-                            alert('✅ ' + response.message);
-                        } else {
-                            alert('❌ خطأ في حفظ البيانات: ' + response.error);
-                        }
-                    })
-                    .withFailureHandler(function(error) {
-                        showLoading(false);
-                        alert('❌ فشل في حفظ البيانات: ' + error);
-                    })
-                    .apiUpdateStudent(studentData);
+                const result = await callGoogleScript('updateStudent', studentData);
+                showLoading(false);
+                
+                if (result.success) {
+                    editModal.style.display = 'none';
+                    toggleFloatingSaveButton(false);
+                    await loadStudentsForTeacher();
+                    alert('✅ ' + result.message);
+                } else {
+                    alert('❌ خطأ في حفظ البيانات: ' + result.error);
+                }
             } else {
                 studentData.teacherId = currentTeacherId;
                 pendingChanges.push(studentData);
