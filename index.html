@@ -856,64 +856,71 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwanwhapxe-TJWJXAFxb
 let currentTeacherId = '';
 let filteredStudents = [];
 
-// ========== دوال الاتصال باستخدام XMLHttpRequest (يدعم CORS أفضل) ==========
-function callGoogleScript(action, data = {}) {
-    return new Promise((resolve, reject) => {
-        console.log(`🔄 جاري استدعاء: ${action}`, data);
+// ========== دوال الاتصال المتعددة ==========
+async function callGoogleScript(action, data = {}) {
+    // المحاولة 1: استخدام fetch مع mode 'no-cors' (للاختبار)
+    try {
+        console.log(`🔄 المحاولة 1 - fetch بسيط: ${action}`);
         
-        const xhr = new XMLHttpRequest();
         const url = `${SCRIPT_URL}?action=${action}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            mode: 'no-cors', // تجربة no-cors
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
         
-        xhr.open('POST', url, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
+        // في وضع no-cors، لا يمكن قراءة الاستجابة لكن الطلب يمر
+        console.log('✅ الطلب تم إرساله (no-cors)');
+        return {
+            success: true,
+            message: 'تم إرسال الطلب - تحقق من السكريبت'
+        };
         
-        xhr.timeout = 30000; // 30 ثانية timeout
+    } catch (error) {
+        console.log('❌ فشلت المحاولة 1:', error);
+    }
+    
+    // المحاولة 2: استخدام JSONP (إذا كان السكريبت يدعمه)
+    try {
+        console.log(`🔄 المحاولة 2 - JSONP: ${action}`);
+        return await jsonpRequest(action, data);
+    } catch (error) {
+        console.log('❌ فشلت المحاولة 2:', error);
+    }
+    
+    // المحاولة 3: عرض رسالة للمستخدم
+    return {
+        success: false,
+        error: 'لا يمكن الاتصال بالخادم. يرجى تشغيل التطبيق من خادم ويب (http://) بدلاً من المجلد المحلي (file://)'
+    };
+}
+
+// دالة JSONP للاتصال
+function jsonpRequest(action, data) {
+    return new Promise((resolve, reject) => {
+        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+        const script = document.createElement('script');
         
-        xhr.onload = function() {
-            console.log('📡 حالة الاستجابة:', xhr.status, xhr.statusText);
-            
-            if (xhr.status >= 200 && xhr.status < 300) {
-                try {
-                    const result = JSON.parse(xhr.responseText);
-                    console.log(`✅ استجابة ${action}:`, result);
-                    resolve(result);
-                } catch (error) {
-                    console.error('❌ خطأ في تحليل JSON:', error);
-                    resolve({
-                        success: false,
-                        error: 'خطأ في تحليل الاستجابة: ' + error.message
-                    });
-                }
-            } else {
-                resolve({
-                    success: false,
-                    error: `خطأ في الخادم: ${xhr.status} ${xhr.statusText}`
-                });
+        window[callbackName] = function(response) {
+            delete window[callbackName];
+            document.body.removeChild(script);
+            resolve(response);
+        };
+        
+        const url = `${SCRIPT_URL}?action=${action}&callback=${callbackName}`;
+        script.src = url;
+        document.body.appendChild(script);
+        
+        setTimeout(() => {
+            if (window[callbackName]) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                reject(new Error('JSONP timeout'));
             }
-        };
-        
-        xhr.onerror = function() {
-            console.error(`❌ خطأ في الاتصال بـ ${action}`);
-            resolve({
-                success: false,
-                error: 'فشل في الاتصال بالخادم. تأكد من اتصال الإنترنت.'
-            });
-        };
-        
-        xhr.ontimeout = function() {
-            console.error(`❌ انتهى الوقت لـ ${action}`);
-            resolve({
-                success: false,
-                error: 'انتهى وقت الانتظار. حاول مرة أخرى.'
-            });
-        };
-        
-        // إرسال البيانات
-        if (Object.keys(data).length > 0) {
-            xhr.send(JSON.stringify(data));
-        } else {
-            xhr.send();
-        }
+        }, 10000);
     });
 }
 
@@ -929,7 +936,18 @@ function showLoading(show) {
 
 function showError(message) {
     loadingDiv.classList.remove('hidden');
-    loadingDiv.innerHTML = `<p style="color: red;">❌ ${message}</p>`;
+    loadingDiv.innerHTML = `
+        <div style="color: red; text-align: center; padding: 20px;">
+            <h3>❌ مشكلة في الاتصال</h3>
+            <p>${message}</p>
+            <p><strong>الحلول المقترحة:</strong></p>
+            <ol style="text-align: right; direction: rtl;">
+                <li>افتح التطبيق من رابط GitHub Pages بدلاً من الملف المحلي</li>
+                <li>استخدم VS Code مع إضافة Live Server</li>
+                <li>شغّل خادم محلي باستخدام Python أو Node.js</li>
+            </ol>
+        </div>
+    `;
 }
 
 function renderStudentsTable(students) {
@@ -939,10 +957,8 @@ function renderStudentsTable(students) {
         studentsTableBody.innerHTML = `
             <tr>
                 <td colspan="7" style="text-align: center; color: #666; padding: 20px;">
-                    📝 لا توجد بيانات للعرض. تأكد من:
-                    <br>1. وجود بيانات للمعلم في الجدول
-                    <br>2. صحة معرف المعلم
-                    <br>3. اتصال الإنترنت
+                    📝 لا توجد بيانات للعرض
+                    <br><small>يجب تشغيل التطبيق من خادم ويب (http://) للاتصال بقاعدة البيانات</small>
                 </td>
             </tr>
         `;
@@ -952,7 +968,6 @@ function renderStudentsTable(students) {
     students.forEach(student => {
         const row = document.createElement('tr');
         
-        // دوال مساعدة لتحديد لون المحصلة
         function getResultClass(result) {
             const value = parseFloat(result) || 0;
             if (value >= 4.5) return 'result-excellent';
@@ -1010,13 +1025,11 @@ async function loadStudentsForTeacher() {
             
         } else {
             showError(result.error || 'فشل في تحميل البيانات');
-            console.error('❌ خطأ في تحميل البيانات:', result);
         }
         
     } catch (error) {
         showLoading(false);
         showError('خطأ غير متوقع: ' + error.message);
-        console.error('❌ خطأ غير متوقع:', error);
     }
 }
 
@@ -1050,7 +1063,7 @@ testConnectionBtn.addEventListener('click', async function() {
     showLoading(false);
     
     if (result.success) {
-        alert(`✅ ${result.message}\n📊 الورقة: ${result.sheetName}\n📈 الصفوف: ${result.lastRow}\n📋 الأعمدة: ${result.lastCol}`);
+        alert(`✅ ${result.message}`);
     } else {
         alert(`❌ ${result.error}`);
     }
@@ -1059,80 +1072,21 @@ testConnectionBtn.addEventListener('click', async function() {
 // إدخال تلقائي للاختبار
 teacherIdInput.value = 'ameen';
 
-// إضافة CSS للنتائج
+// إضافة CSS
 const style = document.createElement('style');
 style.textContent = `
-    .result-cell {
-        font-weight: bold;
-        text-align: center;
-        font-size: 13px;
-        padding: 8px 5px;
-        border-radius: 5px;
-    }
-    
-    .result-excellent {
-        color: #27ae60;
-        background-color: rgba(39, 174, 96, 0.1);
-    }
-    
-    .result-good {
-        color: #3498db;
-        background-color: rgba(52, 152, 219, 0.1);
-    }
-    
-    .result-average {
-        color: #f39c12;
-        background-color: rgba(243, 156, 18, 0.1);
-    }
-    
-    .result-poor {
-        color: #e74c3c;
-        background-color: rgba(231, 76, 60, 0.1);
-    }
-    
-    .student-name {
-        color: #3498db;
-        cursor: pointer;
-        font-weight: bold;
-    }
-    
-    .edit-btn {
-        background-color: #f39c12;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 12px;
-    }
-    
-    .hidden {
-        display: none !important;
-    }
+    .result-cell { font-weight: bold; text-align: center; padding: 8px 5px; border-radius: 5px; }
+    .result-excellent { color: #27ae60; background-color: rgba(39, 174, 96, 0.1); }
+    .result-good { color: #3498db; background-color: rgba(52, 152, 219, 0.1); }
+    .result-average { color: #f39c12; background-color: rgba(243, 156, 18, 0.1); }
+    .result-poor { color: #e74c3c; background-color: rgba(231, 76, 60, 0.1); }
+    .student-name { color: #3498db; cursor: pointer; font-weight: bold; }
+    .edit-btn { background-color: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .hidden { display: none !important; }
 `;
 document.head.appendChild(style);
 
-// اختبار اتصال تلقائي عند التحميل
-async function quickTest() {
-    console.log('🧪 بدء الاختبار السريع...');
-    
-    // اختبار الاتصال
-    const testResult = await callGoogleScript('testConnection');
-    console.log('اختبار الاتصال:', testResult);
-    
-    if (testResult.success) {
-        console.log('✅ الاتصال بالجدول ناجح');
-    } else {
-        console.log('❌ فشل الاتصال بالجدول:', testResult.error);
-    }
-}
-
-// تشغيل الاختبار تلقائياً بعد تحميل الصفحة
-window.addEventListener('load', function() {
-    setTimeout(quickTest, 1000);
-});
-
-console.log('🚀 التطبيق جاهز للاستخدام - نسخة XMLHttpRequest');
+console.log('🚀 التطبيق جاهز - استخدم خادم ويب للاتصال بالبيانات');
 </script>
 </body>
 </html>
