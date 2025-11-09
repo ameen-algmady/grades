@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة درجات الطلاب - Excel</title>
+    <title>نظام إدارة الدرجات - محول Excel إلى JSON</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -12,8 +12,6 @@
             --success-color: #27ae60;
             --danger-color: #e74c3c;
             --warning-color: #f39c12;
-            --light-color: #ecf0f1;
-            --dark-color: #2c3e50;
         }
         
         * {
@@ -45,869 +43,439 @@
             text-align: center;
         }
         
-        .header h1 {
-            font-size: 2.2em;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-        
         .section {
             padding: 25px;
-            display: block;
         }
         
         .hidden {
             display: none !important;
         }
         
-        .login-form {
-            text-align: center;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        input:focus {
-            border-color: #3498db;
-            outline: none;
-            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            margin: 5px;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .btn-logout {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-        
-        .btn-test {
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-        }
-        
-        .teacher-info {
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-right: 5px solid #3498db;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        th {
-            background: linear-gradient(135deg, #34495e, #2c3e50);
-            color: white;
-            padding: 15px 10px;
-            text-align: right;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        td {
-            padding: 12px 10px;
-            border-bottom: 1px solid #ecf0f1;
-            text-align: right;
-            font-size: 14px;
-        }
-        
-        tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            font-size: 18px;
-            color: #666;
-        }
-        
-        .result-cell {
-            font-weight: bold;
-            text-align: center;
-            font-size: 13px;
-            padding: 8px 5px;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-        }
-        
-        .result-excellent {
-            color: #27ae60;
-            background-color: rgba(39, 174, 96, 0.1);
-            border-color: rgba(39, 174, 96, 0.3);
-        }
-        
-        .result-good {
-            color: #3498db;
-            background-color: rgba(52, 152, 219, 0.1);
-            border-color: rgba(52, 152, 219, 0.3);
-        }
-        
-        .result-average {
-            color: #f39c12;
-            background-color: rgba(243, 156, 18, 0.1);
-            border-color: rgba(243, 156, 18, 0.3);
-        }
-        
-        .result-poor {
-            color: #e74c3c;
-            background-color: rgba(231, 76, 60, 0.1);
-            border-color: rgba(231, 76, 60, 0.3);
-        }
-        
-        .student-name {
-            color: #3498db;
-            cursor: pointer;
-            font-weight: bold;
-            transition: color 0.3s ease;
-            padding: 5px;
-            border-radius: 3px;
-        }
-        
-        .student-name:hover {
-            color: #2980b9;
-            background-color: rgba(52, 152, 219, 0.1);
-        }
-        
-        .edit-btn {
-            background-color: #f39c12;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background-color 0.3s ease;
-        }
-        
-        .edit-btn:hover {
-            background-color: #e67e22;
-        }
-        
-        .search-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin: 15px 0;
-        }
-        
-        .search-container input,
-        .search-container select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .stats-container {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 15px 0;
-            border-right: 5px solid #3498db;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .stat-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .file-upload-section {
+        .converter-section {
             text-align: center;
             margin: 20px 0;
-            padding: 20px;
+            padding: 30px;
             background: #f8f9fa;
             border-radius: 10px;
             border: 2px dashed #3498db;
         }
         
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 10px;
-            }
-            
-            .header h1 {
-                font-size: 1.8em;
-            }
-            
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .search-container {
-                flex-direction: column;
-            }
-            
-            .search-container input,
-            .search-container select {
-                min-width: 100%;
-            }
-            
-            table {
-                font-size: 12px;
-            }
-            
-            th, td {
-                padding: 8px 5px;
-            }
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+        }
+        
+        input[type="file"] {
+            margin: 15px 0;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .preview {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: right;
+            direction: ltr;
+        }
+        
+        .json-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            text-align: left;
+            direction: ltr;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎓 نظام إدارة نتائج الطلاب</h1>
-            <p>نظام متكامل لإدارة وتقييم نتائج الطلاب</p>
+            <h1>🔄 محول Excel إلى JSON</h1>
+            <p>تحويل مباشر لملفات Excel إلى تنسيق JSON</p>
         </div>
 
-        <!-- قسم تسجيل الدخول -->
-        <div id="loginSection" class="section">
-            <div class="login-form">
-                <h2 style="margin-bottom: 30px; color: #2c3e50;">🔐 تسجيل الدخول</h2>
-                <div class="input-group">
-                    <input type="text" id="teacherId" placeholder="أدخل معرف المعلم..." autocomplete="off">
-                </div>
-                <button class="btn" id="loginBtn">دخول</button>
+        <div class="section">
+            <!-- قسم المحول -->
+            <div class="converter-section">
+                <h2>📁 رفع ملف Excel</h2>
+                <p>اختر ملف Excel الذي يحتوي على بيانات الطلاب</p>
                 
-                <div class="file-upload-section">
-                    <h3 style="margin-bottom: 15px; color: #2c3e50;">📁 رفع ملف Excel</h3>
-                    <input type="file" id="excelFile" accept=".xlsx, .xls" style="margin: 10px 0;">
-                    <button class="btn btn-test" id="loadExcelBtn">تحميل البيانات من Excel</button>
-                </div>
+                <input type="file" id="excelFile" accept=".xlsx, .xls">
+                <br>
+                
+                <button class="btn btn-success" id="convertBtn">🔄 تحويل إلى JSON</button>
+                <button class="btn btn-warning" id="downloadJsonBtn" disabled>📥 تحميل JSON</button>
+                <button class="btn" id="useInAppBtn" disabled>🚀 استخدام في التطبيق</button>
             </div>
-        </div>
 
-        <!-- القسم الرئيسي -->
-        <div id="mainSection" class="section hidden">
-            <div class="controls">
-                <button class="btn btn-logout" id="logoutBtn">تسجيل الخروج</button>
-                <div style="color: #2c3e50; font-weight: bold;">
-                    <span>المعلم: </span>
-                    <span id="currentTeacher"></span>
-                    <span> | عدد الطلاب: </span>
-                    <span id="studentsCount">0</span>
+            <!-- معاينة البيانات -->
+            <div id="previewSection" class="hidden">
+                <h3>👀 معاينة البيانات</h3>
+                <div class="preview" id="dataPreview">
+                    سيتم عرض البيانات هنا...
                 </div>
             </div>
 
-            <div id="teacherInfo" class="teacher-info hidden">
-                <h3>📊 معلومات المعلم</h3>
-                <p>مرحباً بك في نظام إدارة النتائج</p>
+            <!-- نتيجة JSON -->
+            <div id="jsonSection" class="hidden">
+                <h3>📋 نتيجة JSON</h3>
+                <div class="json-output" id="jsonOutput">
+                    سيتم عرض JSON هنا...
+                </div>
             </div>
 
-            <!-- محرك البحث والترتيب -->
-            <div id="searchContainer" class="search-container hidden">
-                <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو الباركود...">
-                <select id="sortSelect">
-                    <option value="name">ترتيب بالأسم</option>
-                    <option value="barcode">ترتيب بالباركود</option>
-                    <option value="class">ترتيب بالفصل</option>
-                    <option value="result1">ترتيب بالنتيجة 1</option>
-                    <option value="result2">ترتيب بالنتيجة 2</option>
-                    <option value="result3">ترتيب بالنتيجة 3</option>
-                </select>
-                <button class="btn" id="exportBtn" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                    📄 تصدير البيانات
-                </button>
+            <!-- قسم التطبيق الرئيسي (مخفي في البداية) -->
+            <div id="appSection" class="hidden">
+                <h2>🎓 نظام إدارة الدرجات</h2>
+                <!-- هنا سيتم وضع واجهة التطبيق الرئيسية -->
             </div>
-
-            <!-- الإحصائيات -->
-            <div id="statsContainer"></div>
-
-            <!-- الجدول -->
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>الباركود</th>
-                            <th>اسم الطالب</th>
-                            <th>الفصل</th>
-                            <th>النتيجة 1</th>
-                            <th>النتيجة 2</th>
-                            <th>النتيجة 3</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="studentsTableBody">
-                        <tr>
-                            <td colspan="7" style="text-align: center; color: #666; padding: 40px;">
-                                ⏳ جاري تحميل البيانات...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- قسم التحميل -->
-        <div id="loading" class="loading hidden">
-            ⏳ جاري تحميل البيانات...
         </div>
     </div>
 
     <script>
-        // ========== العناصر الرئيسية في الصفحة ==========
-        const loginSection = document.getElementById('loginSection');
-        const mainSection = document.getElementById('mainSection');
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const teacherIdInput = document.getElementById('teacherId');
-        const studentsTableBody = document.getElementById('studentsTableBody');
-        const loadingDiv = document.getElementById('loading');
-        const teacherInfoDiv = document.getElementById('teacherInfo');
-        const currentTeacherSpan = document.getElementById('currentTeacher');
-        const studentsCountSpan = document.getElementById('studentsCount');
-        const loadExcelBtn = document.getElementById('loadExcelBtn');
+        // ========== محول Excel إلى JSON ==========
+        class ExcelToJsonConverter {
+            constructor() {
+                this.jsonData = null;
+                this.excelData = null;
+            }
+
+            // تحويل Excel إلى JSON
+            async convertExcelToJson(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                            const excelData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                            
+                            this.excelData = excelData;
+                            this.jsonData = this.processExcelData(excelData);
+                            
+                            resolve(this.jsonData);
+                            
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+                    
+                    reader.onerror = () => reject(new Error('فشل في قراءة الملف'));
+                    reader.readAsArrayBuffer(file);
+                });
+            }
+
+            // معالجة بيانات Excel وتحويلها إلى JSON
+            processExcelData(excelData) {
+                if (!excelData || excelData.length < 2) {
+                    throw new Error('الملف لا يحتوي على بيانات صحيحة');
+                }
+
+                const headers = excelData[0];
+                const jsonData = [];
+                
+                console.log('🔍 رؤوس الأعمدة:', headers);
+
+                for (let i = 1; i < excelData.length; i++) {
+                    const row = excelData[i];
+                    if (row.length === 0) continue;
+
+                    const item = {};
+                    
+                    // تعبئة جميع الأعمدة
+                    headers.forEach((header, index) => {
+                        if (header && row[index] !== undefined) {
+                            // تنظيف اسم العمود
+                            const cleanHeader = header.toString().trim();
+                            item[cleanHeader] = this.cleanValue(row[index]);
+                        }
+                    });
+
+                    jsonData.push(item);
+                }
+
+                return jsonData;
+            }
+
+            // تنظيف القيم
+            cleanValue(value) {
+                if (value === null || value === undefined) return '';
+                if (typeof value === 'number') return value;
+                return value.toString().trim();
+            }
+
+            // تحميل ملف JSON
+            downloadJson(filename = 'students.json') {
+                if (!this.jsonData) return false;
+                
+                const jsonString = JSON.stringify(this.jsonData, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                
+                URL.revokeObjectURL(url);
+                return true;
+            }
+
+            // الحصول على معاينة البيانات
+            getDataPreview() {
+                if (!this.jsonData || this.jsonData.length === 0) {
+                    return 'لا توجد بيانات للعرض';
+                }
+
+                let preview = `<strong>عدد السجلات: ${this.jsonData.length}</strong><br><br>`;
+                preview += '<strong>الهيكل:</strong><br>';
+                
+                // عرض أول 3 سجلات كمثال
+                const sampleRecords = this.jsonData.slice(0, 3);
+                
+                sampleRecords.forEach((record, index) => {
+                    preview += `<strong>السجل ${index + 1}:</strong><br>`;
+                    Object.keys(record).forEach(key => {
+                        preview += `  ${key}: ${record[key]}<br>`;
+                    });
+                    preview += '<br>';
+                });
+
+                return preview;
+            }
+
+            // الحصول على JSON كـ string
+            getJsonString() {
+                return JSON.stringify(this.jsonData, null, 2);
+            }
+        }
+
+        // ========== إدارة الواجهة ==========
+        const converter = new ExcelToJsonConverter();
+        let currentJsonData = null;
+
+        // عناصر DOM
         const excelFileInput = document.getElementById('excelFile');
-        const exportBtn = document.getElementById('exportBtn');
+        const convertBtn = document.getElementById('convertBtn');
+        const downloadJsonBtn = document.getElementById('downloadJsonBtn');
+        const useInAppBtn = document.getElementById('useInAppBtn');
+        const dataPreview = document.getElementById('dataPreview');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const previewSection = document.getElementById('previewSection');
+        const jsonSection = document.getElementById('jsonSection');
+        const appSection = document.getElementById('appSection');
 
-        // ========== المتغيرات العامة ==========
-        let currentTeacherId = '';
-        let filteredStudents = [];
-        let allStudents = [];
-        let excelData = null;
+        // مستمعات الأحداث
+        convertBtn.addEventListener('click', handleConversion);
+        downloadJsonBtn.addEventListener('click', handleDownload);
+        useInAppBtn.addEventListener('click', handleUseInApp);
 
-        // ========== دوال التحقق ==========
-        function validateTeacherId(teacherId) {
-            return /^[a-zA-Z0-9_\-]+$/.test(teacherId) && teacherId.length >= 3;
-        }
-
-        // ========== دوال الواجهة ==========
-        function showLoading(show, message = '⏳ جاري تحميل البيانات...') {
-            if (show) {
-                loadingDiv.classList.remove('hidden');
-                loadingDiv.innerHTML = `<p>${message}</p>`;
-            } else {
-                loadingDiv.classList.add('hidden');
-            }
-        }
-
-        function showError(message) {
-            loadingDiv.classList.remove('hidden');
-            loadingDiv.innerHTML = `
-                <div style="color: red; text-align: center; padding: 20px;">
-                    <p>❌ ${message}</p>
-                    <button onclick="hideError()" style="margin: 5px; padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer;">
-                        إغلاق
-                    </button>
-                </div>
-            `;
-        }
-
-        function hideError() {
-            loadingDiv.classList.add('hidden');
-        }
-
-        function showSuccess(message) {
-            loadingDiv.classList.remove('hidden');
-            loadingDiv.innerHTML = `<p style="color: green;">✅ ${message}</p>`;
-            setTimeout(() => loadingDiv.classList.add('hidden'), 3000);
-        }
-
-        // ========== معالجة ملف Excel ==========
-        function handleExcelFile(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-                        
-                        excelData = jsonData;
-                        resolve(true);
-                    } catch (error) {
-                        console.error('❌ خطأ في معالجة الملف:', error);
-                        resolve(false);
-                    }
-                };
-                
-                reader.onerror = function() {
-                    resolve(false);
-                };
-                
-                reader.readAsArrayBuffer(file);
-            });
-        }
-
-        // ========== تحليل بيانات Excel ==========
-        function parseExcelData() {
-            if (!excelData || excelData.length < 2) {
-                showError('❌ ملف Excel لا يحتوي على بيانات صحيحة');
-                return false;
-            }
-
-            const headers = excelData[0];
-            console.log('🔍 رؤوس الأعمدة:', headers);
-
-            // البحث عن عمود المعرف في الرؤوس
-            const teacherIdColumn = findTeacherIdColumn(headers);
-            if (teacherIdColumn === -1) {
-                showError('❌ لم يتم العثور على عمود "المعرف" في ملف Excel');
-                return false;
-            }
-
-            allStudents = [];
-            
-            for (let i = 1; i < excelData.length; i++) {
-                const row = excelData[i];
-                if (row.length === 0) continue;
-
-                const rowTeacherId = row[teacherIdColumn];
-                if (!rowTeacherId) continue;
-
-                const student = {
-                    id: row[0] || `STD${i}`,
-                    barcode: row[1] || '',
-                    name: row[2] || 'بدون اسم',
-                    class: row[3] || '---',
-                    result1: formatGrade(row[9]),  // محصلة 1
-                    result2: formatGrade(row[15]), // محصلة 2  
-                    result3: formatGrade(row[21]), // محصلة 3
-                    teacherId: rowTeacherId.toString().trim(),
-                    // حفظ البيانات الكاملة للتعديل
-                    fullData: row
-                };
-
-                allStudents.push(student);
-            }
-
-            console.log(`✅ تم تحليل ${allStudents.length} طالب من ملف Excel`);
-            return true;
-        }
-
-        function findTeacherIdColumn(headers) {
-            for (let i = 0; i < headers.length; i++) {
-                const header = headers[i]?.toString().toLowerCase().trim();
-                if (header && (header.includes('معرف') || header.includes('teacherid') || header.includes('id'))) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        function formatGrade(value) {
-            if (value === null || value === undefined || value === '') return '0.0';
-            if (typeof value === 'number') return value.toFixed(1);
-            return parseFloat(value) || 0.0;
-        }
-
-        // ========== تصفية الطلاب حسب المعلم ==========
-        function filterStudentsByTeacher() {
-            if (!allStudents || allStudents.length === 0) {
-                filteredStudents = [];
-                return;
-            }
-
-            filteredStudents = allStudents.filter(student => 
-                student.teacherId === currentTeacherId
-            );
-
-            console.log(`👨‍🏫 تم تصفية ${filteredStudents.length} طالب للمعلم ${currentTeacherId}`);
-        }
-
-        // ========== إحصائيات النتائج ==========
-        function calculateStatistics(students) {
-            const stats = {
-                total: students.length,
-                excellent: 0,
-                good: 0,
-                average: 0,
-                poor: 0
-            };
-            
-            students.forEach(student => {
-                const avg = (parseFloat(student.result1 || 0) + 
-                            parseFloat(student.result2 || 0) + 
-                            parseFloat(student.result3 || 0)) / 3;
-                
-                if (avg >= 4.5) stats.excellent++;
-                else if (avg >= 3.5) stats.good++;
-                else if (avg >= 2.5) stats.average++;
-                else stats.poor++;
-            });
-            
-            return stats;
-        }
-
-        function displayStatistics(students) {
-            const stats = calculateStatistics(students);
-            const statsHTML = `
-                <div class="stats-container">
-                    <h4 style="margin: 0 0 15px 0; color: #2c3e50;">📊 إحصائيات النتائج</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div style="color: #27ae60; font-weight: bold; font-size: 18px;">${stats.excellent}</div>
-                            <div style="font-size: 12px; color: #666;">ممتاز</div>
-                        </div>
-                        <div class="stat-item">
-                            <div style="color: #3498db; font-weight: bold; font-size: 18px;">${stats.good}</div>
-                            <div style="font-size: 12px; color: #666;">جيد</div>
-                        </div>
-                        <div class="stat-item">
-                            <div style="color: #f39c12; font-weight: bold; font-size: 18px;">${stats.average}</div>
-                            <div style="font-size: 12px; color: #666;">متوسط</div>
-                        </div>
-                        <div class="stat-item">
-                            <div style="color: #e74c3c; font-weight: bold; font-size: 18px;">${stats.poor}</div>
-                            <div style="font-size: 12px; color: #666;">ضعيف</div>
-                        </div>
-                        <div class="stat-item" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white;">
-                            <div style="font-weight: bold; font-size: 18px;">${stats.total}</div>
-                            <div style="font-size: 12px;">المجموع الكلي</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            const existingStats = document.getElementById('statsContainer');
-            if (existingStats) {
-                existingStats.innerHTML = statsHTML;
-            } else {
-                const statsContainer = document.createElement('div');
-                statsContainer.id = 'statsContainer';
-                statsContainer.innerHTML = statsHTML;
-                teacherInfoDiv.parentNode.insertBefore(statsContainer, teacherInfoDiv.nextSibling);
-            }
-        }
-
-        // ========== البحث والترتيب ==========
-        function addSearchFunctionality() {
-            const searchContainer = document.createElement('div');
-            searchContainer.style.cssText = 'margin: 15px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;';
-            
-            searchContainer.innerHTML = `
-                <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو الباركود..." 
-                       style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; flex: 1; min-width: 200px;">
-                <select id="sortSelect" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px;">
-                    <option value="name">ترتيب بالأسم</option>
-                    <option value="barcode">ترتيب بالباركود</option>
-                    <option value="class">ترتيب بالفصل</option>
-                    <option value="result1">ترتيب بالنتيجة 1</option>
-                    <option value="result2">ترتيب بالنتيجة 2</option>
-                    <option value="result3">ترتيب بالنتيجة 3</option>
-                </select>
-            `;
-            
-            teacherInfoDiv.parentNode.insertBefore(searchContainer, teacherInfoDiv.nextSibling);
-            
-            // مستمعات البحث والترتيب
-            document.getElementById('searchInput').addEventListener('input', function(e) {
-                filterAndSortStudents();
-            });
-            
-            document.getElementById('sortSelect').addEventListener('change', function() {
-                filterAndSortStudents();
-            });
-        }
-
-        function filterAndSortStudents() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const sortBy = document.getElementById('sortSelect').value;
-            
-            let filtered = filteredStudents.filter(student => 
-                (student.name?.toLowerCase().includes(searchTerm) ||
-                 student.barcode?.toLowerCase().includes(searchTerm) ||
-                 student.class?.toLowerCase().includes(searchTerm))
-            );
-            
-            // الترتيب
-            filtered.sort((a, b) => {
-                let aVal = a[sortBy] || '';
-                let bVal = b[sortBy] || '';
-                
-                if (sortBy.includes('result')) {
-                    aVal = parseFloat(aVal) || 0;
-                    bVal = parseFloat(bVal) || 0;
-                    return bVal - aVal; // ترتيب تنازلي للنتائج
-                }
-                
-                return aVal.toString().localeCompare(bVal.toString());
-            });
-            
-            renderStudentsTable(filtered);
-            displayStatistics(filtered);
-        }
-
-        // ========== تصدير البيانات ==========
-        function exportToExcel() {
-            if (filteredStudents.length === 0) {
-                alert('لا توجد بيانات للتصدير');
-                return;
-            }
-            
-            // إنشاء بيانات التصدير
-            const exportData = [
-                ['الباركود', 'الاسم', 'الفصل', 'النتيجة 1', 'النتيجة 2', 'النتيجة 3', 'المعلم']
-            ];
-            
-            filteredStudents.forEach(student => {
-                exportData.push([
-                    student.barcode || '',
-                    student.name || '',
-                    student.class || '',
-                    student.result1 || '0.0',
-                    student.result2 || '0.0', 
-                    student.result3 || '0.0',
-                    currentTeacherId
-                ]);
-            });
-            
-            // إنشاء workbook
-            const ws = XLSX.utils.aoa_to_sheet(exportData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
-            
-            // حفظ الملف
-            const fileName = `طلاب_${currentTeacherId}_${new Date().toLocaleDateString('ar-EG')}.xlsx`;
-            XLSX.writeFile(wb, fileName);
-            
-            showSuccess('تم تصدير البيانات بنجاح');
-        }
-
-        // ========== عرض الجدول ==========
-        function renderStudentsTable(students = filteredStudents) {
-            studentsTableBody.innerHTML = '';
-            
-            if (students.length === 0) {
-                studentsTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: #666; padding: 40px;">
-                            📝 لا توجد بيانات للعرض للمعلم ${currentTeacherId}
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            students.forEach((student, index) => {
-                const row = document.createElement('tr');
-                
-                function getResultClass(result) {
-                    const value = parseFloat(result) || 0;
-                    if (value >= 4.5) return 'result-excellent';
-                    if (value >= 3.5) return 'result-good';
-                    if (value >= 2.5) return 'result-average';
-                    return 'result-poor';
-                }
-
-                const result1Class = getResultClass(student.result1);
-                const result2Class = getResultClass(student.result2);
-                const result3Class = getResultClass(student.result3);
-                
-                row.innerHTML = `
-                    <td>${student.barcode || '---'}</td>
-                    <td>
-                        <span class="student-name" data-id="${student.id}">
-                            ${student.name || 'بدون اسم'}
-                        </span>
-                    </td>
-                    <td>${student.class || '---'}</td>
-                    <td class="result-cell ${result1Class}">${student.result1 || '0.0'}</td>
-                    <td class="result-cell ${result2Class}">${student.result2 || '0.0'}</td>
-                    <td class="result-cell ${result3Class}">${student.result3 || '0.0'}</td>
-                    <td>
-                        <button class="edit-btn" data-id="${student.id}" onclick="openEditModal('${student.id}')">تعديل</button>
-                    </td>
-                `;
-                studentsTableBody.appendChild(row);
-            });
-        }
-
-        // ========== تعديل النتائج ==========
-        function openEditModal(studentId) {
-            const student = filteredStudents.find(s => s.id === studentId);
-            if (!student) return;
-            
-            // في التطبيق الحقيقي، هنا نفتح نافذة التعديل
-            // لكن للتبسيط سنستخدم prompt
-            const newResult1 = prompt(`أدخل النتيجة 1 للطالب ${student.name}:`, student.result1);
-            const newResult2 = prompt(`أدخل النتيجة 2 للطالب ${student.name}:`, student.result2);
-            const newResult3 = prompt(`أدخل النتيجة 3 للطالب ${student.name}:`, student.result3);
-            
-            if (newResult1 !== null && newResult2 !== null && newResult3 !== null) {
-                // تحديث البيانات
-                student.result1 = formatGrade(newResult1);
-                student.result2 = formatGrade(newResult2);
-                student.result3 = formatGrade(newResult3);
-                
-                // إعادة عرض الجدول
-                renderStudentsTable();
-                displayStatistics(filteredStudents);
-                showSuccess('تم تحديث الدرجات بنجاح');
-            }
-        }
-
-        // ========== دوال إدارة البيانات ==========
-        function loadStudentsForTeacher() {
-            if (!excelData) {
-                showError('❌ يرجى تحميل ملف Excel أولاً');
-                return;
-            }
-            
-            showLoading(true);
-            
-            try {
-                // تصفية الطلاب حسب المعلم
-                filterStudentsByTeacher();
-                
-                // إعداد واجهة المستخدم
-                renderStudentsTable();
-                displayStatistics(filteredStudents);
-                studentsCountSpan.textContent = filteredStudents.length;
-                currentTeacherSpan.textContent = currentTeacherId;
-                teacherInfoDiv.classList.remove('hidden');
-                
-                // إضافة خواص البحث إذا لم تكن موجودة
-                if (!document.getElementById('searchInput')) {
-                    addSearchFunctionality();
-                }
-                
-                document.getElementById('searchContainer').classList.remove('hidden');
-                
-                showLoading(false);
-                showSuccess(`✅ تم تحميل ${filteredStudents.length} طالب`);
-                
-            } catch (error) {
-                showLoading(false);
-                showError('خطأ غير متوقع: ' + error.message);
-                console.error('❌ خطأ غير متوقع:', error);
-            }
-        }
-
-        // ========== مستمعات الأحداث ==========
-        loginBtn.addEventListener('click', async function() {
-            const teacherId = teacherIdInput.value.trim();
-            if (!teacherId) {
-                alert('يرجى إدخال المعرف');
-                return;
-            }
-            
-            if (!validateTeacherId(teacherId)) {
-                alert('المعرف غير صالح. يجب أن يحتوي على أحرف وأرقام فقط ويكون 3 أحرف على الأقل');
-                return;
-            }
-            
-            currentTeacherId = teacherId;
-            
-            if (!excelData) {
-                showError('❌ يرجى تحميل ملف Excel أولاً');
-                return;
-            }
-            
-            loginSection.classList.add('hidden');
-            mainSection.classList.remove('hidden');
-            logoutBtn.classList.remove('hidden');
-            
-            loadStudentsForTeacher();
-        });
-
-        loadExcelBtn.addEventListener('click', async function() {
+        async function handleConversion() {
             const file = excelFileInput.files[0];
             if (!file) {
-                alert('يرجى اختيار ملف Excel');
+                alert('يرجى اختيار ملف Excel أولاً');
+                return;
+            }
+
+            try {
+                convertBtn.disabled = true;
+                convertBtn.textContent = '⏳ جاري التحويل...';
+                
+                await converter.convertExcelToJson(file);
+                currentJsonData = converter.jsonData;
+                
+                // عرض المعاينة
+                dataPreview.innerHTML = converter.getDataPreview();
+                previewSection.classList.remove('hidden');
+                
+                // عرض JSON
+                jsonOutput.textContent = converter.getJsonString();
+                jsonSection.classList.remove('hidden');
+                
+                // تفعيل الأزرار
+                downloadJsonBtn.disabled = false;
+                useInAppBtn.disabled = false;
+                
+                convertBtn.textContent = '✅ تم التحويل';
+                
+            } catch (error) {
+                alert('❌ فشل في التحويل: ' + error.message);
+                console.error('Conversion error:', error);
+            } finally {
+                convertBtn.disabled = false;
+                convertBtn.textContent = '🔄 تحويل إلى JSON';
+            }
+        }
+
+        function handleDownload() {
+            if (converter.downloadJson()) {
+                alert('✅ تم تحميل ملف JSON بنجاح');
+            } else {
+                alert('❌ فشل في التحميل');
+            }
+        }
+
+        function handleUseInApp() {
+            if (!currentJsonData) {
+                alert('لا توجد بيانات للاستخدام');
                 return;
             }
             
-            showLoading(true, '📁 جاري معالجة ملف Excel...');
+            // بدء التطبيق الرئيسي بالبيانات المحولة
+            startMainApplication(currentJsonData);
+        }
+
+        // ========== التطبيق الرئيسي ==========
+        function startMainApplication(studentsData) {
+            // إخفاء قسم المحول
+            document.querySelector('.converter-section').classList.add('hidden');
+            previewSection.classList.add('hidden');
+            jsonSection.classList.add('hidden');
             
-            const success = await handleExcelFile(file);
-            showLoading(false);
+            // إظهار قسم التطبيق
+            appSection.classList.remove('hidden');
             
-            if (success) {
-                const parsed = parseExcelData();
-                if (parsed) {
-                    showSuccess('✅ تم تحميل ملف Excel بنجاح');
-                    // تفعيل زر الدخول إذا كان المعرف مدخلاً
-                    if (teacherIdInput.value.trim()) {
-                        loginBtn.disabled = false;
-                    }
+            // إنشاء واجهة التطبيق الرئيسية
+            createMainAppInterface(studentsData);
+        }
+
+        function createMainAppInterface(studentsData) {
+            appSection.innerHTML = `
+                <div style="text-align: center; margin: 20px 0;">
+                    <h2>🎓 نظام إدارة درجات الطلاب</h2>
+                    <p>تم تحميل ${studentsData.length} طالب بنجاح</p>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <input type="text" id="teacherIdInput" placeholder="أدخل معرف المعلم..." style="padding: 10px; margin: 10px; border: 2px solid #ddd; border-radius: 5px;">
+                    <button class="btn btn-success" id="loginBtn">🔐 دخول</button>
+                </div>
+
+                <div id="mainAppContent" class="hidden">
+                    <!-- هنا سيتم عرض الجدول والواجهة الرئيسية -->
+                </div>
+
+                <div id="appLoading" class="hidden" style="text-align: center; padding: 20px;">
+                    ⏳ جاري التحميل...
+                </div>
+            `;
+
+            // إضافة مستمعات الأحداث للتطبيق الرئيسي
+            document.getElementById('loginBtn').addEventListener('click', function() {
+                const teacherId = document.getElementById('teacherIdInput').value.trim();
+                if (!teacherId) {
+                    alert('يرجى إدخال معرف المعلم');
+                    return;
                 }
-            } else {
-                showError('❌ فشل في تحميل ملف Excel');
-            }
-        });
+                
+                loadTeacherData(teacherId, studentsData);
+            });
+        }
 
-        logoutBtn.addEventListener('click', function() {
-            currentTeacherId = '';
-            loginSection.classList.remove('hidden');
-            mainSection.classList.add('hidden');
-            logoutBtn.classList.add('hidden');
-            teacherIdInput.value = '';
-            teacherInfoDiv.classList.add('hidden');
+        function loadTeacherData(teacherId, allStudents) {
+            const appLoading = document.getElementById('appLoading');
+            const mainAppContent = document.getElementById('mainAppContent');
             
-            // إخفاء الإحصائيات
-            const statsContainer = document.getElementById('statsContainer');
-            if (statsContainer) {
-                statsContainer.innerHTML = '';
+            appLoading.classList.remove('hidden');
+            
+            // محاكاة التحميل
+            setTimeout(() => {
+                // تصفية الطلاب حسب المعلم
+                const teacherStudents = allStudents.filter(student => 
+                    student.المعرف === teacherId || student.المعلم === teacherId
+                );
+                
+                if (teacherStudents.length === 0) {
+                    alert('❌ لا توجد بيانات لهذا المعلم');
+                    appLoading.classList.add('hidden');
+                    return;
+                }
+                
+                // عرض البيانات
+                displayStudentsTable(teacherStudents, teacherId);
+                appLoading.classList.add('hidden');
+                mainAppContent.classList.remove('hidden');
+                
+            }, 1000);
+        }
+
+        function displayStudentsTable(students, teacherId) {
+            const mainAppContent = document.getElementById('mainAppContent');
+            
+            let tableHTML = `
+                <div style="margin: 20px 0;">
+                    <h3>👨‍🏫 الطلاب الخاصين بالمعلم: ${teacherId}</h3>
+                    <p>عدد الطلاب: ${students.length}</p>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table border="1" style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <thead>
+                            <tr style="background: #34495e; color: white;">
+            `;
+            
+            // إنشاء الرؤوس من المفاتيح الأولى
+            if (students.length > 0) {
+                const firstStudent = students[0];
+                Object.keys(firstStudent).forEach(key => {
+                    tableHTML += `<th style="padding: 10px; text-align: right;">${key}</th>`;
+                });
             }
-        });
+            
+            tableHTML += `</tr></thead><tbody>`;
+            
+            // إضافة البيانات
+            students.forEach(student => {
+                tableHTML += `<tr>`;
+                Object.values(student).forEach(value => {
+                    tableHTML += `<td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${value}</td>`;
+                });
+                tableHTML += `</tr>`;
+            });
+            
+            tableHTML += `</tbody></table></div>`;
+            
+            mainAppContent.innerHTML = tableHTML;
+        }
 
-        exportBtn.addEventListener('click', exportToExcel);
-
-        // إدخال تلقائي للاختبار
-        teacherIdInput.value = 'ameen';
-
-        console.log('🚀 التطبيق جاهز - باستخدام Excel بدلاً من Google Sheets');
+        // رسالة ترحيب
+        console.log('🚀 محول Excel إلى JSON جاهز للاستخدام!');
     </script>
 </body>
 </html>
