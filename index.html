@@ -355,6 +355,41 @@
             color: var(--dark-color);
         }
 
+        /* نافذة الإحصائيات المنبثقة */
+        .stats-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .stats-modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* زر عرض الإحصائيات */
+        .stats-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+
+        /* زر عرض المحصلات فقط */
+        .results-only-btn {
+            background: linear-gradient(135deg, #1abc9c, #16a085);
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -443,12 +478,19 @@
 
             <!-- محرك البحث والتصفية -->
             <div id="searchContainer" class="search-container hidden">
-                <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو الباركود...">
+                <input type="text" id="searchByNameInput" placeholder="🔍 بحث بالاسم...">
+                <input type="text" id="searchByBarcodeInput" placeholder="🔍 بحث بالباركود...">
                 <select id="classFilter">
                     <option value="">جميع الشعب</option>
                 </select>
                 <button class="btn" id="exportBtn" style="background: linear-gradient(135deg, #27ae60, #229954);">
                     📄 تصدير البيانات
+                </button>
+                <button class="btn stats-btn" id="showStatsBtn">
+                    📊 عرض الإحصائيات
+                </button>
+                <button class="btn results-only-btn" id="toggleResultsBtn">
+                    📈 عرض المحصلات فقط
                 </button>
             </div>
 
@@ -579,6 +621,17 @@
                 </form>
             </div>
         </div>
+
+        <!-- نافذة الإحصائيات المنبثقة -->
+        <div id="statsModal" class="stats-modal">
+            <div class="stats-modal-content">
+                <span class="close-modal" id="closeStatsModal">&times;</span>
+                <h3>📊 إحصائيات النتائج</h3>
+                <div id="statsModalContent">
+                    <!-- سيتم تعبئة المحتوى هنا -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -604,12 +657,18 @@
         const studentForm = document.getElementById('studentForm');
         const cancelEditBtn = document.getElementById('cancelEditBtn');
         const currentStudentName = document.getElementById('currentStudentName');
+        const showStatsBtn = document.getElementById('showStatsBtn');
+        const statsModal = document.getElementById('statsModal');
+        const closeStatsModal = document.getElementById('closeStatsModal');
+        const statsModalContent = document.getElementById('statsModalContent');
+        const toggleResultsBtn = document.getElementById('toggleResultsBtn');
 
         // ========== المتغيرات العامة ==========
         let currentTeacherId = '';
         let filteredStudents = [];
         let allStudents = [];
         let currentEditStudent = null;
+        let showResultsOnly = false;
 
         // ========== دوال التحقق ==========
         function validateTeacherId(teacherId) {
@@ -824,7 +883,8 @@
             // تحديث قائمة الشعب
             updateClassFilter();
             
-            document.getElementById('searchInput').addEventListener('input', filterStudents);
+            document.getElementById('searchByNameInput').addEventListener('input', filterStudents);
+            document.getElementById('searchByBarcodeInput').addEventListener('input', filterStudents);
             document.getElementById('classFilter').addEventListener('change', filterStudents);
         }
 
@@ -842,18 +902,25 @@
         }
 
         function filterStudents() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const searchByNameTerm = document.getElementById('searchByNameInput').value.toLowerCase();
+            const searchByBarcodeTerm = document.getElementById('searchByBarcodeInput').value.toLowerCase();
             const selectedClass = document.getElementById('classFilter').value;
             
             let filtered = allStudents.filter(student => 
                 student.teacherId === currentTeacherId
             );
             
-            // تطبيق البحث
-            if (searchTerm) {
+            // تطبيق البحث بالاسم
+            if (searchByNameTerm) {
                 filtered = filtered.filter(student => 
-                    student.name.toLowerCase().includes(searchTerm) ||
-                    student.barcode.toLowerCase().includes(searchTerm)
+                    student.name.toLowerCase().includes(searchByNameTerm)
+                );
+            }
+            
+            // تطبيق البحث بالباركود
+            if (searchByBarcodeTerm) {
+                filtered = filtered.filter(student => 
+                    student.barcode.toLowerCase().includes(searchByBarcodeTerm)
                 );
             }
             
@@ -897,6 +964,9 @@
                 const result2Class = getResultClass(student.result2);
                 const result3Class = getResultClass(student.result3);
                 
+                // إذا كان عرض المحصلات فقط، نخفي بعض الأعمدة
+                const displayStyle = showResultsOnly ? 'display: none;' : '';
+                
                 row.innerHTML = `
                     <td>${student.id}</td>
                     <td>${student.barcode}</td>
@@ -906,23 +976,23 @@
                         </span>
                     </td>
                     <td>${student.class}</td>
-                    <td>${student.attendance1}</td>
-                    <td>${student.oral1}</td>
-                    <td>${student.homework1}</td>
-                    <td>${student.written1}</td>
-                    <td><strong>${student.total1}</strong></td>
+                    <td style="${displayStyle}">${student.attendance1}</td>
+                    <td style="${displayStyle}">${student.oral1}</td>
+                    <td style="${displayStyle}">${student.homework1}</td>
+                    <td style="${displayStyle}">${student.written1}</td>
+                    <td style="${displayStyle}"><strong>${student.total1}</strong></td>
                     <td class="result-cell ${result1Class}">${student.result1}</td>
-                    <td>${student.attendance2}</td>
-                    <td>${student.oral2}</td>
-                    <td>${student.homework2}</td>
-                    <td>${student.written2}</td>
-                    <td><strong>${student.total2}</strong></td>
+                    <td style="${displayStyle}">${student.attendance2}</td>
+                    <td style="${displayStyle}">${student.oral2}</td>
+                    <td style="${displayStyle}">${student.homework2}</td>
+                    <td style="${displayStyle}">${student.written2}</td>
+                    <td style="${displayStyle}"><strong>${student.total2}</strong></td>
                     <td class="result-cell ${result2Class}">${student.result2}</td>
-                    <td>${student.attendance3}</td>
-                    <td>${student.homework3}</td>
-                    <td>${student.oral3}</td>
-                    <td>${student.written3}</td>
-                    <td><strong>${student.total3}</strong></td>
+                    <td style="${displayStyle}">${student.attendance3}</td>
+                    <td style="${displayStyle}">${student.homework3}</td>
+                    <td style="${displayStyle}">${student.oral3}</td>
+                    <td style="${displayStyle}">${student.written3}</td>
+                    <td style="${displayStyle}"><strong>${student.total3}</strong></td>
                     <td class="result-cell ${result3Class}">${student.result3}</td>
                     <td>
                         <button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button>
@@ -965,6 +1035,63 @@
             editModal.style.display = 'none';
             studentForm.reset();
             currentEditStudent = null;
+        }
+
+        // ========== نافذة الإحصائيات المنبثقة ==========
+        function openStatsModal() {
+            const stats = calculateStatistics(filteredStudents);
+            
+            statsModalContent.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div style="color: #27ae60; font-weight: bold; font-size: 24px;">${stats.excellent}</div>
+                        <div style="font-size: 14px; color: #666;">ممتاز</div>
+                    </div>
+                    <div class="stat-item">
+                        <div style="color: #3498db; font-weight: bold; font-size: 24px;">${stats.good}</div>
+                        <div style="font-size: 14px; color: #666;">جيد</div>
+                    </div>
+                    <div class="stat-item">
+                        <div style="color: #f39c12; font-weight: bold; font-size: 24px;">${stats.average}</div>
+                        <div style="font-size: 14px; color: #666;">متوسط</div>
+                    </div>
+                    <div class="stat-item">
+                        <div style="color: #e74c3c; font-weight: bold; font-size: 24px;">${stats.poor}</div>
+                        <div style="font-size: 14px; color: #666;">ضعيف</div>
+                    </div>
+                    <div class="stat-item" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white;">
+                        <div style="font-weight: bold; font-size: 24px;">${stats.total}</div>
+                        <div style="font-size: 14px;">المجموع الكلي</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px;">📈 توزيع النتائج</h4>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>ممتاز (4.5+):</span>
+                            <span style="font-weight: bold;">${stats.excellent} (${((stats.excellent / stats.total) * 100).toFixed(1)}%)</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>جيد (3.5-4.5):</span>
+                            <span style="font-weight: bold;">${stats.good} (${((stats.good / stats.total) * 100).toFixed(1)}%)</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>متوسط (2.5-3.5):</span>
+                            <span style="font-weight: bold;">${stats.average} (${((stats.average / stats.total) * 100).toFixed(1)}%)</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>ضعيف (أقل من 2.5):</span>
+                            <span style="font-weight: bold;">${stats.poor} (${((stats.poor / stats.total) * 100).toFixed(1)}%)</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            statsModal.style.display = 'block';
+        }
+
+        function closeStatsModal() {
+            statsModal.style.display = 'none';
         }
 
         // ========== إحصائيات النتائج ==========
@@ -1168,6 +1295,16 @@
             const total = parseFloat(calculateTotal(student, term));
             return (total / 5).toFixed(1); // القسمة على 5 لأن الدرجة من 20
         }
+
+        // ========== مستمعات الأحداث الجديدة ==========
+        showStatsBtn.addEventListener('click', openStatsModal);
+        closeStatsModal.addEventListener('click', closeStatsModal);
+
+        toggleResultsBtn.addEventListener('click', function() {
+            showResultsOnly = !showResultsOnly;
+            toggleResultsBtn.textContent = showResultsOnly ? '📊 عرض جميع البيانات' : '📈 عرض المحصلات فقط';
+            renderStudentsTable();
+        });
 
         // ========== التهيئة ==========
         document.addEventListener('DOMContentLoaded', function() {
