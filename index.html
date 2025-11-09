@@ -30,7 +30,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -70,7 +70,7 @@
             margin-bottom: 20px;
         }
         
-        input {
+        input, select {
             width: 100%;
             padding: 15px;
             border: 2px solid #ddd;
@@ -79,7 +79,7 @@
             transition: all 0.3s ease;
         }
         
-        input:focus {
+        input:focus, select:focus {
             border-color: #3498db;
             outline: none;
             box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
@@ -283,6 +283,78 @@
             font-weight: bold;
         }
 
+        /* نافذة التعديل */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 2% auto;
+            padding: 25px;
+            border-radius: 15px;
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            background: #f0f0f0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .student-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .form-section {
+            grid-column: 1 / -1;
+            border-bottom: 2px solid var(--light-color);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -313,6 +385,16 @@
             
             th, td {
                 padding: 8px 5px;
+            }
+            
+            .student-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: 5% auto;
+                padding: 15px;
+                width: 98%;
             }
         }
     </style>
@@ -359,16 +441,11 @@
                 <p>مرحباً بك في نظام إدارة النتائج - البيانات loaded مباشرة من GitHub</p>
             </div>
 
-            <!-- محرك البحث والترتيب -->
+            <!-- محرك البحث والتصفية -->
             <div id="searchContainer" class="search-container hidden">
                 <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو الباركود...">
-                <select id="sortSelect">
-                    <option value="name">ترتيب بالأسم</option>
-                    <option value="barcode">ترتيب بالباركود</option>
-                    <option value="class">ترتيب بالفصل</option>
-                    <option value="result1">ترتيب بالنتيجة 1</option>
-                    <option value="result2">ترتيب بالنتيجة 2</option>
-                    <option value="result3">ترتيب بالنتيجة 3</option>
+                <select id="classFilter">
+                    <option value="">جميع الشعب</option>
                 </select>
                 <button class="btn" id="exportBtn" style="background: linear-gradient(135deg, #27ae60, #229954);">
                     📄 تصدير البيانات
@@ -383,18 +460,34 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>الباركود</th>
+                            <th>ID</th>
+                            <th>Barcode</th>
                             <th>اسم الطالب</th>
-                            <th>الفصل</th>
-                            <th>النتيجة 1</th>
-                            <th>النتيجة 2</th>
-                            <th>النتيجة 3</th>
+                            <th>الشعبة</th>
+                            <th>مواظبة 1</th>
+                            <th>شفهي 1</th>
+                            <th>واجبات 1</th>
+                            <th>تحريري 1</th>
+                            <th>المجموع 1</th>
+                            <th>محصلة 1</th>
+                            <th>مواظبة 2</th>
+                            <th>شفهي 2</th>
+                            <th>واجبات 2</th>
+                            <th>تحريري 2</th>
+                            <th>المجموع 2</th>
+                            <th>محصلة 2</th>
+                            <th>مواظبة 3</th>
+                            <th>واجبات 3</th>
+                            <th>شفهي 3</th>
+                            <th>تحريري 3</th>
+                            <th>المجموع 3</th>
+                            <th>محصلة 3</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="studentsTableBody">
                         <tr>
-                            <td colspan="7" style="text-align: center; color: #666; padding: 40px;">
+                            <td colspan="23" style="text-align: center; color: #666; padding: 40px;">
                                 ⏳ جاري تحميل البيانات...
                             </td>
                         </tr>
@@ -407,12 +500,90 @@
         <div id="loading" class="loading hidden">
             ⏳ جاري تحميل البيانات...
         </div>
+
+        <!-- نافذة تعديل الطالب -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3>✏️ تعديل درجات الطالب: <span id="currentStudentName"></span></h3>
+                <form id="studentForm" class="student-form">
+                    <input type="hidden" id="editStudentId">
+                    
+                    <!-- الترم الأول -->
+                    <div class="form-section">
+                        <h4>📘 الترم الأول</h4>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAttendance1">مواظبة 1:</label>
+                        <input type="number" id="editAttendance1" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editOral1">شفهي 1:</label>
+                        <input type="number" id="editOral1" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editHomework1">واجبات 1:</label>
+                        <input type="number" id="editHomework1" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editWritten1">تحريري 1:</label>
+                        <input type="number" id="editWritten1" min="0" max="20" step="0.1">
+                    </div>
+
+                    <!-- الترم الثاني -->
+                    <div class="form-section">
+                        <h4>📗 الترم الثاني</h4>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAttendance2">مواظبة 2:</label>
+                        <input type="number" id="editAttendance2" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editOral2">شفهي 2:</label>
+                        <input type="number" id="editOral2" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editHomework2">واجبات 2:</label>
+                        <input type="number" id="editHomework2" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editWritten2">تحريري 2:</label>
+                        <input type="number" id="editWritten2" min="0" max="20" step="0.1">
+                    </div>
+
+                    <!-- الترم الثالث -->
+                    <div class="form-section">
+                        <h4>📙 الترم الثالث</h4>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAttendance3">مواظبة 3:</label>
+                        <input type="number" id="editAttendance3" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editHomework3">واجبات 3:</label>
+                        <input type="number" id="editHomework3" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editOral3">شفهي 3:</label>
+                        <input type="number" id="editOral3" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editWritten3">تحريري 3:</label>
+                        <input type="number" id="editWritten3" min="0" max="20" step="0.1">
+                    </div>
+
+                    <div class="form-section">
+                        <button type="submit" class="btn btn-success">💾 حفظ التغييرات</button>
+                        <button type="button" id="cancelEditBtn" class="btn btn-danger">❌ إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script>
         // ========== إعدادات GitHub ==========
-        // استبدل هذا الرابط برابط الملف الحقيقي على GitHub
-        const GITHUB_EXCEL_URL = 'https://github.com/ameen-algmady/grades/blob/main/students.xlsx';
+        const GITHUB_EXCEL_URL = 'https://raw.githubusercontent.com/ameen-algmady/grades/main/students.xlsx';
         
         // ========== العناصر الرئيسية في الصفحة ==========
         const loginSection = document.getElementById('loginSection');
@@ -428,12 +599,17 @@
         const studentsCountSpan = document.getElementById('studentsCount');
         const exportBtn = document.getElementById('exportBtn');
         const connectionStatus = document.getElementById('connectionStatus');
+        const editModal = document.getElementById('editModal');
+        const closeModal = document.querySelector('.close-modal');
+        const studentForm = document.getElementById('studentForm');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const currentStudentName = document.getElementById('currentStudentName');
 
         // ========== المتغيرات العامة ==========
         let currentTeacherId = '';
         let filteredStudents = [];
         let allStudents = [];
-        let excelData = null;
+        let currentEditStudent = null;
 
         // ========== دوال التحقق ==========
         function validateTeacherId(teacherId) {
@@ -507,12 +683,10 @@
                 
                 updateConnectionStatus('🔄 جاري تحويل Excel إلى JSON...', 'info');
                 
-                // تحويل Excel إلى JSON
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                 const excelData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
                 
-                // معالجة البيانات
                 const processed = processExcelData(excelData);
                 allStudents = processed;
                 
@@ -528,11 +702,6 @@
                     ❌ فشل في التحميل من GitHub
                     <br><br>
                     <strong>تفاصيل الخطأ:</strong> ${error.message}
-                    <br><br>
-                    <strong>الحلول المقترحة:</strong>
-                    <br>• تأكد من رابط GitHub
-                    <br>• تأكد أن المستودع public
-                    <br>• تأكد من اسم الملف (students.xlsx)
                 `, 'error');
                 
                 loginBtn.disabled = true;
@@ -550,28 +719,72 @@
             
             console.log('🔍 رؤوس الأعمدة:', headers);
 
-            // البحث عن أعمدة المعرف
-            const teacherIdColumn = findColumnIndex(headers, ['المعرف', 'teacherid', 'id']);
-            const nameColumn = findColumnIndex(headers, ['الاسم', 'name', 'studentname']);
-            const barcodeColumn = findColumnIndex(headers, ['barcode', 'الباركود', 'رقم']);
-            const classColumn = findColumnIndex(headers, ['الشعبة', 'class', 'الفصل', 'الصف']);
-            const result1Column = findColumnIndex(headers, ['محصلة1', 'result1', 'النتيجة1']);
-            const result2Column = findColumnIndex(headers, ['محصلة2', 'result2', 'النتيجة2']);
-            const result3Column = findColumnIndex(headers, ['محصلة3', 'result3', 'النتيجة3']);
+            // البحث عن أعمدة المعرف (العمود X)
+            const teacherIdColumn = 23; // العمود X (24-1)
+            const idColumn = 0; // ID
+            const barcodeColumn = 1; // Barcode
+            const nameColumn = 2; // الاسم
+            const classColumn = 3; // الشعبة
+            
+            // الترم الأول
+            const attendance1Column = 4;
+            const oral1Column = 5;
+            const homework1Column = 6;
+            const written1Column = 7;
+            const total1Column = 8;
+            const result1Column = 9;
+            
+            // الترم الثاني
+            const attendance2Column = 10;
+            const oral2Column = 11;
+            const homework2Column = 12;
+            const written2Column = 13;
+            const total2Column = 14;
+            const result2Column = 15;
+            
+            // الترم الثالث
+            const attendance3Column = 16;
+            const homework3Column = 17;
+            const oral3Column = 18;
+            const written3Column = 19;
+            const total3Column = 20;
+            const result3Column = 21;
 
             for (let i = 1; i < excelData.length; i++) {
                 const row = excelData[i];
                 if (row.length === 0) continue;
 
                 const student = {
-                    id: `STD${i}`,
+                    id: row[idColumn] || `STD${i}`,
                     barcode: row[barcodeColumn] || '',
                     name: row[nameColumn] || 'بدون اسم',
                     class: row[classColumn] || '---',
-                    result1: formatGrade(row[result1Column]),
-                    result2: formatGrade(row[result2Column]),
-                    result3: formatGrade(row[result3Column]),
                     teacherId: (row[teacherIdColumn] || '').toString().trim(),
+                    
+                    // الترم الأول
+                    attendance1: formatGrade(row[attendance1Column]),
+                    oral1: formatGrade(row[oral1Column]),
+                    homework1: formatGrade(row[homework1Column]),
+                    written1: formatGrade(row[written1Column]),
+                    total1: formatGrade(row[total1Column]),
+                    result1: formatGrade(row[result1Column]),
+                    
+                    // الترم الثاني
+                    attendance2: formatGrade(row[attendance2Column]),
+                    oral2: formatGrade(row[oral2Column]),
+                    homework2: formatGrade(row[homework2Column]),
+                    written2: formatGrade(row[written2Column]),
+                    total2: formatGrade(row[total2Column]),
+                    result2: formatGrade(row[result2Column]),
+                    
+                    // الترم الثالث
+                    attendance3: formatGrade(row[attendance3Column]),
+                    homework3: formatGrade(row[homework3Column]),
+                    oral3: formatGrade(row[oral3Column]),
+                    written3: formatGrade(row[written3Column]),
+                    total3: formatGrade(row[total3Column]),
+                    result3: formatGrade(row[result3Column]),
+                    
                     // حفظ البيانات الكاملة
                     fullData: row
                 };
@@ -584,21 +797,10 @@
             return students;
         }
 
-        function findColumnIndex(headers, possibleNames) {
-            for (let i = 0; i < headers.length; i++) {
-                const header = headers[i]?.toString().toLowerCase().trim();
-                if (header && possibleNames.some(name => header.includes(name.toLowerCase()))) {
-                    return i;
-                }
-            }
-            return 0; // العودة للعمود الأول إذا لم يتم العثور
-        }
-
         function formatGrade(value) {
-            if (value === null || value === undefined || value === '') return '0.0';
-            if (typeof value === 'number') return value.toFixed(1);
-            const num = parseFloat(value);
-            return isNaN(num) ? '0.0' : num.toFixed(1);
+            if (value === null || value === undefined || value === '') return '0';
+            if (typeof value === 'number') return value.toString();
+            return value.toString().trim();
         }
 
         // ========== تصفية الطلاب حسب المعلم ==========
@@ -613,6 +815,156 @@
             );
 
             console.log(`👨‍🏫 تم تصفية ${filteredStudents.length} طالب للمعلم ${currentTeacherId}`);
+        }
+
+        // ========== البحث والتصفية ==========
+        function addSearchFunctionality() {
+            const searchContainer = document.getElementById('searchContainer');
+            
+            // تحديث قائمة الشعب
+            updateClassFilter();
+            
+            document.getElementById('searchInput').addEventListener('input', filterStudents);
+            document.getElementById('classFilter').addEventListener('change', filterStudents);
+        }
+
+        function updateClassFilter() {
+            const classFilter = document.getElementById('classFilter');
+            const classes = [...new Set(filteredStudents.map(student => student.class).filter(c => c))];
+            
+            classFilter.innerHTML = '<option value="">جميع الشعب</option>';
+            classes.forEach(className => {
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                classFilter.appendChild(option);
+            });
+        }
+
+        function filterStudents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedClass = document.getElementById('classFilter').value;
+            
+            let filtered = allStudents.filter(student => 
+                student.teacherId === currentTeacherId
+            );
+            
+            // تطبيق البحث
+            if (searchTerm) {
+                filtered = filtered.filter(student => 
+                    student.name.toLowerCase().includes(searchTerm) ||
+                    student.barcode.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // تطبيق تصفية الشعبة
+            if (selectedClass) {
+                filtered = filtered.filter(student => student.class === selectedClass);
+            }
+            
+            filteredStudents = filtered;
+            renderStudentsTable();
+            displayStatistics(filteredStudents);
+        }
+
+        // ========== عرض الجدول ==========
+        function renderStudentsTable() {
+            studentsTableBody.innerHTML = '';
+            
+            if (filteredStudents.length === 0) {
+                studentsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="23" style="text-align: center; color: #666; padding: 40px;">
+                            📝 لا توجد بيانات للعرض للمعلم ${currentTeacherId}
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            filteredStudents.forEach((student) => {
+                const row = document.createElement('tr');
+                
+                function getResultClass(result) {
+                    const value = parseFloat(result) || 0;
+                    if (value >= 4.5) return 'result-excellent';
+                    if (value >= 3.5) return 'result-good';
+                    if (value >= 2.5) return 'result-average';
+                    return 'result-poor';
+                }
+
+                const result1Class = getResultClass(student.result1);
+                const result2Class = getResultClass(student.result2);
+                const result3Class = getResultClass(student.result3);
+                
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.barcode}</td>
+                    <td>
+                        <span class="student-name" onclick="openEditModal('${student.id}')">
+                            ${student.name}
+                        </span>
+                    </td>
+                    <td>${student.class}</td>
+                    <td>${student.attendance1}</td>
+                    <td>${student.oral1}</td>
+                    <td>${student.homework1}</td>
+                    <td>${student.written1}</td>
+                    <td><strong>${student.total1}</strong></td>
+                    <td class="result-cell ${result1Class}">${student.result1}</td>
+                    <td>${student.attendance2}</td>
+                    <td>${student.oral2}</td>
+                    <td>${student.homework2}</td>
+                    <td>${student.written2}</td>
+                    <td><strong>${student.total2}</strong></td>
+                    <td class="result-cell ${result2Class}">${student.result2}</td>
+                    <td>${student.attendance3}</td>
+                    <td>${student.homework3}</td>
+                    <td>${student.oral3}</td>
+                    <td>${student.written3}</td>
+                    <td><strong>${student.total3}</strong></td>
+                    <td class="result-cell ${result3Class}">${student.result3}</td>
+                    <td>
+                        <button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button>
+                    </td>
+                `;
+                studentsTableBody.appendChild(row);
+            });
+        }
+
+        // ========== نافذة التعديل ==========
+        function openEditModal(studentId) {
+            currentEditStudent = filteredStudents.find(s => s.id === studentId);
+            if (!currentEditStudent) return;
+            
+            currentStudentName.textContent = currentEditStudent.name;
+            document.getElementById('editStudentId').value = currentEditStudent.id;
+            
+            // تعبئة بيانات الترم الأول
+            document.getElementById('editAttendance1').value = currentEditStudent.attendance1;
+            document.getElementById('editOral1').value = currentEditStudent.oral1;
+            document.getElementById('editHomework1').value = currentEditStudent.homework1;
+            document.getElementById('editWritten1').value = currentEditStudent.written1;
+            
+            // تعبئة بيانات الترم الثاني
+            document.getElementById('editAttendance2').value = currentEditStudent.attendance2;
+            document.getElementById('editOral2').value = currentEditStudent.oral2;
+            document.getElementById('editHomework2').value = currentEditStudent.homework2;
+            document.getElementById('editWritten2').value = currentEditStudent.written2;
+            
+            // تعبئة بيانات الترم الثالث
+            document.getElementById('editAttendance3').value = currentEditStudent.attendance3;
+            document.getElementById('editHomework3').value = currentEditStudent.homework3;
+            document.getElementById('editOral3').value = currentEditStudent.oral3;
+            document.getElementById('editWritten3').value = currentEditStudent.written3;
+            
+            editModal.style.display = 'block';
+        }
+
+        function closeEditModal() {
+            editModal.style.display = 'none';
+            studentForm.reset();
+            currentEditStudent = null;
         }
 
         // ========== إحصائيات النتائج ==========
@@ -680,106 +1032,6 @@
             }
         }
 
-        // ========== البحث والترتيب ==========
-        function addSearchFunctionality() {
-            const searchContainer = document.createElement('div');
-            searchContainer.style.cssText = 'margin: 15px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;';
-            
-            searchContainer.innerHTML = `
-                <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو الباركود..." 
-                       style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; flex: 1; min-width: 200px;">
-                <select id="sortSelect" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px;">
-                    <option value="name">ترتيب بالأسم</option>
-                    <option value="barcode">ترتيب بالباركود</option>
-                    <option value="class">ترتيب بالفصل</option>
-                    <option value="result1">ترتيب بالنتيجة 1</option>
-                    <option value="result2">ترتيب بالنتيجة 2</option>
-                    <option value="result3">ترتيب بالنتيجة 3</option>
-                </select>
-            `;
-            
-            teacherInfoDiv.parentNode.insertBefore(searchContainer, teacherInfoDiv.nextSibling);
-            
-            document.getElementById('searchInput').addEventListener('input', filterAndSortStudents);
-            document.getElementById('sortSelect').addEventListener('change', filterAndSortStudents);
-        }
-
-        function filterAndSortStudents() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const sortBy = document.getElementById('sortSelect').value;
-            
-            let filtered = filteredStudents.filter(student => 
-                (student.name?.toLowerCase().includes(searchTerm) ||
-                 student.barcode?.toLowerCase().includes(searchTerm) ||
-                 student.class?.toLowerCase().includes(searchTerm))
-            );
-            
-            filtered.sort((a, b) => {
-                let aVal = a[sortBy] || '';
-                let bVal = b[sortBy] || '';
-                
-                if (sortBy.includes('result')) {
-                    aVal = parseFloat(aVal) || 0;
-                    bVal = parseFloat(bVal) || 0;
-                    return bVal - aVal;
-                }
-                
-                return aVal.toString().localeCompare(bVal.toString());
-            });
-            
-            renderStudentsTable(filtered);
-            displayStatistics(filtered);
-        }
-
-        // ========== عرض الجدول ==========
-        function renderStudentsTable(students = filteredStudents) {
-            studentsTableBody.innerHTML = '';
-            
-            if (students.length === 0) {
-                studentsTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: #666; padding: 40px;">
-                            📝 لا توجد بيانات للعرض للمعلم ${currentTeacherId}
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            students.forEach((student) => {
-                const row = document.createElement('tr');
-                
-                function getResultClass(result) {
-                    const value = parseFloat(result) || 0;
-                    if (value >= 4.5) return 'result-excellent';
-                    if (value >= 3.5) return 'result-good';
-                    if (value >= 2.5) return 'result-average';
-                    return 'result-poor';
-                }
-
-                const result1Class = getResultClass(student.result1);
-                const result2Class = getResultClass(student.result2);
-                const result3Class = getResultClass(student.result3);
-                
-                row.innerHTML = `
-                    <td>${student.barcode || '---'}</td>
-                    <td>
-                        <span class="student-name" data-id="${student.id}">
-                            ${student.name || 'بدون اسم'}
-                        </span>
-                    </td>
-                    <td>${student.class || '---'}</td>
-                    <td class="result-cell ${result1Class}">${student.result1 || '0.0'}</td>
-                    <td class="result-cell ${result2Class}">${student.result2 || '0.0'}</td>
-                    <td class="result-cell ${result3Class}">${student.result3 || '0.0'}</td>
-                    <td>
-                        <button class="edit-btn" data-id="${student.id}" onclick="openEditModal('${student.id}')">تعديل</button>
-                    </td>
-                `;
-                studentsTableBody.appendChild(row);
-            });
-        }
-
         // ========== دوال إدارة البيانات ==========
         function loadStudentsForTeacher() {
             if (!allStudents || allStudents.length === 0) {
@@ -798,10 +1050,7 @@
                 currentTeacherSpan.textContent = currentTeacherId;
                 teacherInfoDiv.classList.remove('hidden');
                 
-                if (!document.getElementById('searchInput')) {
-                    addSearchFunctionality();
-                }
-                
+                addSearchFunctionality();
                 document.getElementById('searchContainer').classList.remove('hidden');
                 
                 showLoading(false);
@@ -866,23 +1115,58 @@
             showSuccess('تم تصدير البيانات بنجاح');
         });
 
-        function openEditModal(studentId) {
-            const student = filteredStudents.find(s => s.id === studentId);
-            if (!student) return;
+        closeModal.addEventListener('click', closeEditModal);
+        cancelEditBtn.addEventListener('click', closeEditModal);
+
+        studentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            const newResult1 = prompt(`أدخل النتيجة 1 للطالب ${student.name}:`, student.result1);
-            const newResult2 = prompt(`أدخل النتيجة 2 للطالب ${student.name}:`, student.result2);
-            const newResult3 = prompt(`أدخل النتيجة 3 للطالب ${student.name}:`, student.result3);
+            if (!currentEditStudent) return;
             
-            if (newResult1 !== null && newResult2 !== null && newResult3 !== null) {
-                student.result1 = formatGrade(newResult1);
-                student.result2 = formatGrade(newResult2);
-                student.result3 = formatGrade(newResult3);
-                
-                renderStudentsTable();
-                displayStatistics(filteredStudents);
-                showSuccess('تم تحديث الدرجات بنجاح');
-            }
+            // تحديث بيانات الترم الأول
+            currentEditStudent.attendance1 = document.getElementById('editAttendance1').value;
+            currentEditStudent.oral1 = document.getElementById('editOral1').value;
+            currentEditStudent.homework1 = document.getElementById('editHomework1').value;
+            currentEditStudent.written1 = document.getElementById('editWritten1').value;
+            
+            // تحديث بيانات الترم الثاني
+            currentEditStudent.attendance2 = document.getElementById('editAttendance2').value;
+            currentEditStudent.oral2 = document.getElementById('editOral2').value;
+            currentEditStudent.homework2 = document.getElementById('editHomework2').value;
+            currentEditStudent.written2 = document.getElementById('editWritten2').value;
+            
+            // تحديث بيانات الترم الثالث
+            currentEditStudent.attendance3 = document.getElementById('editAttendance3').value;
+            currentEditStudent.homework3 = document.getElementById('editHomework3').value;
+            currentEditStudent.oral3 = document.getElementById('editOral3').value;
+            currentEditStudent.written3 = document.getElementById('editWritten3').value;
+            
+            // إعادة حساب المجاميع والمحصلات
+            currentEditStudent.total1 = calculateTotal(currentEditStudent, 1);
+            currentEditStudent.result1 = calculateResult(currentEditStudent, 1);
+            currentEditStudent.total2 = calculateTotal(currentEditStudent, 2);
+            currentEditStudent.result2 = calculateResult(currentEditStudent, 2);
+            currentEditStudent.total3 = calculateTotal(currentEditStudent, 3);
+            currentEditStudent.result3 = calculateResult(currentEditStudent, 3);
+            
+            renderStudentsTable();
+            displayStatistics(filteredStudents);
+            closeEditModal();
+            showSuccess('تم تحديث الدرجات بنجاح');
+        });
+
+        function calculateTotal(student, term) {
+            const attendance = parseFloat(student[`attendance${term}`]) || 0;
+            const oral = parseFloat(student[`oral${term}`]) || 0;
+            const homework = parseFloat(student[`homework${term}`]) || 0;
+            const written = parseFloat(student[`written${term}`]) || 0;
+            
+            return (attendance + oral + homework + written).toString();
+        }
+
+        function calculateResult(student, term) {
+            const total = parseFloat(calculateTotal(student, term));
+            return (total / 5).toFixed(1); // القسمة على 5 لأن الدرجة من 20
         }
 
         // ========== التهيئة ==========
