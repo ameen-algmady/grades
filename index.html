@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة درجات الطلاب - GitHub Excel</title>
+    <title>نظام إدارة درجات الطلاب</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -438,7 +438,7 @@
     <div class="container">
         <div class="header">
             <h1>🎓 نظام إدارة نتائج الطلاب</h1>
-            <p>اتصال مباشر مع GitHub - تحويل Excel إلى JSON تلقائي</p>
+            <p>نظام متكامل لإدارة درجات الطلاب - مع بيانات تجريبية</p>
         </div>
 
         <!-- قسم تسجيل الدخول -->
@@ -451,10 +451,10 @@
                 </div>
 
                 <div class="connection-status" id="connectionStatus">
-                    ⏳ جاري الاتصال بـ GitHub وتحويل البيانات...
+                    ⏳ جاري تهيئة النظام...
                 </div>
 
-                <button class="btn btn-success" id="loginBtn" disabled>🔗 الاتصال والتحميل</button>
+                <button class="btn btn-success" id="loginBtn">🔗 تسجيل الدخول</button>
                 <button class="btn btn-warning" id="retryBtn">🔄 إعادة المحاولة</button>
             </div>
         </div>
@@ -471,13 +471,13 @@
                 </div>
             </div>
 
-            <div id="teacherInfo" class="teacher-info hidden">
+            <div id="teacherInfo" class="teacher-info">
                 <h3>📊 معلومات المعلم</h3>
-                <p>مرحباً بك في نظام إدارة النتائج - البيانات loaded مباشرة من GitHub</p>
+                <p>مرحباً بك في نظام إدارة النتائج - البيانات جاهزة للاستخدام</p>
             </div>
 
             <!-- محرك البحث والتصفية -->
-            <div id="searchContainer" class="search-container hidden">
+            <div id="searchContainer" class="search-container">
                 <input type="text" id="searchByNameInput" placeholder="🔍 بحث بالاسم...">
                 <input type="text" id="searchByBarcodeInput" placeholder="🔍 بحث بالباركود...">
                 <select id="classFilter">
@@ -635,9 +635,6 @@
     </div>
 
     <script>
-        // ========== إعدادات GitHub ==========
-        const GITHUB_EXCEL_URL = 'https://raw.githubusercontent.com/ameen-algmady/grades/main/students.xlsx';
-        
         // ========== العناصر الرئيسية في الصفحة ==========
         const loginSection = document.getElementById('loginSection');
         const mainSection = document.getElementById('mainSection');
@@ -669,6 +666,70 @@
         let allStudents = [];
         let currentEditStudent = null;
         let showResultsOnly = false;
+
+        // ========== بيانات تجريبية ==========
+        const sampleStudents = [
+            {
+                id: "STD001",
+                barcode: "BC001",
+                name: "أحمد محمد",
+                class: "أ",
+                teacherId: "ameen",
+                attendance1: "4", oral1: "3", homework1: "4", written1: "5", total1: "16", result1: "3.2",
+                attendance2: "4", oral2: "4", homework2: "3", written2: "4", total2: "15", result2: "3.0",
+                attendance3: "5", homework3: "4", oral3: "3", written3: "5", total3: "17", result3: "3.4"
+            },
+            {
+                id: "STD002",
+                barcode: "BC002",
+                name: "فاطمة علي",
+                class: "أ",
+                teacherId: "ameen",
+                attendance1: "5", oral1: "4", homework1: "5", written1: "4", total1: "18", result1: "3.6",
+                attendance2: "5", oral2: "5", homework2: "4", written2: "5", total2: "19", result2: "3.8",
+                attendance3: "4", homework3: "5", oral3: "4", written3: "4", total3: "17", result3: "3.4"
+            },
+            {
+                id: "STD003",
+                barcode: "BC003",
+                name: "يوسف إبراهيم",
+                class: "ب",
+                teacherId: "ameen",
+                attendance1: "3", oral1: "2", homework1: "3", written1: "2", total1: "10", result1: "2.0",
+                attendance2: "4", oral2: "3", homework2: "2", written2: "3", total2: "12", result2: "2.4",
+                attendance3: "3", homework3: "3", oral3: "2", written3: "3", total3: "11", result3: "2.2"
+            },
+            {
+                id: "STD004",
+                barcode: "BC004",
+                name: "سارة خالد",
+                class: "ب",
+                teacherId: "ameen",
+                attendance1: "4", oral1: "5", homework1: "4", written1: "5", total1: "18", result1: "3.6",
+                attendance2: "5", oral2: "4", homework2: "5", written2: "4", total2: "18", result2: "3.6",
+                attendance3: "4", homework3: "5", oral3: "4", written3: "5", total3: "18", result3: "3.6"
+            },
+            {
+                id: "STD005",
+                barcode: "BC005",
+                name: "محمد حسن",
+                class: "أ",
+                teacherId: "ameen",
+                attendance1: "5", oral1: "5", homework1: "5", written1: "5", total1: "20", result1: "4.0",
+                attendance2: "5", oral2: "5", homework2: "5", written2: "5", total2: "20", result2: "4.0",
+                attendance3: "5", homework3: "5", oral3: "5", written3: "5", total3: "20", result3: "4.0"
+            },
+            {
+                id: "STD006",
+                barcode: "BC006",
+                name: "نورة عبدالله",
+                class: "ج",
+                teacherId: "ameen",
+                attendance1: "4", oral1: "3", homework1: "4", written1: "3", total1: "14", result1: "2.8",
+                attendance2: "3", oral2: "4", homework2: "3", written2: "4", total2: "14", result2: "2.8",
+                attendance3: "4", homework3: "3", oral3: "4", written3: "3", total3: "14", result3: "2.8"
+            }
+        ];
 
         // ========== دوال التحقق ==========
         function validateTeacherId(teacherId) {
@@ -725,141 +786,11 @@
             connectionStatus.style.borderColor = borderColors[type] || borderColors.info;
         }
 
-        // ========== الاتصال بـ GitHub وتحويل Excel ==========
-        async function loadExcelFromGitHub() {
-            updateConnectionStatus('🌐 جاري الاتصال بـ GitHub...', 'info');
-            
-            try {
-                const response = await fetch(GITHUB_EXCEL_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`فشل في تحميل الملف: ${response.status} ${response.statusText}`);
-                }
-                
-                updateConnectionStatus('📁 تم الاتصال - جاري تحميل الملف...', 'info');
-                
-                const arrayBuffer = await response.arrayBuffer();
-                
-                updateConnectionStatus('🔄 جاري تحويل Excel إلى JSON...', 'info');
-                
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const excelData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-                
-                const processed = processExcelData(excelData);
-                allStudents = processed;
-                
-                updateConnectionStatus(`✅ تم التحويل بنجاح - ${allStudents.length} طالب`, 'success');
-                loginBtn.disabled = false;
-                loginBtn.style.background = 'linear-gradient(135deg, #27ae60, #229954)';
-                
-                console.log('📊 البيانات المحملة:', allStudents);
-                
-            } catch (error) {
-                console.error('❌ خطأ في التحميل:', error);
-                updateConnectionStatus(`
-                    ❌ فشل في التحميل من GitHub
-                    <br><br>
-                    <strong>تفاصيل الخطأ:</strong> ${error.message}
-                `, 'error');
-                
-                loginBtn.disabled = true;
-            }
-        }
-
-        // ========== معالجة بيانات Excel ==========
-        function processExcelData(excelData) {
-            if (!excelData || excelData.length < 2) {
-                throw new Error('الملف لا يحتوي على بيانات صحيحة');
-            }
-
-            const headers = excelData[0];
-            const students = [];
-            
-            console.log('🔍 رؤوس الأعمدة:', headers);
-
-            // البحث عن أعمدة المعرف (العمود X)
-            const teacherIdColumn = 23; // العمود X (24-1)
-            const idColumn = 0; // ID
-            const barcodeColumn = 1; // Barcode
-            const nameColumn = 2; // الاسم
-            const classColumn = 3; // الشعبة
-            
-            // الترم الأول
-            const attendance1Column = 4;
-            const oral1Column = 5;
-            const homework1Column = 6;
-            const written1Column = 7;
-            const total1Column = 8;
-            const result1Column = 9;
-            
-            // الترم الثاني
-            const attendance2Column = 10;
-            const oral2Column = 11;
-            const homework2Column = 12;
-            const written2Column = 13;
-            const total2Column = 14;
-            const result2Column = 15;
-            
-            // الترم الثالث
-            const attendance3Column = 16;
-            const homework3Column = 17;
-            const oral3Column = 18;
-            const written3Column = 19;
-            const total3Column = 20;
-            const result3Column = 21;
-
-            for (let i = 1; i < excelData.length; i++) {
-                const row = excelData[i];
-                if (row.length === 0) continue;
-
-                const student = {
-                    id: row[idColumn] || `STD${i}`,
-                    barcode: row[barcodeColumn] || '',
-                    name: row[nameColumn] || 'بدون اسم',
-                    class: row[classColumn] || '---',
-                    teacherId: (row[teacherIdColumn] || '').toString().trim(),
-                    
-                    // الترم الأول
-                    attendance1: formatGrade(row[attendance1Column]),
-                    oral1: formatGrade(row[oral1Column]),
-                    homework1: formatGrade(row[homework1Column]),
-                    written1: formatGrade(row[written1Column]),
-                    total1: formatGrade(row[total1Column]),
-                    result1: formatGrade(row[result1Column]),
-                    
-                    // الترم الثاني
-                    attendance2: formatGrade(row[attendance2Column]),
-                    oral2: formatGrade(row[oral2Column]),
-                    homework2: formatGrade(row[homework2Column]),
-                    written2: formatGrade(row[written2Column]),
-                    total2: formatGrade(row[total2Column]),
-                    result2: formatGrade(row[result2Column]),
-                    
-                    // الترم الثالث
-                    attendance3: formatGrade(row[attendance3Column]),
-                    homework3: formatGrade(row[homework3Column]),
-                    oral3: formatGrade(row[oral3Column]),
-                    written3: formatGrade(row[written3Column]),
-                    total3: formatGrade(row[total3Column]),
-                    result3: formatGrade(row[result3Column]),
-                    
-                    // حفظ البيانات الكاملة
-                    fullData: row
-                };
-
-                if (student.teacherId) {
-                    students.push(student);
-                }
-            }
-
-            return students;
-        }
-
-        function formatGrade(value) {
-            if (value === null || value === undefined || value === '') return '0';
-            if (typeof value === 'number') return value.toString();
-            return value.toString().trim();
+        // ========== تهيئة البيانات ==========
+        function initializeData() {
+            updateConnectionStatus('✅ النظام جاهز للاستخدام - تم تحميل البيانات التجريبية', 'success');
+            allStudents = sampleStudents;
+            loginBtn.disabled = false;
         }
 
         // ========== تصفية الطلاب حسب المعلم ==========
@@ -1175,10 +1106,8 @@
                 displayStatistics(filteredStudents);
                 studentsCountSpan.textContent = filteredStudents.length;
                 currentTeacherSpan.textContent = currentTeacherId;
-                teacherInfoDiv.classList.remove('hidden');
                 
                 addSearchFunctionality();
-                document.getElementById('searchContainer').classList.remove('hidden');
                 
                 showLoading(false);
                 showSuccess(`✅ تم تحميل ${filteredStudents.length} طالب`);
@@ -1205,22 +1134,19 @@
             currentTeacherId = teacherId;
             loginSection.classList.add('hidden');
             mainSection.classList.remove('hidden');
-            logoutBtn.classList.remove('hidden');
             
             loadStudentsForTeacher();
         });
 
         retryBtn.addEventListener('click', function() {
-            loadExcelFromGitHub();
+            initializeData();
         });
 
         logoutBtn.addEventListener('click', function() {
             currentTeacherId = '';
             loginSection.classList.remove('hidden');
             mainSection.classList.add('hidden');
-            logoutBtn.classList.add('hidden');
             teacherIdInput.value = '';
-            teacherInfoDiv.classList.add('hidden');
         });
 
         exportBtn.addEventListener('click', function() {
@@ -1309,10 +1235,10 @@
         // ========== التهيئة ==========
         document.addEventListener('DOMContentLoaded', function() {
             teacherIdInput.value = 'ameen';
-            loadExcelFromGitHub();
+            initializeData();
         });
 
-        console.log('🚀 التطبيق جاهز - اتصال مباشر مع GitHub');
+        console.log('🚀 التطبيق جاهز للاستخدام');
     </script>
 </body>
 </html>
