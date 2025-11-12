@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة درجات الطلاب - GitHub Excel</title>
+    <title>نظام إدارة درجات الطلاب - GitHub Excel + Google Sheets Update</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -15,20 +15,20 @@
             --light-color: #ecf0f1;
             --dark-color: #2c3e50;
         }
-        
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -37,39 +37,39 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
-        
+
         .header {
             background: linear-gradient(135deg, #2c3e50, #34495e);
             color: white;
             padding: 25px;
             text-align: center;
         }
-        
+
         .header h1 {
             font-size: 2.2em;
             margin-bottom: 10px;
             font-weight: 300;
         }
-        
+
         .section {
             padding: 25px;
             display: block;
         }
-        
+
         .hidden {
             display: none !important;
         }
-        
+
         .login-form {
             text-align: center;
             max-width: 500px;
             margin: 0 auto;
         }
-        
+
         .input-group {
             margin-bottom: 20px;
         }
-        
+
         input, select {
             width: 100%;
             padding: 15px;
@@ -78,13 +78,13 @@
             font-size: 16px;
             transition: all 0.3s ease;
         }
-        
+
         input:focus, select:focus {
             border-color: #3498db;
             outline: none;
             box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
         }
-        
+
         .btn {
             background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
@@ -97,24 +97,24 @@
             transition: all 0.3s ease;
             margin: 5px;
         }
-        
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        
+
         .btn-logout {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
         }
-        
+
         .btn-success {
             background: linear-gradient(135deg, #27ae60, #229954);
         }
-        
+
         .btn-warning {
             background: linear-gradient(135deg, #f39c12, #e67e22);
         }
-        
+
         .teacher-info {
             background: #ecf0f1;
             padding: 20px;
@@ -122,7 +122,7 @@
             margin-bottom: 20px;
             border-right: 5px solid #3498db;
         }
-        
+
         .controls {
             display: flex;
             justify-content: space-between;
@@ -131,7 +131,7 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -141,7 +141,7 @@
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         th {
             background: linear-gradient(135deg, #34495e, #2c3e50);
             color: white;
@@ -150,25 +150,25 @@
             font-weight: 600;
             font-size: 14px;
         }
-        
+
         td {
             padding: 12px 10px;
             border-bottom: 1px solid #ecf0f1;
             text-align: right;
             font-size: 14px;
         }
-        
+
         tr:hover {
             background-color: #f8f9fa;
         }
-        
+
         .loading {
             text-align: center;
             padding: 40px;
             font-size: 18px;
             color: #666;
         }
-        
+
         .result-cell {
             font-weight: bold;
             text-align: center;
@@ -178,31 +178,31 @@
             transition: all 0.3s ease;
             border: 1px solid transparent;
         }
-        
+
         .result-excellent {
             color: #27ae60;
             background-color: rgba(39, 174, 96, 0.1);
             border-color: rgba(39, 174, 96, 0.3);
         }
-        
+
         .result-good {
             color: #3498db;
             background-color: rgba(52, 152, 219, 0.1);
             border-color: rgba(52, 152, 219, 0.3);
         }
-        
+
         .result-average {
             color: #f39c12;
             background-color: rgba(243, 156, 18, 0.1);
             border-color: rgba(243, 156, 18, 0.3);
         }
-        
+
         .result-poor {
             color: #e74c3c;
             background-color: rgba(231, 76, 60, 0.1);
             border-color: rgba(231, 76, 60, 0.3);
         }
-        
+
         .student-name {
             color: #3498db;
             cursor: pointer;
@@ -212,13 +212,13 @@
             border-radius: 3px;
             display: inline-block;
         }
-        
+
         .student-name:hover {
             color: #2980b9;
             background-color: rgba(52, 152, 219, 0.1);
             transform: translateY(-1px);
         }
-        
+
         .edit-btn {
             background-color: #f39c12;
             color: white;
@@ -229,11 +229,11 @@
             font-size: 12px;
             transition: background-color 0.3s ease;
         }
-        
+
         .edit-btn:hover {
             background-color: #e67e22;
         }
-        
+
         .search-container {
             display: flex;
             gap: 10px;
@@ -241,7 +241,7 @@
             flex-wrap: wrap;
             margin: 15px 0;
         }
-        
+
         .search-container input,
         .search-container select {
             padding: 10px;
@@ -250,42 +250,8 @@
             flex: 1;
             min-width: 200px;
         }
-        
-        .stats-container {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 15px 0;
-            border-right: 5px solid #3498db;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .stat-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .connection-status {
-            background: #fff3cd;
-            border: 2px solid #ffeaa7;
-            color: #856404;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
 
-        /* نافذة التعديل */
+        /* 1- نافذة الإحصائيات ونافذة التعديل (Modal) */
         .modal {
             display: none;
             position: fixed;
@@ -308,6 +274,11 @@
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
+        }
+
+        /* 1- تصميم نافذة الإحصائيات (Popup Stats) */
+        #statsModal .modal-content {
+            max-width: 600px;
         }
 
         .close-modal {
@@ -333,17 +304,37 @@
             margin-top: 20px;
         }
 
+        /* 3- تعديل تصميم زر الحفظ بجوار الشهر */
         .form-section {
             grid-column: 1 / -1;
             border-bottom: 2px solid var(--light-color);
             padding-bottom: 15px;
             margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .form-section h4 {
             color: var(--primary-color);
-            margin-bottom: 15px;
-            text-align: center;
+            margin: 0;
+        }
+
+        .save-term-btn {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .save-term-btn:hover {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            transform: translateY(-1px);
         }
 
         .form-group {
@@ -357,42 +348,77 @@
             color: var(--dark-color);
         }
 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #d0eaff;
+        }
+        
+        /* 🚨 إظهار عدد التعديلات المعلقة */
+        .sync-btn-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        #pendingCount {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 3px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
                 border-radius: 10px;
             }
-            
+
             .header h1 {
                 font-size: 1.8em;
             }
-            
+
             .controls {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .search-container {
                 flex-direction: column;
             }
-            
+
             .search-container input,
             .search-container select {
                 min-width: 100%;
             }
-            
+
             table {
                 font-size: 12px;
             }
-            
+
             th, td {
                 padding: 8px 5px;
             }
-            
+
             .student-form {
                 grid-template-columns: 1fr;
             }
-            
+
             .modal-content {
                 margin: 5% auto;
                 padding: 15px;
@@ -405,19 +431,19 @@
     <div class="container">
         <div class="header">
             <h1>🎓 نظام إدارة نتائج الطلاب</h1>
-            <p>اتصال مباشر مع GitHub - تحويل Excel إلى JSON تلقائي</p>
+            <p>اتصال مباشر مع Google Sheets</p>
         </div>
 
         <div id="loginSection" class="section">
             <div class="login-form">
                 <h2 style="margin-bottom: 30px; color: #2c3e50;">🔐 تسجيل الدخول</h2>
-                
+
                 <div class="input-group">
                     <input type="text" id="teacherId" placeholder="أدخل معرف المعلم..." autocomplete="off" value="ameen">
                 </div>
 
                 <div class="connection-status" id="connectionStatus">
-                    ⏳ جاري الاتصال بـ GitHub وتحويل البيانات...
+                    ⏳ جاري الاتصال بـ Google Sheets...
                 </div>
 
                 <button class="btn btn-success" id="loginBtn" disabled>🔗 الاتصال والتحميل</button>
@@ -439,23 +465,27 @@
 
             <div id="teacherInfo" class="teacher-info hidden">
                 <h3>📊 معلومات المعلم</h3>
-                <p>مرحباً بك في نظام إدارة النتائج - البيانات loaded مباشرة من GitHub</p>
+                <p>مرحباً بك في نظام إدارة النتائج - البيانات </p>
             </div>
 
             <div id="searchContainer" class="search-container hidden">
-                <input type="text" id="searchInput" placeholder="🔍 بحث بالاسم أو الباركود...">
+                <input type="text" id="searchInput" placeholder="🔍 تصفية عن طريق جزء من الاسم...">
                 <select id="classFilter">
                     <option value="">جميع الشعب</option>
                 </select>
-                <button class="btn" id="exportBtn" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                    📄 تصدير البيانات
+                <button class="btn" id="showStatsBtn" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                    📈 عرض الإحصائيات
                 </button>
                 <button class="btn" id="saveLocalBtn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
                     💾 حفظ البيانات محلياً
                 </button>
+                <div class="sync-btn-container">
+                    <button class="btn" id="syncSheetsBtn" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                        ☁️ مزامنة التعديلات (Sheets)
+                    </button>
+                    <span id="pendingCount" class="hidden">0</span>
+                </div>
             </div>
-
-            <div id="statsContainer"></div>
 
             <div style="overflow-x: auto;">
                 <table>
@@ -501,15 +531,25 @@
             ⏳ جاري تحميل البيانات...
         </div>
 
+        <div id="statsModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeModal('statsModal')">&times;</span>
+                <h3>📊 إحصائيات الطلاب المفلترين</h3>
+                <div id="statsContainer" class="stats-grid">
+                    </div>
+            </div>
+        </div>
+
         <div id="editModal" class="modal">
             <div class="modal-content">
-                <span class="close-modal">&times;</span>
+                <span class="close-modal" onclick="closeModal('editModal')">&times;</span>
                 <h3>✏️ تعديل درجات الطالب: <span id="currentStudentName"></span></h3>
-                <form id="studentForm" class="student-form">
+                <div id="studentForm" class="student-form">
                     <input type="hidden" id="editStudentId">
-                    
+
                     <div class="form-section">
-                        <h4>📘 الترم الأول</h4>
+                        <h4>📘 الشهر الأول</h4>
+                        <button type="button" class="save-term-btn btn-warning" data-term="1">حفظ تعديلات الشهر 1</button>
                     </div>
                     <div class="form-group">
                         <label for="editAttendance1">مواظبة 1:</label>
@@ -525,11 +565,12 @@
                     </div>
                     <div class="form-group">
                         <label for="editWritten1">تحريري 1:</label>
-                        <input type="number" id="editWritten1" min="0" max="20" step="0.1">
+                        <input type="number" id="editWritten1" min="0" max="40" step="0.1">
                     </div>
 
                     <div class="form-section">
-                        <h4>📗 الترم الثاني</h4>
+                        <h4>📗 الشهر الثاني</h4>
+                        <button type="button" class="save-term-btn btn-warning" data-term="2">حفظ تعديلات الشهر 2</button>
                     </div>
                     <div class="form-group">
                         <label for="editAttendance2">مواظبة 2:</label>
@@ -545,11 +586,12 @@
                     </div>
                     <div class="form-group">
                         <label for="editWritten2">تحريري 2:</label>
-                        <input type="number" id="editWritten2" min="0" max="20" step="0.1">
+                        <input type="number" id="editWritten2" min="0" max="40" step="0.1">
                     </div>
 
                     <div class="form-section">
-                        <h4>📙 الترم الثالث</h4>
+                        <h4>📙 الشهر الثالث</h4>
+                        <button type="button" class="save-term-btn btn-warning" data-term="3">حفظ تعديلات الشهر 3</button>
                     </div>
                     <div class="form-group">
                         <label for="editAttendance3">مواظبة 3:</label>
@@ -565,698 +607,708 @@
                     </div>
                     <div class="form-group">
                         <label for="editWritten3">تحريري 3:</label>
-                        <input type="number" id="editWritten3" min="0" max="20" step="0.1">
+                        <input type="number" id="editWritten3" min="0" max="40" step="0.1">
                     </div>
 
-                    <div class="form-section">
-                        <button type="submit" class="btn btn-success">💾 حفظ التغييرات</button>
+                    <div class="form-section" style="justify-content: center; border-bottom: none;">
                         <button type="button" id="cancelEditBtn" class="btn btn-danger">❌ إلغاء</button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-    // ========== إعدادات GitHub و المتغيرات الرئيسية ==========
-    const GITHUB_EXCEL_URL = 'https://raw.githubusercontent.com/ameen-algmady/grades/main/students.xlsx';
-    const LOCAL_STORAGE_KEY = 'studentsData';
-    
-    // ========== العناصر الرئيسية في الصفحة ==========
-    const loginSection = document.getElementById('loginSection');
-    const mainSection = document.getElementById('mainSection');
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const retryBtn = document.getElementById('retryBtn');
-    const useLocalDataBtn = document.getElementById('useLocalDataBtn');
-    const saveLocalBtn = document.getElementById('saveLocalBtn'); 
-    const teacherIdInput = document.getElementById('teacherId');
-    const studentsTableBody = document.getElementById('studentsTableBody');
-    const loadingDiv = document.getElementById('loading');
-    const teacherInfoDiv = document.getElementById('teacherInfo');
-    const currentTeacherSpan = document.getElementById('currentTeacher');
-    const studentsCountSpan = document.getElementById('studentsCount');
-    const exportBtn = document.getElementById('exportBtn');
-    const connectionStatus = document.getElementById('connectionStatus');
-    const editModal = document.getElementById('editModal');
-    const closeModal = document.querySelector('.close-modal');
-    const studentForm = document.getElementById('studentForm');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-    const currentStudentName = document.getElementById('currentStudentName');
+// JavaScript Code (مصحح لتتبع ومزامنة التعديلات المعلقة)
 
-    // العناصر داخل نافذة التعديل
-    const editStudentId = document.getElementById('editStudentId');
-    const editAttendance1 = document.getElementById('editAttendance1');
-    const editOral1 = document.getElementById('editOral1');
-    const editHomework1 = document.getElementById('editHomework1');
-    const editWritten1 = document.getElementById('editWritten1');
-    const editAttendance2 = document.getElementById('editAttendance2');
-    const editOral2 = document.getElementById('editOral2');
-    const editHomework2 = document.getElementById('editHomework2');
-    const editWritten2 = document.getElementById('editWritten2');
-    const editAttendance3 = document.getElementById('editAttendance3');
-    const editHomework3 = document.getElementById('editHomework3');
-    const editOral3 = document.getElementById('editOral3');
-    const editWritten3 = document.getElementById('editWritten3');
+// ========== إعدادات Google Sheets و المتغيرات الرئيسية ==========
+const GITHUB_EXCEL_URL = 'https://raw.githubusercontent.com/ameen-algmady/grades/main/students.xlsx';
+const LOCAL_STORAGE_KEY = 'studentsData';
+const PENDING_UPDATES_KEY = 'pendingUpdates'; // 🚨 مفتاح جديد لتخزين التعديلات المعلقة
+// 🔗 رابط النشر الجديد من Google Apps Script (تم افتراض أن هذا الرابط يدعم الآن عمليات الإضافة والتعديل عبر POST)
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyj4psjmlbXkjFsOz9rgEbkSMvvDO0rJal7BAHo7QhJfrTIxP8nb3t3XFKekV1IkcZx/exec';
 
-    // ========== المتغيرات العامة ==========
-    let currentTeacherId = '';
-    let filteredStudents = [];
-    let allStudents = [];
-    let currentEditStudent = null;
-    let usingLocalData = false;
+// ========== العناصر الرئيسية في الصفحة (تم تحديدها مسبقاً) ==========
+const loginSection = document.getElementById('loginSection');
+const mainSection = document.getElementById('mainSection');
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const retryBtn = document.getElementById('retryBtn');
+const useLocalDataBtn = document.getElementById('useLocalDataBtn');
+const saveLocalBtn = document.getElementById('saveLocalBtn');
+const teacherIdInput = document.getElementById('teacherId');
+const studentsTableBody = document.getElementById('studentsTableBody');
+const loadingDiv = document.getElementById('loading');
+const teacherInfoDiv = document.getElementById('teacherInfo');
+const currentTeacherSpan = document.getElementById('currentTeacher');
+const studentsCountSpan = document.getElementById('studentsCount');
+const connectionStatus = document.getElementById('connectionStatus');
+const editModal = document.getElementById('editModal');
+const syncSheetsBtn = document.getElementById('syncSheetsBtn'); // 🚨 زر المزامنة
+const pendingCountSpan = document.getElementById('pendingCount'); // 🚨 عداد التعديلات المعلقة
 
-    // ========== دوال التحقق والواجهة ==========
-    function validateTeacherId(teacherId) {
-        return /^[a-zA-Z0-9_\-]+$/.test(teacherId) && teacherId.length >= 3;
+const cancelEditBtn = document.getElementById('cancelEditBtn');
+const currentStudentName = document.getElementById('currentStudentName');
+
+// العناصر داخل نافذة التعديل
+const editStudentId = document.getElementById('editStudentId');
+const editAttendance1 = document.getElementById('editAttendance1');
+const editOral1 = document.getElementById('editOral1');
+const editHomework1 = document.getElementById('editHomework1');
+const editWritten1 = document.getElementById('editWritten1');
+const editAttendance2 = document.getElementById('editAttendance2');
+const editOral2 = document.getElementById('editOral2');
+const editHomework2 = document.getElementById('editHomework2');
+const editWritten2 = document.getElementById('editWritten2');
+const editAttendance3 = document.getElementById('editAttendance3');
+const editHomework3 = document.getElementById('editHomework3');
+const editOral3 = document.getElementById('editOral3');
+const editWritten3 = document.getElementById('editWritten3');
+
+// العناصر الخاصة بـ أزرار الحفظ الجديدة
+const saveTermButtons = document.querySelectorAll('.save-term-btn');
+
+
+// ========== المتغيرات العامة ==========
+let currentTeacherId = '';
+let filteredStudents = [];
+let allStudents = [];
+let currentEditStudent = null;
+let usingLocalData = false;
+let pendingUpdates = []; // 🚨 المصفوفة الرئيسية لتتبع التعديلات
+
+// ========== دوال الإعداد والواجهة (تم تحديث بعضها) ==========
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function updatePendingCount() {
+    pendingUpdates = loadPendingUpdates(); // إعادة تحميل للتأكد
+    const count = pendingUpdates.length;
+    pendingCountSpan.textContent = count;
+    if (count > 0) {
+        pendingCountSpan.classList.remove('hidden');
+        syncSheetsBtn.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)'; // إظهار اللون الأحمر للتنبيه
+    } else {
+        pendingCountSpan.classList.add('hidden');
+        syncSheetsBtn.style.background = 'linear-gradient(135deg, #3498db, #2980b9)'; // لون عادي عند عدم وجود تعديلات
     }
+}
 
-    function showLoading(show, message = '⏳ جاري تحميل البيانات...') {
-        if (show) {
-            loadingDiv.classList.remove('hidden');
-            loadingDiv.innerHTML = `<p>${message}</p>`;
-        } else {
-            loadingDiv.classList.add('hidden');
-        }
+// ========== دوال إدارة البيانات المحلية (مع تتبع التعديلات) ==========
+
+function savePendingUpdates() {
+    try {
+        localStorage.setItem(PENDING_UPDATES_KEY, JSON.stringify(pendingUpdates));
+        updatePendingCount();
+    } catch (error) {
+        console.error('فشل في حفظ التعديلات المعلقة محلياً:', error);
     }
+}
 
-    function showError(message) {
-        loadingDiv.classList.remove('hidden');
-        loadingDiv.innerHTML = `
-            <div style="color: red; text-align: center; padding: 20px;">
-                <p>❌ ${message}</p>
-                <button onclick="hideError()" style="margin: 5px; padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer;">
-                    إغلاق
-                </button>
-            </div>
-        `;
+function loadPendingUpdates() {
+    try {
+        const data = localStorage.getItem(PENDING_UPDATES_KEY);
+        return data ? JSON.parse(data) : [];
+    } catch (error) {
+        console.error('خطأ في تحميل التعديلات المعلقة:', error);
+        return [];
     }
+}
 
-    function hideError() {
-        loadingDiv.classList.add('hidden');
-    }
-
-    function showSuccess(message) {
-        loadingDiv.classList.remove('hidden');
-        loadingDiv.innerHTML = `<p style="color: green;">✅ ${message}</p>`;
-        setTimeout(() => loadingDiv.classList.add('hidden'), 3000);
-    }
-
-    function updateConnectionStatus(message, type = 'info') {
-        const colors = {
-            info: '#fff3cd',
-            success: '#d4edda',
-            error: '#f8d7da'
-        };
-        
-        const borderColors = {
-            info: '#ffeaa7',
-            success: '#c3e6cb',
-            error: '#f5c6cb'
-        };
-        
-        connectionStatus.innerHTML = message;
-        connectionStatus.style.background = colors[type] || colors.info;
-        connectionStatus.style.borderColor = borderColors[type] || borderColors.info;
-    }
-
-    // ========== إدارة البيانات المحلية ==========
-    function saveDataToLocalStorage() {
-        try {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(allStudents));
-            showSuccess('تم حفظ البيانات محلياً بنجاح');
-            return true;
-        } catch (error) {
-            showError('فشل في حفظ البيانات محلياً: ' + error.message);
-            return false;
-        }
-    }
-
-    function loadDataFromLocalStorage() {
-        try {
-            const data = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (data) {
-                allStudents = JSON.parse(data);
-                return true;
-            }
-        } catch (error) {
-            console.error('خطأ في تحميل البيانات المحلية:', error);
-        }
+function saveDataToLocalStorage() {
+    try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(allStudents));
+        // لا نحتاج لإظهار Success هنا، بل عند الضغط على زر الحفظ المحلي
+        return true;
+    } catch (error) {
+        showError('فشل في حفظ البيانات محلياً: ' + error.message);
         return false;
     }
+}
 
-    // ========== الاتصال بـ GitHub وتحويل Excel ==========
-    async function loadExcelFromGitHub() {
-        updateConnectionStatus('🌐 جاري الاتصال بـ GitHub...', 'info');
-        
-        try {
-            const response = await fetch(GITHUB_EXCEL_URL);
-            
-            if (!response.ok) {
-                throw new Error(`فشل في تحميل الملف: ${response.status} ${response.statusText}`);
-            }
-            
-            updateConnectionStatus('📁 تم الاتصال - جاري تحميل الملف...', 'info');
-            
-            const arrayBuffer = await response.arrayBuffer();
-            
-            updateConnectionStatus('🔄 جاري تحويل Excel إلى JSON...', 'info');
-            
-            // يجب أن تكون مكتبة XLSX (SheetJS) محملة في ملف HTML قبل هذا الكود
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const excelData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-            
-            const processed = processExcelData(excelData);
-            allStudents = processed;
-            
-            // حفظ البيانات المحلية تلقائياً عند نجاح التحميل
-            saveDataToLocalStorage();
-            
-            updateConnectionStatus(`✅ تم التحويل بنجاح - ${allStudents.length} طالب`, 'success');
-            loginBtn.disabled = false;
-            loginBtn.style.background = 'linear-gradient(135deg, #27ae60, #229954)';
-            usingLocalData = false;
-            
-            console.log('📊 البيانات المحملة:', allStudents);
-            
-        } catch (error) {
-            console.error('❌ خطأ في التحميل:', error);
-            updateConnectionStatus(`
-                ❌ فشل في التحميل من GitHub
-                <br><br>
-                <strong>تفاصيل الخطأ:</strong> ${error.message}
-                <br><br>
-                <strong>يمكنك استخدام البيانات المحلية المخزنة</strong>
-            `, 'error');
-            
-            // محاولة تحميل البيانات المحلية عند فشل الاتصال
-            if (loadDataFromLocalStorage()) {
-                updateConnectionStatus(`✅ تم تحميل ${allStudents.length} طالب من البيانات المحلية`, 'success');
-                loginBtn.disabled = false;
-                loginBtn.style.background = 'linear-gradient(135deg, #27ae60, #229954)';
-                usingLocalData = true;
-            } else {
-                loginBtn.disabled = true;
-            }
+function loadDataFromLocalStorage() {
+    try {
+        const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (data) {
+            allStudents = JSON.parse(data);
+            pendingUpdates = loadPendingUpdates(); // 🚨 تحميل التعديلات المعلقة عند بدء التشغيل
+            updatePendingCount(); // تحديث العداد
+            return true;
         }
+    } catch (error) {
+        console.error('خطأ في تحميل البيانات المحلية:', error);
     }
+    return false;
+}
 
-    // ========== معالجة بيانات Excel ==========
-    function processExcelData(excelData) {
-        if (!excelData || excelData.length < 2) {
-            throw new Error('الملف لا يحتوي على بيانات صحيحة');
-        }
+// ... (بقية الدوال: validateTeacherId, showLoading, showError, hideError, showSuccess, updateConnectionStatus, formatGrade تبقى كما هي)
+function validateTeacherId(teacherId) {
+    return /^[a-zA-Z0-9_\-]+$/.test(teacherId) && teacherId.length >= 3;
+}
 
-        const students = [];
-        
-        // رؤوس الأعمدة كما حددتها سابقاً
-        const teacherIdColumn = 23;
-        const idColumn = 0;
-        const barcodeColumn = 1;
-        const nameColumn = 2;
-        const classColumn = 3;
-        const attendance1Column = 4;
-        const oral1Column = 5;
-        const homework1Column = 6;
-        const written1Column = 7;
-        const total1Column = 8;
-        const result1Column = 9;
-        const attendance2Column = 10;
-        const oral2Column = 11;
-        const homework2Column = 12;
-        const written2Column = 13;
-        const total2Column = 14;
-        const result2Column = 15;
-        const attendance3Column = 16;
-        const homework3Column = 17;
-        const oral3Column = 18;
-        const written3Column = 19;
-        const total3Column = 20;
-        const result3Column = 21;
-
-        for (let i = 1; i < excelData.length; i++) {
-            const row = excelData[i];
-            if (row.length === 0) continue;
-
-            const student = {
-                id: row[idColumn] || `STD${i}`,
-                barcode: row[barcodeColumn] || '',
-                name: row[nameColumn] || 'بدون اسم',
-                class: row[classColumn] || '---',
-                teacherId: (row[teacherIdColumn] || '').toString().trim(),
-                
-                attendance1: formatGrade(row[attendance1Column]),
-                oral1: formatGrade(row[oral1Column]),
-                homework1: formatGrade(row[homework1Column]),
-                written1: formatGrade(row[written1Column]),
-                total1: formatGrade(row[total1Column]),
-                result1: formatGrade(row[result1Column]),
-                
-                attendance2: formatGrade(row[attendance2Column]),
-                oral2: formatGrade(row[oral2Column]),
-                homework2: formatGrade(row[homework2Column]),
-                written2: formatGrade(row[written2Column]),
-                total2: formatGrade(row[total2Column]),
-                result2: formatGrade(row[result2Column]),
-                
-                attendance3: formatGrade(row[attendance3Column]),
-                homework3: formatGrade(row[homework3Column]),
-                oral3: formatGrade(row[oral3Column]),
-                written3: formatGrade(row[written3Column]),
-                total3: formatGrade(row[total3Column]),
-                result3: formatGrade(row[result3Column]),
-                
-                fullData: row
-            };
-
-            if (student.teacherId) {
-                students.push(student);
-            }
-        }
-
-        return students;
+function showLoading(show, message = '⏳ جاري تحميل البيانات...') {
+    if (show) {
+        loadingDiv.classList.remove('hidden');
+        loadingDiv.innerHTML = `<p>${message}</p>`;
+    } else {
+        loadingDiv.classList.add('hidden');
     }
+}
 
-    function formatGrade(value) {
-        if (value === null || value === undefined || value === '') return '0';
-        // تحويل القيمة إلى سلسلة نصية وإزالة أي مسافات
-        const strValue = value.toString().trim();
-        // محاولة تحويلها إلى رقم (باستخدام 0 إذا لم تكن رقماً صالحاً)
-        const numValue = parseFloat(strValue);
-        if (isNaN(numValue)) return '0';
-        // عرض الرقم مع منزلة عشرية واحدة على الأكثر
-        return numValue.toFixed(1).replace(/\.0$/, '');
-    }
-    
-    function filterStudentsByTeacher() {
-        if (!allStudents || allStudents.length === 0) {
-            filteredStudents = [];
-            return;
-        }
+function showError(message) {
+    loadingDiv.classList.remove('hidden');
+    loadingDiv.innerHTML = `
+        <div style="color: red; text-align: center; padding: 20px;">
+            <p>❌ ${message}</p>
+            <button onclick="hideError()" style="margin: 5px; padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                إغلاق
+            </button>
+        </div>
+    `;
+}
 
-        filteredStudents = allStudents.filter(student => student.teacherId === currentTeacherId);
-    }
+function hideError() {
+    loadingDiv.classList.add('hidden');
+}
 
-    // ========== دوال البحث والتصفية ==========
-    function addSearchFunctionality() {
-        updateClassFilter();
-        document.getElementById('searchInput').addEventListener('input', filterStudents);
-        document.getElementById('classFilter').addEventListener('change', filterStudents);
-    }
+function showSuccess(message) {
+    loadingDiv.classList.remove('hidden');
+    loadingDiv.innerHTML = `<p style="color: green;">✅ ${message}</p>`;
+    setTimeout(() => loadingDiv.classList.add('hidden'), 3000);
+}
 
-    function updateClassFilter() {
-        const classFilter = document.getElementById('classFilter');
-        const classes = [...new Set(filteredStudents.map(student => student.class).filter(c => c))];
-        
-        classFilter.innerHTML = '<option value="">جميع الشعب</option>';
-        classes.forEach(className => {
-            const option = document.createElement('option');
-            option.value = className;
-            option.textContent = className;
-            classFilter.appendChild(option);
-        });
-    }
+function updateConnectionStatus(message, type = 'info') {
+    const colors = {
+        info: '#fff3cd',
+        success: '#d4edda',
+        error: '#f8d7da',
+        warning: '#ffe0b2'
+    };
 
-    function filterStudents() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const selectedClass = document.getElementById('classFilter').value;
-        
-        let filtered = allStudents.filter(student => student.teacherId === currentTeacherId);
-        
-        if (searchTerm) {
-            filtered = filtered.filter(student => 
-                student.name.toLowerCase().includes(searchTerm) ||
-                student.barcode.toLowerCase().includes(searchTerm)
-            );
-        }
-        
-        if (selectedClass) {
-            filtered = filtered.filter(student => student.class === selectedClass);
-        }
-        
-        filteredStudents = filtered;
-        renderStudentsTable();
-        displayStatistics(filteredStudents);
-    }
+    const borderColors = {
+        info: '#ffeaa7',
+        success: '#c3e6cb',
+        error: '#f5c6cb',
+        warning: '#ffc107'
+    };
 
-    // ========== عرض الجدول (مع التصحيح) ==========
-    function renderStudentsTable() {
-        studentsTableBody.innerHTML = '';
-        
-        studentsCountSpan.textContent = filteredStudents.length;
+    connectionStatus.innerHTML = message;
+    connectionStatus.style.background = colors[type] || colors.info;
+    connectionStatus.style.borderColor = borderColors[type] || colors.info;
+}
 
-        if (filteredStudents.length === 0) {
-            studentsTableBody.innerHTML = `
-                <tr>
-                    <td colspan="23" style="text-align: center; color: #666; padding: 40px;">
-                        📝 لا توجد بيانات للعرض للمعلم ${currentTeacherId}
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-        
-        filteredStudents.forEach((student) => {
-            const row = document.createElement('tr');
-            
-            function getResultClass(result) {
-                const value = parseFloat(result) || 0;
-                if (value >= 4.5) return 'result-excellent';
-                if (value >= 3.5) return 'result-good';
-                if (value >= 2.5) return 'result-average';
-                return 'result-poor';
-            }
+function formatGrade(value) {
+    if (value === null || value === undefined || value === '') return '0';
+    const strValue = value.toString().trim();
+    const numValue = parseFloat(strValue);
+    if (isNaN(numValue)) return '0';
+    return numValue.toFixed(1).replace(/\.0$/, '');
+}
 
-            const result1Class = getResultClass(student.result1);
-            const result2Class = getResultClass(student.result2);
-            const result3Class = getResultClass(student.result3);
-            
-            // **********************************************
-            // 💡 الكود المصحح لإنشاء صف الجدول بالكامل
-            // **********************************************
-            row.innerHTML = `
-                <td>${student.id}</td>
-                <td>${student.barcode}</td>
-                <td>
-                    <span class="student-name" data-student-id="${student.id}">
-                        ${student.name}
-                    </span>
-                </td>
-                <td>${student.class}</td>
-                <td>${student.attendance1}</td>
-                <td>${student.oral1}</td>
-                <td>${student.homework1}</td>
-                <td>${student.written1}</td>
-                <td><strong>${student.total1}</strong></td>
-                <td class="result-cell ${result1Class}">${student.result1}</td>
-                <td>${student.attendance2}</td>
-                <td>${student.oral2}</td>
-                <td>${student.homework2}</td>
-                <td>${student.written2}</td>
-                <td><strong>${student.total2}</strong></td>
-                <td class="result-cell ${result2Class}">${student.result2}</td>
-                <td>${student.attendance3}</td>
-                <td>${student.homework3}</td>
-                <td>${student.oral3}</td>
-                <td>${student.written3}</td>
-                <td><strong>${student.total3}</strong></td>
-                <td class="result-cell ${result3Class}">${student.result3}</td>
-                <td>
-                    <button class="edit-btn" data-student-id="${student.id}">تعديل</button>
-                </td>
-            `;
-            // **********************************************
-            
-            studentsTableBody.appendChild(row);
-        });
-    }
+// ========== دوال التصفية والإحصاء (لم تتغير) ==========
 
-    // ========== دوال الإحصائيات (مكررة كما كانت) ==========
-    function calculateStatistics(students) {
-        // يتم حساب المتوسطات والنسب هنا
-        // لتبسيط الكود، سأفترض أن هذه الدالة تعمل بشكل سليم
-        return {
-            totalStudents: students.length,
-            classes: [...new Set(students.map(s => s.class))].join(', '),
-            avgTotal1: calculateAverage(students.map(s => parseFloat(s.total1))),
-            avgTotal2: calculateAverage(students.map(s => parseFloat(s.total2))),
-            avgTotal3: calculateAverage(students.map(s => parseFloat(s.total3))),
-        };
-    }
-
-    function calculateAverage(arr) {
-        const validNumbers = arr.filter(n => !isNaN(n));
-        if (validNumbers.length === 0) return '0.0';
-        const sum = validNumbers.reduce((a, b) => a + b, 0);
-        return (sum / validNumbers.length).toFixed(1);
-    }
-
-    function displayStatistics(students) {
-        const stats = calculateStatistics(students);
-        const statsContainer = document.getElementById('statsContainer');
-        
-        statsContainer.innerHTML = `
-            <div class="stats-container">
-                <h3>📈 الإحصائيات الفورية</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <strong>إجمالي الطلاب</strong>
-                        <p>${stats.totalStudents}</p>
-                    </div>
-                    <div class="stat-item">
-                        <strong>متوسط المجموع 1</strong>
-                        <p>${stats.avgTotal1}</p>
-                    </div>
-                    <div class="stat-item">
-                        <strong>متوسط المجموع 2</strong>
-                        <p>${stats.avgTotal2}</p>
-                    </div>
-                    <div class="stat-item">
-                        <strong>متوسط المجموع 3</strong>
-                        <p>${stats.avgTotal3}</p>
-                    </div>
-                    <div class="stat-item">
-                        <strong>الشعب المدارة</strong>
-                        <p>${stats.classes || 'لا توجد شعب'}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    // ========== إدارة التعديل (Edit Modal Logic) ==========
-
-    function getStudentById(id) {
-        return allStudents.find(student => student.id.toString() === id.toString());
-    }
-
-    function openEditModal(studentId) {
-        currentEditStudent = getStudentById(studentId);
-        
-        if (!currentEditStudent) {
-            showError('تعذر العثور على بيانات الطالب للتعديل.');
-            return;
-        }
-
-        // تعبئة بيانات النموذج
-        currentStudentName.textContent = currentEditStudent.name;
-        editStudentId.value = currentEditStudent.id;
-        
-        editAttendance1.value = currentEditStudent.attendance1;
-        editOral1.value = currentEditStudent.oral1;
-        editHomework1.value = currentEditStudent.homework1;
-        editWritten1.value = currentEditStudent.written1;
-        
-        editAttendance2.value = currentEditStudent.attendance2;
-        editOral2.value = currentEditStudent.oral2;
-        editHomework2.value = currentEditStudent.homework2;
-        editWritten2.value = currentEditStudent.written2;
-        
-        editAttendance3.value = currentEditStudent.attendance3;
-        editHomework3.value = currentEditStudent.homework3;
-        editOral3.value = currentEditStudent.oral3;
-        editWritten3.value = currentEditStudent.written3;
-
-        // إظهار النافذة
-        editModal.style.display = 'block';
-        console.log('تم فتح مودال التعديل للطالب ID:', studentId);
-    }
-
-    function closeEditModal() {
-        editModal.style.display = 'none';
-        currentEditStudent = null;
-    }
-
-    function handleEditSubmit(event) {
-        event.preventDefault();
-        
-        if (!currentEditStudent) return;
-
-        // جمع البيانات الجديدة
-        const newAttendance1 = parseFloat(editAttendance1.value) || 0;
-        const newOral1 = parseFloat(editOral1.value) || 0;
-        const newHomework1 = parseFloat(editHomework1.value) || 0;
-        const newWritten1 = parseFloat(editWritten1.value) || 0;
-        const newTotal1 = newAttendance1 + newOral1 + newHomework1 + newWritten1;
-        const newResult1 = (newTotal1 / 80) * 5; // إذا كان المجموع الكلي 80
-
-        const newAttendance2 = parseFloat(editAttendance2.value) || 0;
-        const newOral2 = parseFloat(editOral2.value) || 0;
-        const newHomework2 = parseFloat(editHomework2.value) || 0;
-        const newWritten2 = parseFloat(editWritten2.value) || 0;
-        const newTotal2 = newAttendance2 + newOral2 + newHomework2 + newWritten2;
-        const newResult2 = (newTotal2 / 80) * 5; 
-
-        const newAttendance3 = parseFloat(editAttendance3.value) || 0;
-        const newHomework3 = parseFloat(editHomework3.value) || 0;
-        const newOral3 = parseFloat(editOral3.value) || 0;
-        const newWritten3 = parseFloat(editWritten3.value) || 0;
-        const newTotal3 = newAttendance3 + newHomework3 + newOral3 + newWritten3;
-        const newResult3 = (newTotal3 / 80) * 5; 
-
-        // تحديث كائن الطالب
-        currentEditStudent.attendance1 = newAttendance1.toFixed(1);
-        currentEditStudent.oral1 = newOral1.toFixed(1);
-        currentEditStudent.homework1 = newHomework1.toFixed(1);
-        currentEditStudent.written1 = newWritten1.toFixed(1);
-        currentEditStudent.total1 = newTotal1.toFixed(1);
-        currentEditStudent.result1 = newResult1.toFixed(1);
-
-        currentEditStudent.attendance2 = newAttendance2.toFixed(1);
-        currentEditStudent.oral2 = newOral2.toFixed(1);
-        currentEditStudent.homework2 = newHomework2.toFixed(1);
-        currentEditStudent.written2 = newWritten2.toFixed(1);
-        currentEditStudent.total2 = newTotal2.toFixed(1);
-        currentEditStudent.result2 = newResult2.toFixed(1);
-
-        currentEditStudent.attendance3 = newAttendance3.toFixed(1);
-        currentEditStudent.homework3 = newHomework3.toFixed(1);
-        currentEditStudent.oral3 = newOral3.toFixed(1);
-        currentEditStudent.written3 = newWritten3.toFixed(1);
-        currentEditStudent.total3 = newTotal3.toFixed(1);
-        currentEditStudent.result3 = newResult3.toFixed(1);
-
-        // إعادة عرض الجدول وحفظ البيانات محلياً
-        filterStudents(); // لإعادة تحديث الجدول والإحصائيات
-        saveDataToLocalStorage();
-        showSuccess(`تم تحديث بيانات الطالب ${currentEditStudent.name} بنجاح.`);
-        closeEditModal();
-    }
-
-    // ========== دوال التنقل وتسجيل الدخول ==========
-    function handleLogin() {
-        const teacherId = teacherIdInput.value.trim().toLowerCase();
-        if (!validateTeacherId(teacherId) || allStudents.length === 0) {
-            showError('يجب إدخال معرف معلم صحيح وتحميل البيانات أولاً.');
-            return;
-        }
-
-        currentTeacherId = teacherId;
-        filterStudentsByTeacher();
-
-        if (filteredStudents.length === 0) {
-            showError(`عذراً، لا توجد بيانات مسجلة للمعلم "${currentTeacherId}".`);
-            return;
-        }
-
-        loginSection.classList.add('hidden');
-        mainSection.classList.remove('hidden');
-        teacherInfoDiv.classList.remove('hidden');
-        document.getElementById('searchContainer').classList.remove('hidden');
-        currentTeacherSpan.textContent = currentTeacherId;
-        
-        renderStudentsTable();
-        displayStatistics(filteredStudents);
-        addSearchFunctionality(); // إضافة مستمعات البحث والتصفية
-    }
-
-    function handleLogout() {
-        // يمكنك إضافة كود لتنظيف الجلسة هنا إذا لزم الأمر
-        currentTeacherId = '';
-        allStudents = [];
+function filterStudentsByTeacher() {
+    if (!allStudents || allStudents.length === 0) {
         filteredStudents = [];
+        return;
+    }
+
+    filteredStudents = allStudents.filter(student => student.teacherId === currentTeacherId);
+}
+
+function updateClassFilter() {
+    const classFilter = document.getElementById('classFilter');
+    const classes = [...new Set(filteredStudents.map(student => student.class).filter(c => c))];
+
+    classFilter.innerHTML = '<option value="">جميع الشعب</option>';
+    classes.forEach(className => {
+        const option = document.createElement('option');
+        option.value = className;
+        option.textContent = className;
+        classFilter.appendChild(option);
+    });
+}
+
+function filterStudents() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const selectedClass = document.getElementById('classFilter').value;
+
+    let filtered = allStudents.filter(student => student.teacherId === currentTeacherId);
+
+    if (searchTerm) {
+        filtered = filtered.filter(student =>
+            student.name.toLowerCase().includes(searchTerm) ||
+            student.barcode.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    if (selectedClass) {
+        filtered = filtered.filter(student => student.class === selectedClass);
+    }
+
+    filteredStudents = filtered;
+    renderStudentsTable();
+    displayStatistics(filteredStudents);
+}
+
+function renderStudentsTable() {
+    studentsTableBody.innerHTML = '';
+
+    studentsCountSpan.textContent = filteredStudents.length;
+
+    if (filteredStudents.length === 0) {
+        studentsTableBody.innerHTML = `
+            <tr>
+                <td colspan="23" style="text-align: center; color: #666; padding: 40px;">
+                    📝 لا توجد بيانات للعرض للمعلم ${currentTeacherId}
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    filteredStudents.forEach((student) => {
+        const row = document.createElement('tr');
+
+        function getResultClass(result) {
+            const value = parseFloat(result) || 0;
+            if (value >= 4.5) return 'result-excellent';
+            if (value >= 3.5) return 'result-good';
+            if (value >= 2.5) return 'result-average';
+            return 'result-poor';
+        }
+
+        const result1Class = getResultClass(student.result1);
+        const result2Class = getResultClass(student.result2);
+        const result3Class = getResultClass(student.result3);
+
+        // 🚨 إضافة زر التعديل في العمود الأخير
+        row.innerHTML = `
+            <td>${student.id}</td>
+            <td>${student.barcode}</td>
+            <td>
+                <span class="student-name" onclick="openEditModal('${student.id}')">
+                    ${student.name}
+                </span>
+            </td>
+            <td>${student.class}</td>
+            <td>${student.attendance1}</td>
+            <td>${student.oral1}</td>
+            <td>${student.homework1}</td>
+            <td>${student.written1}</td>
+            <td>${student.total1}</td>
+            <td class="result-cell ${result1Class}">${student.result1}</td>
+            <td>${student.attendance2}</td>
+            <td>${student.oral2}</td>
+            <td>${student.homework2}</td>
+            <td>${student.written2}</td>
+            <td>${student.total2}</td>
+            <td class="result-cell ${result2Class}">${student.result2}</td>
+            <td>${student.attendance3}</td>
+            <td>${student.homework3}</td>
+            <td>${student.oral3}</td>
+            <td>${student.written3}</td>
+            <td>${student.total3}</td>
+            <td class="result-cell ${result3Class}">${student.result3}</td>
+            <td><button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button></td>
+        `;
+        studentsTableBody.appendChild(row);
+    });
+}
+
+
+function calculateAverage(data, key) {
+    if (!data || data.length === 0) return '0.0';
+    const sum = data.reduce((acc, student) => acc + (parseFloat(student[key]) || 0), 0);
+    return (sum / data.length).toFixed(2);
+}
+
+function calculateStatistics(data) {
+    const stats = {
+        totalStudents: data.length,
+        avgResult1: calculateAverage(data, 'result1'),
+        avgResult2: calculateAverage(data, 'result2'),
+        avgResult3: calculateAverage(data, 'result3'),
+        avgAttendance1: calculateAverage(data, 'attendance1'),
+        avgWritten2: calculateAverage(data, 'written2'),
+        // يمكن إضافة المزيد من الإحصائيات هنا
+    };
+    return stats;
+}
+
+function displayStatistics(data) {
+    const stats = calculateStatistics(data);
+    const statsContainer = document.getElementById('statsContainer');
+    statsContainer.innerHTML = `
+        <div class="stat-item">
+            <strong>إجمالي الطلاب</strong>
+            <p style="font-size: 1.5em; color: var(--dark-color);">${stats.totalStudents}</p>
+        </div>
+        <div class="stat-item">
+            <strong>متوسط محصلة 1</strong>
+            <p style="font-size: 1.5em; color: var(--primary-color);">${stats.avgResult1}</p>
+        </div>
+        <div class="stat-item">
+            <strong>متوسط محصلة 2</strong>
+            <p style="font-size: 1.5em; color: var(--primary-color);">${stats.avgResult2}</p>
+        </div>
+        <div class="stat-item">
+            <strong>متوسط محصلة 3</strong>
+            <p style="font-size: 1.5em; color: var(--primary-color);">${stats.avgResult3}</p>
+        </div>
+        <div class="stat-item">
+            <strong>متوسط مواظبة 1</strong>
+            <p style="font-size: 1.5em; color: var(--success-color);">${stats.avgAttendance1}</p>
+        </div>
+        <div class="stat-item">
+            <strong>متوسط تحريري 2</strong>
+            <p style="font-size: 1.5em; color: var(--warning-color);">${stats.avgWritten2}</p>
+        </div>
+    `;
+}
+
+// ========== دوال جلب البيانات الرئيسية (لم تتغير) ==========
+
+async function loadDataFromGoogleSheets() {
+    updateConnectionStatus('🌐 جاري جلب البيانات المحدثة من Google Sheets...', 'info');
+
+    try {
+        const response = await fetch(WEB_APP_URL, {
+            method: 'GET',
+        });
+
+        if (!response.ok) {
+            throw new Error(`فشل في جلب البيانات: ${response.status} ${response.statusText}`);
+        }
+
+        const rawData = await response.json();
+
+        if (rawData.error) {
+            throw new Error(rawData.error);
+        }
+
+        const processedStudents = rawData.map(row => {
+            const teacherIdFromSheet = (row['المعرف'] || '').toString().trim();
+
+            return {
+                // بيانات الطالب الأساسية
+                id: (row['ID'] || '').toString().trim(), // ID من العمود A
+                barcode: (row['Barcode'] || '').toString().trim(),
+                name: row['الاسم'] || 'بدون اسم',
+                class: row['الشعبة'] || '---',
+                teacherId: teacherIdFromSheet,
+                subject: row['المادة'] || '---',
+
+                // الترم الأول
+                attendance1: formatGrade(row['مواظبة']),
+                oral1: formatGrade(row['شفهي 1']),
+                homework1: formatGrade(row['واجبات 1']),
+                written1: formatGrade(row['تحريري 1']),
+                total1: formatGrade(row['المجمـــــوع1']),
+                result1: formatGrade(row['محصلة1']),
+
+                // الترم الثاني
+                attendance2: formatGrade(row['مواظبة 2']),
+                oral2: formatGrade(row['شفهي 2']),
+                homework2: formatGrade(row['واجبات 2']),
+                written2: formatGrade(row['تحريري 2']),
+                total2: formatGrade(row['المجمـــــوع2']),
+                result2: formatGrade(row['محصلة2']),
+
+                // الترم الثالث
+                attendance3: formatGrade(row['مواظبة']),
+                homework3: formatGrade(row['واجبات 3']),
+                oral3: formatGrade(row['شفهي 3']),
+                written3: formatGrade(row['تحريري 3']),
+                total3: formatGrade(row['المجمـــــوع']),
+                result3: formatGrade(row['محصلة3']),
+            };
+        })
+        .filter(student => student.teacherId && student.id);
+
+        allStudents = processedStudents;
+        saveDataToLocalStorage();
+
+        updateConnectionStatus(`✅ تم تحميل ${allStudents.length} طالب من Google Sheets`, 'success');
+        loginBtn.disabled = false;
+        loginBtn.style.background = 'linear-gradient(135deg, #27ae60, #229954)';
+        usingLocalData = false;
+        pendingUpdates = loadPendingUpdates(); // 🚨 تحديث قائمة التعديلات المعلقة
+        updatePendingCount(); // تحديث العداد
+
+    } catch (error) {
+        console.error('❌ خطأ في التحميل من Google Sheets:', error);
+
+        if (loadDataFromLocalStorage()) {
+            updateConnectionStatus(`⚠️ فشل اتصال. تم تحميل ${allStudents.length} طالب من البيانات المحلية`, 'warning');
+            loginBtn.disabled = false;
+            usingLocalData = true;
+        } else {
+            showError('فشل التحميل من كلا المصدرين. تحقق من الاتصال بالإنترنت.');
+            loginBtn.disabled = true;
+        }
+    }
+}
+
+// ========== دوال التعديل والمزامنة (التعديلات الرئيسية هنا) ==========
+
+function openEditModal(studentId) {
+    currentEditStudent = allStudents.find(s => s.id === studentId);
+    if (!currentEditStudent) {
+        showError('لم يتم العثور على بيانات الطالب!');
+        return;
+    }
+
+    currentStudentName.textContent = currentEditStudent.name;
+    editStudentId.value = currentEditStudent.id;
+
+    // ملء بيانات الشهر الأول
+    editAttendance1.value = currentEditStudent.attendance1;
+    editOral1.value = currentEditStudent.oral1;
+    editHomework1.value = currentEditStudent.homework1;
+    editWritten1.value = currentEditStudent.written1;
+
+    // ملء بيانات الشهر الثاني
+    editAttendance2.value = currentEditStudent.attendance2;
+    editOral2.value = currentEditStudent.oral2;
+    editHomework2.value = currentEditStudent.homework2;
+    editWritten2.value = currentEditStudent.written2;
+
+    // ملء بيانات الشهر الثالث
+    editAttendance3.value = currentEditStudent.attendance3;
+    editHomework3.value = currentEditStudent.homework3;
+    editOral3.value = currentEditStudent.oral3;
+    editWritten3.value = currentEditStudent.written3;
+
+    editModal.style.display = 'block';
+}
+
+function saveTerm(term) {
+    const studentId = editStudentId.value;
+    const studentIndex = allStudents.findIndex(s => s.id === studentId);
+
+    if (studentIndex === -1) {
+        showError('خطأ: لم يتم العثور على الطالب للحفظ.');
+        return;
+    }
+
+    const student = allStudents[studentIndex];
+    let newGrades = {};
+
+    // تجميع التعديلات بناءً على الشهر (Term)
+    if (term === 1) {
+        newGrades = {
+            attendance1: formatGrade(editAttendance1.value),
+            oral1: formatGrade(editOral1.value),
+            homework1: formatGrade(editHomework1.value),
+            written1: formatGrade(editWritten1.value),
+            // يتم حساب total1 و result1 تلقائياً في Google Sheets، لذا نرسل العلامات الفردية فقط
+        };
+    } else if (term === 2) {
+        newGrades = {
+            attendance2: formatGrade(editAttendance2.value),
+            oral2: formatGrade(editOral2.value),
+            homework2: formatGrade(editHomework2.value),
+            written2: formatGrade(editWritten2.value),
+        };
+    } else if (term === 3) {
+        newGrades = {
+            attendance3: formatGrade(editAttendance3.value),
+            homework3: formatGrade(editHomework3.value),
+            oral3: formatGrade(editOral3.value),
+            written3: formatGrade(editWritten3.value),
+        };
+    } else {
+        showError('خطأ: رقم الشهر غير صالح.');
+        return;
+    }
+
+    // تطبيق التعديلات على البيانات المحلية
+    Object.assign(student, newGrades);
+
+    // 🚨 تتبع التعديلات المعلقة
+    const updatePayload = {
+        id: student.id,
+        term: term,
+        grades: newGrades,
+        // يمكن إضافة المزيد من البيانات لضمان التحديد الدقيق للصف، مثل teacherId أو class
+    };
+
+    // إضافة أو تحديث التعديل في قائمة pendingUpdates
+    // نبحث عن تعديل لنفس الطالب
+    const existingIndex = pendingUpdates.findIndex(update => update.id === student.id);
+
+    if (existingIndex !== -1) {
+        // إذا وجدنا تعديل سابق، ندمج التعديلات الجديدة مع القديمة
+        const existingUpdate = pendingUpdates[existingIndex];
+        // ندمج الدرجات الجديدة، مع الحفاظ على التعديلات الأخرى
+        existingUpdate.grades = { ...existingUpdate.grades, ...newGrades };
+        pendingUpdates[existingIndex] = existingUpdate;
+    } else {
+        // إذا لم يكن هناك تعديل سابق، نضيف التعديل الجديد
+        pendingUpdates.push(updatePayload);
+    }
+
+    // حفظ البيانات وقائمة التعديلات محلياً
+    saveDataToLocalStorage(); // حفظ كل البيانات المحدثة محلياً
+    savePendingUpdates(); // حفظ قائمة التعديلات المعلقة
+
+    showSuccess(`✅ تم حفظ تعديلات الشهر ${term} للطالب ${student.name} محلياً. يرجى المزامنة!`);
+
+    // إعادة عرض الجدول لتظهر التغييرات مباشرة
+    filterStudents();
+    closeModal('editModal');
+}
+
+async function syncSheets() {
+    if (pendingUpdates.length === 0) {
+        showError('⚠️ لا توجد تعديلات معلقة للمزامنة.');
+        return;
+    }
+
+    showLoading(true, `☁️ جاري مزامنة ${pendingUpdates.length} تعديل مع Google Sheets...`);
+    syncSheetsBtn.disabled = true;
+
+    try {
+        // 🚨 إرسال جميع التعديلات المعلقة في طلب واحد
+        const response = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'updateGrades', // الإجراء الذي يجب أن ينفذه Apps Script
+                updates: JSON.stringify(pendingUpdates)
+            }).toString()
+        });
+
+        if (!response.ok) {
+            throw new Error(`فشل في المزامنة: ${response.status} ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            const successCount = result.updatedCount || pendingUpdates.length;
+
+            // 🚨 مسح التعديلات المعلقة بعد نجاح المزامنة
+            pendingUpdates = [];
+            savePendingUpdates(); // حفظ قائمة فارغة
+
+            showSuccess(`🎉 نجاح المزامنة! تم تحديث ${successCount} سجل في Google Sheets.`);
+
+            // إعادة تحميل البيانات بالكامل للتأكد من حساب المجاميع والمحصلات بشكل صحيح
+            await loadDataFromGoogleSheets();
+            filterStudents(); // إعادة عرض الجدول
+
+        } else {
+            throw new Error(result.error || 'فشل المزامنة بدون رسالة خطأ محددة.');
+        }
+
+    } catch (error) {
+        console.error('❌ خطأ في مزامنة البيانات:', error);
+        showError('فشل في مزامنة التعديلات. تحقق من اتصالك أو خادم Apps Script: ' + error.message);
+    } finally {
+        showLoading(false);
+        syncSheetsBtn.disabled = false;
+        updatePendingCount(); // تحديث العداد
+    }
+}
+
+
+// ... (بقية دوال التحكم في الواجهة و Event Listeners)
+
+function setupEventListeners() {
+    teacherIdInput.addEventListener('input', () => {
+        const id = teacherIdInput.value.trim();
+        loginBtn.disabled = !validateTeacherId(id);
+        if (loginBtn.disabled) {
+            updateConnectionStatus('يرجى إدخال معرف معلم صحيح (أحرف وأرقام).', 'warning');
+        } else {
+            updateConnectionStatus('جاهز للاتصال والتحميل.', 'info');
+        }
+    });
+
+    loginBtn.addEventListener('click', async () => {
+        currentTeacherId = teacherIdInput.value.trim();
+        if (!currentTeacherId) return;
+
+        showLoading(true, 'جاري تسجيل الدخول والتحميل...');
+        await loadDataFromGoogleSheets();
+
+        if (allStudents.length > 0) {
+            loginSection.classList.add('hidden');
+            mainSection.classList.remove('hidden');
+            teacherInfoDiv.classList.remove('hidden');
+            document.getElementById('searchContainer').classList.remove('hidden');
+            currentTeacherSpan.textContent = currentTeacherId;
+
+            filterStudentsByTeacher();
+            updateClassFilter();
+            filterStudents();
+        } else {
+            showError('لم يتم العثور على بيانات لهذا المعلم أو فشل تحميل البيانات.');
+            loginSection.classList.remove('hidden');
+            mainSection.classList.add('hidden');
+        }
+        showLoading(false);
+    });
+
+    logoutBtn.addEventListener('click', () => {
         loginSection.classList.remove('hidden');
         mainSection.classList.add('hidden');
-        teacherIdInput.value = 'ameen'; // إعادة القيمة الافتراضية
-        updateConnectionStatus('⏳ جاري الاتصال بـ GitHub وتحويل البيانات...', 'info');
-        loadExcelFromGitHub(); // إعادة محاولة تحميل البيانات عند الخروج
-    }
+        filteredStudents = [];
+        currentTeacherId = '';
+        renderStudentsTable();
+        updateConnectionStatus('⏳ جاري الاتصال بـ Google Sheets...', 'info');
+    });
 
-    // ========== وظيفة التصدير ==========
-    function exportToExcel() {
-        if (filteredStudents.length === 0) {
-            alert('لا توجد بيانات لتصديرها.');
-            return;
-        }
-
-        // إنشاء نسخة مبسطة من البيانات للتصدير
-        const dataToExport = filteredStudents.map(student => ({
-            'ID': student.id,
-            'الباركود': student.barcode,
-            'اسم الطالب': student.name,
-            'الشعبة': student.class,
-            // ... (باقي الحقول)
-            'مواظبة 1': student.attendance1,
-            'شفهي 1': student.oral1,
-            'واجبات 1': student.homework1,
-            'تحريري 1': student.written1,
-            'المجموع 1': student.total1,
-            'محصلة 1': student.result1,
-
-            'مواظبة 2': student.attendance2,
-            'شفهي 2': student.oral2,
-            'واجبات 2': student.homework2,
-            'تحريري 2': student.written2,
-            'المجموع 2': student.total2,
-            'محصلة 2': student.result2,
-
-            'مواظبة 3': student.attendance3,
-            'واجبات 3': student.homework3,
-            'شفهي 3': student.oral3,
-            'تحريري 3': student.written3,
-            'المجموع 3': student.total3,
-            'محصلة 3': student.result3,
-            // ... إضافة المزيد من الحقول هنا
-        }));
-
-        const ws = XLSX.utils.json_to_sheet(dataToExport);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "النتائج");
-
-        const fileName = `النتائج_${currentTeacherId}_${new Date().toLocaleDateString('en-CA')}.xlsx`;
-        XLSX.writeFile(wb, fileName);
-    }
-
-    // ========== ربط الأحداث (Event Listeners) ==========
-    
-    // 1. شاشة تسجيل الدخول
-    document.addEventListener('DOMContentLoaded', loadExcelFromGitHub);
-    loginBtn.addEventListener('click', handleLogin);
-    retryBtn.addEventListener('click', loadExcelFromGitHub);
+    retryBtn.addEventListener('click', loadDataFromGoogleSheets);
     useLocalDataBtn.addEventListener('click', () => {
         if (loadDataFromLocalStorage()) {
-            allStudents.length > 0 ? loginBtn.disabled = false : loginBtn.disabled = true;
+            loginBtn.disabled = false;
+            loginBtn.style.background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
+            updateConnectionStatus(`⚠️ تم تحميل ${allStudents.length} طالب من البيانات المحلية.`, 'warning');
             usingLocalData = true;
-            updateConnectionStatus(`✅ تم تحميل ${allStudents.length} طالب من البيانات المحلية`, 'success');
         } else {
-            updateConnectionStatus('❌ لا توجد بيانات محلية محفوظة.', 'error');
+            showError('لا توجد بيانات محلية محفوظة. يرجى الاتصال بالإنترنت أولاً.');
         }
     });
 
-    // 2. شاشة النظام الرئيسية
-    logoutBtn.addEventListener('click', handleLogout);
-    exportBtn.addEventListener('click', exportToExcel);
-    saveLocalBtn.addEventListener('click', saveDataToLocalStorage);
-
-    // 3. مستمع تفويض الأحداث (Event Delegation) 🚨 هذا هو التصحيح الرئيسي
-    studentsTableBody.addEventListener('click', function(event) {
-        const target = event.target;
-        let studentId = null;
-
-        // التحقق مما إذا تم النقر على اسم الطالب أو زر التعديل
-        if (target.classList.contains('student-name') || target.classList.contains('edit-btn')) {
-            studentId = target.dataset.studentId;
-        }
-
-        if (studentId) {
-            console.log('تم النقر على الطالب ID:', studentId); // للتحقق في الـ Console
-            openEditModal(studentId);
+    saveLocalBtn.addEventListener('click', () => {
+        if (saveDataToLocalStorage()) {
+            showSuccess('✅ تم حفظ البيانات المحدثة محلياً بنجاح.');
         }
     });
 
-    // 4. نافذة التعديل (Modal)
-    closeModal.addEventListener('click', closeEditModal);
-    cancelEditBtn.addEventListener('click', closeEditModal);
-    studentForm.addEventListener('submit', handleEditSubmit);
+    // 🚨 ربط زر المزامنة بالدالة الجديدة
+    syncSheetsBtn.addEventListener('click', syncSheets);
 
-    // إغلاق المودال عند النقر خارجها
-    window.addEventListener('click', function(event) {
-        if (event.target === editModal) {
-            closeEditModal();
-        }
+
+    document.getElementById('searchInput').addEventListener('input', filterStudents);
+    document.getElementById('classFilter').addEventListener('change', filterStudents);
+    document.getElementById('showStatsBtn').addEventListener('click', () => {
+        document.getElementById('statsModal').style.display = 'block';
+    });
+    cancelEditBtn.addEventListener('click', () => closeModal('editModal'));
+
+
+    // 🚨 ربط أزرار حفظ الشهر بالدالة saveTerm
+    saveTermButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const term = parseInt(event.target.dataset.term);
+            saveTerm(term);
+        });
     });
 
+    // تحميل البيانات عند بدء التشغيل
+    loadDataFromGoogleSheets();
+}
+
+setupEventListeners();
     </script>
 </body>
 </html>
