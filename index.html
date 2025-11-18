@@ -1418,7 +1418,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
     <script>
-        // JavaScript Code (محدث مع جميع الإصلاحات)
+        // JavaScript Code (محدث مع إصلاح مشكلة الباركود وجميع الشهور)
 
         // ========== الإعدادات والمتغيرات الرئيسية ==========
         const LOCAL_STORAGE_KEY = 'studentsData';
@@ -1503,7 +1503,8 @@
             });
             
             // إظهار نافذة العمل المحددة
-            document.getElementById(`month${month}Workspace`).classList.add('active');
+            const workspaceId = month === 'all' ? 'allMonthsWorkspace' : `month${month}Workspace`;
+            document.getElementById(workspaceId).classList.add('active');
             
             // إخفاء نافذة اختيار الشهر
             monthSelectionSection.classList.add('hidden');
@@ -1536,11 +1537,12 @@
             // ربط أحداث أزرار المسح لجميع الشهور
             for (let i = 1; i <= 3; i++) {
                 const btn = document.getElementById(`qrScanBtn${i}`);
-                const allBtn = document.getElementById('qrScanBtnAll');
-                
                 if (btn) btn.addEventListener('click', () => startQRScanner(i));
-                if (allBtn) allBtn.addEventListener('click', () => startQRScanner('all'));
             }
+            
+            // زر المسح لجميع الشهور
+            const allBtn = document.getElementById('qrScanBtnAll');
+            if (allBtn) allBtn.addEventListener('click', () => startQRScanner('all'));
             
             // زر إيقاف المسح
             const stopBtn = document.getElementById('stopScannerBtn');
@@ -1605,21 +1607,35 @@
         }
 
         function handleScannedBarcode(barcode, month) {
-            const student = allStudents.find(s => s.barcode === barcode);
+            console.log('البحث عن الباركود:', barcode);
+            console.log('الطلاب المتاحين:', allStudents.map(s => ({ id: s.id, barcode: s.barcode, name: s.studentName })));
+            
+            // البحث عن الطالب باستخدام الباركود
+            const student = allStudents.find(s => {
+                // تنظيف الباركود من المسافات والحروف الخاصة
+                const cleanBarcode = s.barcode ? s.barcode.toString().trim().replace(/\s+/g, '') : '';
+                const scannedBarcode = barcode.toString().trim().replace(/\s+/g, '');
+                return cleanBarcode === scannedBarcode;
+            });
+            
             const resultDiv = document.getElementById('qrResult');
             const resultText = document.getElementById('qrResultText');
             
             if (student) {
-                resultText.textContent = `✅ تم العثور على الطالب: ${student.studentName}`;
+                resultText.textContent = `✅ تم العثور على الطالب: ${student.studentName} (${student.barcode})`;
                 resultDiv.className = 'qr-result success';
                 stopQRScanner();
                 closeModal('qrModal');
                 
                 // فتح نافذة التعديل للطالب
-                setTimeout(() => openEditModal(student.id), 500);
+                setTimeout(() => {
+                    openEditModal(student.id);
+                }, 1000);
             } else {
                 resultText.textContent = `❌ لا يوجد طالب بهذا الباركود: ${barcode}`;
                 resultDiv.className = 'qr-result error';
+                console.log('الباركود الممسوح:', barcode);
+                console.log('الباركود المخزنة:', allStudents.map(s => s.barcode));
             }
             
             resultDiv.classList.remove('hidden');
@@ -2290,6 +2306,7 @@
                 
                 newItem.id = newItem.id ? newItem.id.toString().trim() : '';
                 newItem.teacherId = newItem.teacherId ? newItem.teacherId.toString().trim() : '';
+                newItem.barcode = newItem.barcode ? newItem.barcode.toString().trim() : '';
                 
                 return newItem;
             });
