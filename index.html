@@ -1418,7 +1418,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
     <script>
-        // JavaScript Code (محدث مع إصلاح مشكلة الحفظ)
+        // JavaScript Code (محدث مع جميع الإصلاحات)
 
         // ========== الإعدادات والمتغيرات الرئيسية ==========
         const LOCAL_STORAGE_KEY = 'studentsData';
@@ -1469,8 +1469,30 @@
         let isSyncing = false; 
         let autoSyncInterval; 
         let currentMonth = 1;
+        let qrScanner = null;
+        let qrStream = null;
 
-        // ========== دوال إدارة الواجهة الجديدة ==========
+        // ========== إصلاح مشكلة الشهور ==========
+        function initializeMonthSystem() {
+            console.log('بدء تهيئة نظام الشهور...');
+            
+            // ربط أحداث جميع أزرار الشهور
+            document.querySelectorAll('.month-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const month = this.classList.contains('month-1') ? 1 : 
+                                 this.classList.contains('month-2') ? 2 : 
+                                 this.classList.contains('month-3') ? 3 : 'all';
+                    selectMonth(month);
+                });
+            });
+            
+            // ربط أحداث العودة
+            document.querySelectorAll('.back-to-selection').forEach(btn => {
+                btn.addEventListener('click', backToMonthSelection);
+            });
+            
+            console.log('تم تهيئة نظام الشهور بنجاح');
+        }
 
         function selectMonth(month) {
             currentMonth = month;
@@ -1505,6 +1527,266 @@
             
             // إظهار نافذة اختيار الشهر
             monthSelectionSection.classList.remove('hidden');
+        }
+
+        // ========== إصلاح نظام مسح QR Code ==========
+        function initializeQRScanner() {
+            console.log('تهيئة ماسح QR Code...');
+            
+            // ربط أحداث أزرار المسح لجميع الشهور
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`qrScanBtn${i}`);
+                const allBtn = document.getElementById('qrScanBtnAll');
+                
+                if (btn) btn.addEventListener('click', () => startQRScanner(i));
+                if (allBtn) allBtn.addEventListener('click', () => startQRScanner('all'));
+            }
+            
+            // زر إيقاف المسح
+            const stopBtn = document.getElementById('stopScannerBtn');
+            if (stopBtn) stopBtn.addEventListener('click', stopQRScanner);
+        }
+
+        async function startQRScanner(month) {
+            console.log(`بدء المسح للشهر: ${month}`);
+            
+            try {
+                // طلب إذن الكاميرا
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" } 
+                });
+                
+                qrStream = stream;
+                const videoElement = document.createElement('video');
+                const canvasElement = document.createElement('canvas');
+                const canvas = canvasElement.getContext('2d');
+                
+                const scannerContainer = document.getElementById('qrScanner');
+                scannerContainer.innerHTML = '';
+                scannerContainer.appendChild(videoElement);
+                
+                videoElement.srcObject = stream;
+                videoElement.setAttribute("playsinline", true);
+                videoElement.play();
+                
+                // عرض نافذة المسح
+                document.getElementById('qrModal').style.display = 'block';
+                document.getElementById('qrResult').classList.add('hidden');
+                
+                function scanFrame() {
+                    if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+                        canvasElement.height = videoElement.videoHeight;
+                        canvasElement.width = videoElement.videoWidth;
+                        canvas.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+                        
+                        const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: "dontInvert",
+                        });
+                        
+                        if (code) {
+                            console.log('تم مسح الكود:', code.data);
+                            handleScannedBarcode(code.data, month);
+                        }
+                    }
+                    
+                    if (qrScanner !== null) {
+                        requestAnimationFrame(scanFrame);
+                    }
+                }
+                
+                qrScanner = true;
+                requestAnimationFrame(scanFrame);
+                
+            } catch (err) {
+                console.error('خطأ في تشغيل الكاميرا:', err);
+                showError('❌ لا يمكن الوصول إلى الكاميرا. تأكد من منح الإذن.');
+            }
+        }
+
+        function handleScannedBarcode(barcode, month) {
+            const student = allStudents.find(s => s.barcode === barcode);
+            const resultDiv = document.getElementById('qrResult');
+            const resultText = document.getElementById('qrResultText');
+            
+            if (student) {
+                resultText.textContent = `✅ تم العثور على الطالب: ${student.studentName}`;
+                resultDiv.className = 'qr-result success';
+                stopQRScanner();
+                closeModal('qrModal');
+                
+                // فتح نافذة التعديل للطالب
+                setTimeout(() => openEditModal(student.id), 500);
+            } else {
+                resultText.textContent = `❌ لا يوجد طالب بهذا الباركود: ${barcode}`;
+                resultDiv.className = 'qr-result error';
+            }
+            
+            resultDiv.classList.remove('hidden');
+        }
+
+        function stopQRScanner() {
+            if (qrStream) {
+                qrStream.getTracks().forEach(track => track.stop());
+                qrStream = null;
+            }
+            qrScanner = null;
+            
+            const scannerContainer = document.getElementById('qrScanner');
+            scannerContainer.innerHTML = '<span>جاري تشغيل الكاميرا...</span>';
+        }
+
+        // ========== إصلاح نظام الإحصائيات ==========
+        function initializeStatistics() {
+            console.log('تهيئة نظام الإحصائيات...');
+            
+            // ربط أحداث أزرار الإحصائيات لجميع الشهور
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`showStatsBtn${i}`);
+                const allBtn = document.getElementById('showStatsBtnAll');
+                
+                if (btn) btn.addEventListener('click', () => showStatistics(i));
+                if (allBtn) allBtn.addEventListener('click', () => showStatistics('all'));
+            }
+            
+            // ربط أحداث تبويبات الإحصائيات
+            document.querySelectorAll('.stats-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.textContent.trim();
+                    openStatsTab(
+                        tabName.includes('الأول') ? 'month1' :
+                        tabName.includes('الثاني') ? 'month2' :
+                        tabName.includes('الثالث') ? 'month3' : 'overall'
+                    );
+                });
+            });
+        }
+
+        function showStatistics(month) {
+            console.log(`عرض إحصائيات الشهر: ${month}`);
+            
+            // تحديث اسم المعلم في الإحصائيات
+            document.getElementById('statsTeacherId').textContent = currentTeacherId;
+            
+            // حساب الإحصائيات
+            calculateAllStatistics();
+            
+            // عرض النافذة
+            document.getElementById('statsModal').style.display = 'block';
+        }
+
+        function calculateAllStatistics() {
+            const searchTerm = document.getElementById(`searchNameInput${currentMonth}`)?.value.trim().toLowerCase() || '';
+            const selectedClass = document.getElementById(`classNameFilter${currentMonth}`)?.value || '';
+
+            const filteredStudents = allStudents.filter(student => {
+                const studentName = student.studentName ? student.studentName.toLowerCase() : '';
+                const matchesName = searchTerm === '' || studentName.includes(searchTerm);
+                const matchesClass = selectedClass === '' || student.className === selectedClass;
+                return matchesName && matchesClass;
+            });
+
+            // تحديث العدد الكلي
+            document.getElementById('totalStudentsCount').textContent = filteredStudents.length;
+            
+            // حساب إحصائيات كل شهر
+            calculateMonthStatistics(filteredStudents, 1);
+            calculateMonthStatistics(filteredStudents, 2);
+            calculateMonthStatistics(filteredStudents, 3);
+            calculateOverallStatistics(filteredStudents);
+        }
+
+        function calculateMonthStatistics(students, month) {
+            const ranges = {
+                less5: 0,   // أقل من 5
+                from5to10: 0, // من 5 إلى 10
+                from11to15: 0, // من 11 إلى 15  
+                from16to20: 0  // من 16 إلى 20
+            };
+            
+            students.forEach(student => {
+                const total = parseFloat(student[`total${month}`]) || 0;
+                
+                if (total < 5) ranges.less5++;
+                else if (total >= 5 && total <= 10) ranges.from5to10++;
+                else if (total >= 11 && total <= 15) ranges.from11to15++;
+                else if (total >= 16 && total <= 20) ranges.from16to20++;
+            });
+            
+            // تحديث واجهة المستخدم
+            document.getElementById(`statsMonth${month}Less5`).textContent = ranges.less5;
+            document.getElementById(`statsMonth${month}5to10`).textContent = ranges.from5to10;
+            document.getElementById(`statsMonth${month}11to15`).textContent = ranges.from11to15;
+            document.getElementById(`statsMonth${month}16to20`).textContent = ranges.from16to20;
+        }
+
+        function calculateOverallStatistics(students) {
+            const ranges = {
+                less5: 0,
+                from5to10: 0, 
+                from11to15: 0,
+                from16to20: 0
+            };
+            
+            students.forEach(student => {
+                // حساب المعدل العام من الأشهر الثلاثة
+                const total1 = parseFloat(student.total1) || 0;
+                const total2 = parseFloat(student.total2) || 0;
+                const total3 = parseFloat(student.total3) || 0;
+                
+                const overallAverage = (total1 + total2 + total3) / 3;
+                
+                if (overallAverage < 5) ranges.less5++;
+                else if (overallAverage >= 5 && overallAverage <= 10) ranges.from5to10++;
+                else if (overallAverage >= 11 && overallAverage <= 15) ranges.from11to15++;
+                else if (overallAverage >= 16 && overallAverage <= 20) ranges.from16to20++;
+            });
+            
+            // تحديث واجهة المستخدم
+            document.getElementById('statsOverallLess5').textContent = ranges.less5;
+            document.getElementById('statsOverall5to10').textContent = ranges.from5to10;
+            document.getElementById('statsOverall11to15').textContent = ranges.from11to15;
+            document.getElementById('statsOverall16to20').textContent = ranges.from16to20;
+        }
+
+        function openStatsTab(tabName) {
+            // إخفاء جميع المحتويات
+            document.querySelectorAll('.stats-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // إلغاء تنشيط جميع الأزرار
+            document.querySelectorAll('.stats-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // إظهار المحتوى المحدد
+            document.getElementById(`${tabName}Stats`).classList.add('active');
+            
+            // تنشيط الزر المحدد
+            document.querySelector(`.stats-tab[onclick*="${tabName}"]`).classList.add('active');
+        }
+
+        // ========== تحسين نظام الحفظ المحلي ==========
+        function initializeLocalStorage() {
+            console.log('تهيئة نظام التخزين المحلي...');
+            
+            // اختبار سعة التخزين المحلي
+            try {
+                localStorage.setItem('storage_test', 'test');
+                localStorage.removeItem('storage_test');
+                console.log('✅ التخزين المحلي يعمل بشكل صحيح');
+            } catch (e) {
+                console.error('❌ مشكلة في التخزين المحلي:', e);
+                showError('⚠️ التخزين المحلي غير متوفر. قد لا يتم حفظ البيانات.');
+            }
+            
+            // مراقبة التعديلات التلقائية
+            setInterval(() => {
+                if (pendingUpdates.length > 0) {
+                    savePendingUpdates();
+                }
+            }, 5000); // حفظ كل 5 ثواني
         }
 
         // ========== دوال نافذة التعديل المخصصة ==========
@@ -2327,18 +2609,57 @@
             }
         }
 
-        // ========== تهيئة التطبيق وربط الأحداث ==========
-
+        // ========== التهيئة النهائية للتطبيق ==========
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('بدء تهيئة التطبيق...');
+            
             // تحميل التعديلات المعلقة
             pendingUpdates = loadPendingUpdates();
             updatePendingCount();
+            
+            // تهيئة جميع الأنظمة
+            initializeMonthSystem();
+            initializeQRScanner();
+            initializeStatistics();
+            initializeLocalStorage();
             
             // ربط أحداث الدخول والتحميل
             loginBtn.addEventListener('click', () => login(false));
             useLocalDataBtn.addEventListener('click', () => login(true));
             retryBtn.addEventListener('click', initializeData);
 
+            // ربط أحداث البحث والفلترة
+            setupSearchAndFilters();
+            
+            // ربط أحداث المزامنة
+            document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
+                btn.addEventListener('click', () => syncPendingUpdates(false));
+            });
+
+            // ربط أحداث تسجيل الخروج
+            document.querySelectorAll('[id^="logoutBtn"]').forEach(btn => {
+                btn.addEventListener('click', handleLogout);
+            });
+
+            // مراقبة حالة الاتصال بالإنترنت
+            window.addEventListener('online', () => {
+                console.log('الاتصال بالإنترنت متاح - محاولة المزامنة...');
+                attemptAutoSync();
+            });
+
+            window.addEventListener('offline', () => {
+                console.log('الاتصال بالإنترنت مقطوع');
+                updateAutoSyncStatus();
+            });
+
+            // بدء التهيئة
+            initializeData();
+            startAutoSync();
+            
+            console.log('✅ تم تهيئة التطبيق بنجاح');
+        });
+
+        function setupSearchAndFilters() {
             // ربط أحداث البحث والفلترة لكل شهر
             for (let i = 1; i <= 3; i++) {
                 const searchInput = document.getElementById(`searchNameInput${i}`);
@@ -2362,38 +2683,32 @@
             if (classFilterAll) {
                 classFilterAll.addEventListener('change', updateDisplayedStudents);
             }
+        }
 
-            // ربط أحداث المزامنة
-            document.querySelectorAll('#syncSheetsBtn1, #syncSheetsBtn2, #syncSheetsBtn3, #syncSheetsBtnAll').forEach(btn => {
-                btn.addEventListener('click', () => syncPendingUpdates(false));
+        function handleLogout() {
+            // حفظ أي تعديلات معلقة قبل الخروج
+            if (pendingUpdates.length > 0) {
+                savePendingUpdates();
+                saveDataToLocalStorage();
+            }
+            
+            // العودة لشاشة الدخول
+            loginSection.classList.remove('hidden');
+            monthSelectionSection.classList.add('hidden');
+            document.querySelectorAll('.month-workspace').forEach(workspace => {
+                workspace.classList.remove('active');
             });
+            allStudents = [];
+            showSuccess('تم تسجيل الخروج بنجاح.');
+        }
 
-            // ربط أحداث تسجيل الخروج
-            document.querySelectorAll('#logoutBtn1, #logoutBtn2, #logoutBtn3, #logoutBtnAll').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    loginSection.classList.remove('hidden');
-                    monthSelectionSection.classList.add('hidden');
-                    document.querySelectorAll('.month-workspace').forEach(workspace => {
-                        workspace.classList.remove('active');
-                    });
-                    allStudents = [];
-                    showSuccess('تم تسجيل الخروج بنجاح.');
-                });
-            });
-
-            // مراقبة حالة الاتصال بالإنترنت
-            window.addEventListener('online', () => {
-                console.log('الاتصال بالإنترنت متاح - محاولة المزامنة...');
-                attemptAutoSync();
-            });
-
-            window.addEventListener('offline', () => {
-                console.log('الاتصال بالإنترنت مقطوع');
-                updateAutoSyncStatus();
-            });
-
-            initializeData();
-            console.log('تم تهيئة التطبيق بنجاح');
+        // تحسين دورة حياة الصفحة
+        window.addEventListener('beforeunload', () => {
+            if (pendingUpdates.length > 0) {
+                savePendingUpdates();
+                saveDataToLocalStorage();
+                return 'هناك تعديلات غير محفوظة. هل تريد حقاً مغادرة الصفحة؟';
+            }
         });
 
     </script>
