@@ -1418,7 +1418,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
     <script>
-        // JavaScript Code (محدث مع النظام الجديد)
+        // JavaScript Code (محدث مع إصلاح مشكلة الحفظ)
 
         // ========== الإعدادات والمتغيرات الرئيسية ==========
         const LOCAL_STORAGE_KEY = 'studentsData';
@@ -1599,6 +1599,254 @@
             `;
             
             return section;
+        }
+
+        // ========== دوال حفظ التعديلات المفقودة ==========
+
+        function saveAllEdits() {
+            const studentId = document.getElementById('editStudentId').value;
+            const currentMonth = document.getElementById('currentEditMonth').value;
+            const idToFind = studentId.toString().trim(); 
+            const student = allStudents.find(s => s.id && s.id.toString().trim() === idToFind);
+
+            if (!student) {
+                showError('❌ خطأ: لم يتم العثور على الطالب في البيانات المحلية للحفظ. (ID: ' + idToFind + ')');
+                return;
+            }
+
+            const updateData = {
+                row: student.originalRowIndex, 
+                id: student.id,
+            };
+
+            let changesMade = false;
+
+            // تحديد الحقول التي يجب جمعها بناءً على الشهر الحالي
+            let fieldsToCheck = [];
+            if (currentMonth === 'all') {
+                // جمع جميع الحقول للأشهر الثلاثة
+                fieldsToCheck = [
+                    'attendance1', 'oral1', 'homework1', 'written1',
+                    'attendance2', 'oral2', 'homework2', 'written2', 
+                    'attendance3', 'homework3', 'oral3', 'written3'
+                ];
+            } else {
+                // جمع الحقول الخاصة بالشهر الحالي فقط
+                const monthFields = {
+                    1: ['attendance1', 'oral1', 'homework1', 'written1'],
+                    2: ['attendance2', 'oral2', 'homework2', 'written2'],
+                    3: ['attendance3', 'homework3', 'oral3', 'written3']
+                };
+                fieldsToCheck = monthFields[currentMonth];
+            }
+
+            // جمع التعديلات
+            fieldsToCheck.forEach(field => {
+                const inputElement = document.getElementById(`edit${field}`);
+                if (inputElement) {
+                    const oldValue = student[field]; 
+                    const newValue = inputElement.value;
+                    
+                    const newFormatted = newValue.toString().trim();
+                    const oldFormatted = oldValue ? oldValue.toString().trim() : '';
+                    
+                    if (oldFormatted !== newFormatted) {
+                        student[field] = newFormatted;
+                        updateData[field] = newFormatted; 
+                        changesMade = true;
+                    }
+                }
+            });
+
+            // إعادة حساب المجاميع والمحصلات
+            for(let i = 1; i <= 3; i++) {
+                student[`total${i}`] = calculateTotal(student, i);
+                student[`result${i}`] = calculateResult(student[`total${i}`]);
+            }
+
+            if (changesMade) {
+                // إضافة التعديلات إلى قائمة الانتظار
+                pendingUpdates = pendingUpdates.filter(update => update.id !== student.id);
+                pendingUpdates.push(updateData);
+                
+                // حفظ التعديلات محلياً
+                savePendingUpdates();
+                saveDataToLocalStorage();
+                
+                // تحديث العرض
+                updateDisplayedStudents(); 
+                
+                // إغلاق النافذة وإظهار رسالة النجاح
+                closeModal('editModal');
+                showSuccess('✅ تم حفظ التعديلات للطالب محلياً وإضافتها للمزامنة.');
+                
+                // محاولة المزامنة التلقائية
+                attemptAutoSync();
+            } else {
+                closeModal('editModal');
+                showSuccess('👍 لم يتم إجراء تعديلات جديدة لحفظها.');
+            }
+        }
+
+        function savePendingUpdates() {
+            try {
+                localStorage.setItem(PENDING_UPDATES_KEY, JSON.stringify(pendingUpdates));
+                updatePendingCount();
+                return true;
+            } catch (error) {
+                showError('فشل في حفظ التعديلات المعلقة: ' + error.message);
+                return false;
+            }
+        }
+
+        function saveDataToLocalStorage() {
+            try {
+                const dataToSave = {
+                    students: allStudents,
+                    teacherId: currentTeacherId,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
+                return true;
+            } catch (error) {
+                showError('فشل في حفظ البيانات المحلية: ' + error.message);
+                return false;
+            }
+        }
+
+        function loadPendingUpdates() {
+            try {
+                const data = localStorage.getItem(PENDING_UPDATES_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function updatePendingCount() {
+            const count = pendingUpdates.length;
+            // تحديث جميع عدادات التعديلات المعلقة
+            document.querySelectorAll('#pendingCount1, #pendingCount2, #pendingCount3, #pendingCountAll').forEach(span => {
+                span.textContent = count;
+                if (count > 0) {
+                    span.classList.remove('hidden');
+                } else {
+                    span.classList.add('hidden');
+                }
+            });
+        }
+
+        // ========== دوال المزامنة ==========
+
+        async function syncPendingUpdates(isAuto = false) {
+            if (pendingUpdates.length === 0 || isSyncing) {
+                if (!isAuto && pendingUpdates.length === 0) {
+                    showSuccess('لا توجد تعديلات معلقة للمزامنة.');
+                }
+                return;
+            }
+
+            isSyncing = true;
+            const updatesToSync = [...pendingUpdates]; 
+
+            showLoading(true, `☁️ جاري مزامنة ${updatesToSync.length} تعديل مع Google Sheets...`);
+            
+            // تحديث حالة المزامنة في جميع النوافذ
+            document.querySelectorAll('#syncStatus1, #syncStatus2, #syncStatus3, #syncStatusAll').forEach(status => {
+                status.textContent = `المزامنة التلقائية: جاري المزامنة (${updatesToSync.length})...`;
+            });
+            
+            // تعطيل أزرار المزامنة
+            document.querySelectorAll('#syncSheetsBtn1, #syncSheetsBtn2, #syncSheetsBtn3, #syncSheetsBtnAll').forEach(btn => {
+                btn.disabled = true;
+            });
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8',
+                    },
+                    body: JSON.stringify({ updates: updatesToSync })
+                });
+                
+                const data = await response.json();
+                
+                showLoading(false);
+                
+                // تمكين أزرار المزامنة
+                document.querySelectorAll('#syncSheetsBtn1, #syncSheetsBtn2, #syncSheetsBtn3, #syncSheetsBtnAll').forEach(btn => {
+                    btn.disabled = false;
+                });
+                
+                if (data.status === 'success') {
+                    const successCount = data.updatedCount || updatesToSync.length;
+                    
+                    // إزالت التعديلات التي تمت مزامنتها
+                    pendingUpdates = pendingUpdates.filter(update => 
+                        !updatesToSync.some(synced => synced.id === update.id)
+                    );
+                    
+                    savePendingUpdates(); 
+                    showSuccess(`✅ تم مزامنة ${successCount} خلية بنجاح!`);
+                    
+                    // تحديث البيانات من السيرفر بعد المزامنة الناجحة
+                    await fetchDataFromSheet(currentTeacherId, false);
+                } else {
+                    showError(`❌ فشلت المزامنة: ${data.error || 'خطأ غير معروف.'}`);
+                    document.querySelectorAll('#syncStatus1, #syncStatus2, #syncStatus3, #syncStatusAll').forEach(status => {
+                        status.textContent = `المزامنة التلقائية: فشلت!`;
+                    });
+                }
+            } catch (error) {
+                showLoading(false);
+                document.querySelectorAll('#syncSheetsBtn1, #syncSheetsBtn2, #syncSheetsBtn3, #syncSheetsBtnAll').forEach(btn => {
+                    btn.disabled = false;
+                });
+                showError('❌ خطأ في الاتصال أثناء المزامنة: ' + error.message);
+                document.querySelectorAll('#syncStatus1, #syncStatus2, #syncStatus3, #syncStatusAll').forEach(status => {
+                    status.textContent = `المزامنة التلقائية: فشلت! (خطأ شبكة)`;
+                });
+            } finally {
+                isSyncing = false;
+                updateAutoSyncStatus();
+            }
+        }
+
+        function updateAutoSyncStatus() {
+            const hasPending = pendingUpdates.length > 0;
+            const isOnline = navigator.onLine;
+
+            let statusText = 'المزامنة التلقائية: متوقفة';
+            let statusColor = '#666';
+
+            if (hasPending && isOnline) {
+                statusText = `المزامنة التلقائية: قيد التشغيل (تعديلات: ${pendingUpdates.length})`;
+                statusColor = '#27ae60';
+            } else if (hasPending && !isOnline) {
+                statusText = `المزامنة التلقائية: متوقفة (لا يوجد إنترنت)`;
+                statusColor = '#f39c12';
+            }
+
+            // تحديث جميع حالات المزامنة
+            document.querySelectorAll('#syncStatus1, #syncStatus2, #syncStatus3, #syncStatusAll').forEach(status => {
+                status.textContent = statusText;
+                status.style.color = statusColor;
+            });
+        }
+
+        function attemptAutoSync() {
+            if (navigator.onLine && pendingUpdates.length > 0 && !isSyncing) {
+                console.log('المزامنة التلقائية: محاولة مزامنة التعديلات...');
+                syncPendingUpdates(true);
+            }
+        }
+
+        function startAutoSync() {
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            autoSyncInterval = setInterval(attemptAutoSync, 30000); 
+            attemptAutoSync(); 
         }
 
         // ========== دوال المساعدة الأساسية ==========
@@ -2082,6 +2330,10 @@
         // ========== تهيئة التطبيق وربط الأحداث ==========
 
         document.addEventListener('DOMContentLoaded', () => {
+            // تحميل التعديلات المعلقة
+            pendingUpdates = loadPendingUpdates();
+            updatePendingCount();
+            
             // ربط أحداث الدخول والتحميل
             loginBtn.addEventListener('click', () => login(false));
             useLocalDataBtn.addEventListener('click', () => login(true));
@@ -2111,6 +2363,11 @@
                 classFilterAll.addEventListener('change', updateDisplayedStudents);
             }
 
+            // ربط أحداث المزامنة
+            document.querySelectorAll('#syncSheetsBtn1, #syncSheetsBtn2, #syncSheetsBtn3, #syncSheetsBtnAll').forEach(btn => {
+                btn.addEventListener('click', () => syncPendingUpdates(false));
+            });
+
             // ربط أحداث تسجيل الخروج
             document.querySelectorAll('#logoutBtn1, #logoutBtn2, #logoutBtn3, #logoutBtnAll').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -2124,12 +2381,20 @@
                 });
             });
 
+            // مراقبة حالة الاتصال بالإنترنت
+            window.addEventListener('online', () => {
+                console.log('الاتصال بالإنترنت متاح - محاولة المزامنة...');
+                attemptAutoSync();
+            });
+
+            window.addEventListener('offline', () => {
+                console.log('الاتصال بالإنترنت مقطوع');
+                updateAutoSyncStatus();
+            });
+
             initializeData();
             console.log('تم تهيئة التطبيق بنجاح');
         });
-
-        // ملاحظة: تحتاج إلى إضافة دوال المزامنة والإحصائيات وماسح QR من الكود السابق
-        // لتكامل النظام بالكامل
 
     </script>
 </body>
