@@ -1607,59 +1607,84 @@
         }
 
         // ========== نظام PWA والتثبيت ==========
-        function initializePWA() {
-            console.log('تهيئة نظام PWA...');
+       function initializePWA() {
+    console.log('تهيئة نظام PWA لتطبيق grades...');
+    
+    // تسجيل Service Worker مع النطاق المحدد
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/grades/service-worker.js', {
+            scope: '/grades/'
+        })
+        .then(function(registration) {
+            console.log('✅ Service Worker للتطبيق grades مسجل بنجاح:', registration);
+            updatePWAStatus('✅ Service Worker نشط - تطبيق النتائج');
             
-            // تسجيل Service Worker
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(function(registration) {
-                        console.log('Service Worker مسجل بنجاح:', registration);
-                        updatePWAStatus('✅ Service Worker نشط');
-                    })
-                    .catch(function(error) {
-                        console.log('فشل تسجيل Service Worker:', error);
-                        updatePWAStatus('❌ Service Worker غير نشط');
-                    });
-            } else {
-                updatePWAStatus('❌ المتصفح لا يدعم Service Worker');
-            }
-
-            // حدث قبل التثبيت
-            window.addEventListener('beforeinstallprompt', (e) => {
-                console.log('حدث beforeinstallprompt تم تشغيله');
-                e.preventDefault();
-                deferredPrompt = e;
-                installBtn.style.display = 'block';
-                updatePWAStatus('📲 التطبيق جاهز للتثبيت');
+            // التحقق من وجود تحديثات
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                console.log('🔄 تم العثور على تحديث جديد لـ Service Worker');
+                newWorker.addEventListener('statechange', () => {
+                    console.log('حالة Service Worker الجديد:', newWorker.state);
+                });
             });
+        })
+        .catch(function(error) {
+            console.log('❌ فشل تسجيل Service Worker:', error);
+            updatePWAStatus('❌ Service Worker غير نشط - العمل بدون وضع عدم الاتصال');
+        });
+    } else {
+        updatePWAStatus('❌ المتصفح لا يدعم Service Worker');
+    }
 
-            // حدث بعد التثبيت
-            window.addEventListener('appinstalled', (evt) => {
-                console.log('تم تثبيت التطبيق بنجاح');
-                installBtn.style.display = 'none';
-                deferredPrompt = null;
-                updatePWAStatus('✅ التطبيق مثبت');
-            });
+    // حدث قبل التثبيت
+    window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('حدث beforeinstallprompt تم تشغيله لتطبيق grades');
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = 'block';
+        updatePWAStatus('📲 تطبيق النتائج جاهز للتثبيت');
+    });
 
-            // التحقق إذا كان التطبيق مثبتاً بالفعل
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                console.log('التطبيق يعمل في وضع standalone');
-                installBtn.style.display = 'none';
-                updatePWAStatus('✅ التطبيق مثبت ويعمل');
-            }
-
-            // زر التثبيت
-            installBtn.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`نتيجة التثبيت: ${outcome}`);
-                    deferredPrompt = null;
-                    installBtn.style.display = 'none';
-                }
+    // حدث بعد التثبيت
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('تم تثبيت تطبيق النتائج بنجاح');
+        installBtn.style.display = 'none';
+        deferredPrompt = null;
+        updatePWAStatus('✅ تطبيق النتائج مثبت');
+        
+        // تتبع التثبيت
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'app_installed', {
+                'app_name': 'نتائج الطلاب'
             });
         }
+    });
+
+    // التحقق إذا كان التطبيق مثبتاً بالفعل
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('تطبيق النتائج يعمل في وضع standalone');
+        installBtn.style.display = 'none';
+        updatePWAStatus('✅ تطبيق النتائج مثبت ويعمل');
+    }
+
+    // زر التثبيت
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`نتيجة تثبيت تطبيق النتائج: ${outcome}`);
+            
+            if (outcome === 'accepted') {
+                updatePWAStatus('✅ تم قبول تثبيت التطبيق');
+            } else {
+                updatePWAStatus('❌ تم رفض تثبيت التطبيق');
+            }
+            
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+        }
+    });
+}
 
         function updatePWAStatus(message) {
             if (pwaStatus) {
