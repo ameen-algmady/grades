@@ -1,0 +1,35 @@
+{
+  "name": "grades-management-system",
+  "version": "2.0.0",
+  "description": "نظام إدارة نتائج الطلاب مع Google Sheets",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=8080 --host=localhost",
+    "build": "echo 'بناء التطبيق...'",
+    "test": "echo 'اختبار التطبيق...'",
+    "deploy": "echo 'نشر على GitHub Pages...'"
+  },
+  "keywords": [
+    "grades",
+    "education",
+    "google-sheets",
+    "pwa",
+    "arabic"
+  ],
+  "author": "نظام الدرجات",
+  "license": "MIT",
+  "dependencies": {
+    "jsqr": "^1.4.0"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/grades-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/username/grades-system/issues"
+  },
+  "homepage": "https://username.github.io/grades-system"
+}

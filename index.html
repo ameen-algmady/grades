@@ -5,12 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام إدارة نتائج الطلاب - Google Sheets Update</title>
     
-    <!-- Meta Tags for PWA - محدث -->
+    <!-- Meta Tags for PWA -->
     <meta name="theme-color" content="#667eea"/>
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="نتائج الطلاب">
+    
+    <!-- منع التخزين المؤقت -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     
     <!-- الأيقونات -->
     <link rel="icon" type="image/x-icon" href="/grades/icon-192x192.png">
@@ -21,7 +26,6 @@
     <link rel="manifest" href="/grades/manifest.json">
     
     <style>
-        /* CSS الأصلي (محدث) */
         :root {
             --primary-color: #3498db;
             --secondary-color: #2980b9;
@@ -261,39 +265,6 @@
             border-color: rgba(231, 76, 60, 0.3);
         }
 
-        .install-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-            color: white;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            display: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-
-        .install-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(135deg, #8e44ad, #732d91);
-        }
-
-        .install-btn:active {
-            transform: translateY(0);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .student-name {
             color: #3498db;
             cursor: pointer;
@@ -342,94 +313,6 @@
             min-width: 200px;
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .modal-content {
-            background: white;
-            margin: 2% auto;
-            padding: 25px;
-            border-radius: 15px;
-            width: 95%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        #statsModal .modal-content {
-            max-width: 600px;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-            background: #f0f0f0;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .student-form {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .form-section {
-            grid-column: 1 / -1;
-            border-bottom: 2px solid var(--light-color);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: var(--dark-color);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .stat-item {
-            background: #f0f8ff;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border: 1px solid #d0eaff;
-        }
-        
         .sync-btn-container {
             position: relative;
             display: inline-block;
@@ -468,315 +351,94 @@
             text-align: center;
         }
 
-        /* إضافة أنماط ماسح QR Code */
-        .qr-scanner-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        #qrScanner {
-            width: 100%;
-            height: 300px;
-            border: 2px dashed #3498db;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-        }
-
-        #qrScanner video {
-            width: 100%;
-            height: 100%;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
-        .scanner-overlay {
-            position: absolute;
+        .modal {
+            display: none;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
         }
 
-        .scanner-frame {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            border: 2px solid #3498db;
-            border-radius: 10px;
-            box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.3);
-        }
-
-        .qr-result {
-            margin-top: 15px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            border: 1px solid #dee2e6;
-        }
-
-        .qr-result.success {
-            background: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-
-        .qr-result.error {
-            background: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-
-        /* تحسينات نافذة التعديل للهواتف */
-        .edit-modal-header {
-            position: sticky;
-            top: 0;
+        .modal-content {
             background: white;
-            padding: 15px 0;
-            border-bottom: 2px solid #ecf0f1;
-            z-index: 10;
-            margin-bottom: 15px;
+            margin: 2% auto;
+            padding: 25px;
+            border-radius: 15px;
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
         }
 
-        .edit-form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            background: #f0f0f0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .month-section {
-            background: #f8f9fa;
-            padding: 15px;
+        .sync-controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .sync-status-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
             border-radius: 10px;
             border: 1px solid #dee2e6;
         }
 
-        .month-title {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 1.2em;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 8px;
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
         }
 
-        .scores-grid {
+        .status-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .status-label {
+            display: block;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .sync-actions-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
 
-        .score-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .score-group label {
-            font-size: 0.9em;
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        .score-group input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .total-display {
-            grid-column: 1 / -1;
-            background: #e8f4fd;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            margin-top: 10px;
-            border: 1px solid #3498db;
-        }
-
-        .total-display .label {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .total-display .value {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #3498db;
-        }
-
-        .result-display {
-            grid-column: 1 / -1;
-            background: #e8f6f3;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            margin-top: 5px;
-            border: 1px solid #27ae60;
-        }
-
-        .result-display .label {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .result-display .value {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #27ae60;
-        }
-
-        /* زر الحفظ في الأعلى */
-        .top-save-btn {
-            position: sticky;
-            top: 80px;
-            background: linear-gradient(135deg, #27ae60, #229954);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            z-index: 20;
-            margin: 10px auto;
-            display: block;
-            width: 220px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .top-save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
-        }
-
-        /* تبويبات الإحصائيات */
-        .stats-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #ecf0f1;
-        }
-
-        .stats-tab {
-            background: none;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            color: #7f8c8d;
-        }
-
-        .stats-tab.active {
-            color: #3498db;
-            border-bottom-color: #3498db;
-        }
-
-        .stats-tab:hover {
-            color: #2980b9;
-        }
-
-        .stats-tab-content {
-            display: none;
-        }
-
-        .stats-tab-content.active {
-            display: block;
-        }
-
-        /* تبويبات الشهور الجديدة */
-        .months-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #ecf0f1;
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 5px;
-        }
-
-        .month-tab {
-            background: none;
-            border: none;
-            padding: 12px 20px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            color: #555;
-            flex: 1;
-            text-align: center;
-            margin: 0 2px;
-        }
-
-        .month-tab.active {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-        }
-
-        .month-tab:hover:not(.active) {
-            background: #e9ecef;
-            color: #2c3e50;
-        }
-
-        .month-tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .month-tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* تخصيص ألوان التبويبات */
-        .month-tab[data-month="1"] { border-right: 3px solid #3498db; }
-        .month-tab[data-month="2"] { border-right: 3px solid #27ae60; }
-        .month-tab[data-month="3"] { border-right: 3px solid #f39c12; }
-        .month-tab[data-month="all"] { border-right: 3px solid #9b59b6; }
-
-        .month-tab.active[data-month="1"] { background: linear-gradient(135deg, #3498db, #2980b9); }
-        .month-tab.active[data-month="2"] { background: linear-gradient(135deg, #27ae60, #229954); }
-        .month-tab.active[data-month="3"] { background: linear-gradient(135deg, #f39c12, #e67e22); }
-        .month-tab.active[data-month="all"] { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
-
-        /* تحسين عرض الجدول في التبويبات المختلفة */
-        .month-table th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .current-month-indicator {
-            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
-            color: #2d3436;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            margin-left: 10px;
-            display: inline-block;
-        }
-
-        /* أنماط جديدة لاختيار الشهر */
         .month-selection {
             text-align: center;
             padding: 40px 20px;
@@ -830,30 +492,12 @@
             margin-bottom: 15px;
         }
 
-        .month-card h3 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 1.4em;
-        }
-
-        .month-card p {
-            color: #7f8c8d;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
-
-        /* نافذة الشهر المنفصلة */
         .month-workspace {
             display: none;
         }
 
         .month-workspace.active {
             display: block;
-        }
-
-        .back-to-selection {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-            margin-bottom: 20px;
         }
 
         .current-month-header {
@@ -863,213 +507,6 @@
             border-radius: 10px;
             margin-bottom: 20px;
             text-align: center;
-        }
-
-        .current-month-header.month-2 {
-            background: linear-gradient(135deg, #27ae60, #229954);
-        }
-
-        .current-month-header.month-3 {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-        }
-
-        .current-month-header.all-months {
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-        }
-
-        /* أنماط نظام المزامنة المتقدم */
-        .sync-controls-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .sync-status-card {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #dee2e6;
-        }
-
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .status-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .status-label {
-            display: block;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .status-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #3498db;
-        }
-
-        .status-item:nth-child(2) .status-value {
-            color: #27ae60;
-        }
-
-        .status-item:nth-child(3) .status-value {
-            color: #e74c3c;
-        }
-
-        .status-item:nth-child(4) .status-value {
-            color: #9b59b6;
-        }
-
-        .sync-actions-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .sync-details-section {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #dee2e6;
-        }
-
-        .sync-details-list {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
-
-        .sync-detail-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sync-detail-item:last-child {
-            border-bottom: none;
-        }
-
-        .sync-detail-info {
-            flex: 1;
-        }
-
-        .sync-detail-status {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            background: #ffeaa7;
-            color: #e67e22;
-        }
-
-        .status-completed {
-            background: #d4edda;
-            color: #27ae60;
-        }
-
-        .status-failed {
-            background: #f8d7da;
-            color: #e74c3c;
-        }
-
-        .sync-options {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #dee2e6;
-        }
-
-        .option-item {
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .option-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .option-item input[type="checkbox"] {
-            width: auto;
-        }
-
-        .option-item select {
-            width: 100px;
-            padding: 5px;
-        }
-
-        .sync-history-container {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-top: 15px;
-        }
-
-        .sync-history-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        .sync-history-table th {
-            background: #34495e;
-            color: white;
-            padding: 10px;
-            position: sticky;
-            top: 0;
-        }
-
-        .sync-history-table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .sync-history-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .badge {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .badge-success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .badge-warning {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .badge-danger {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .badge-info {
-            background: #d1ecf1;
-            color: #0c5460;
         }
 
         @media (max-width: 768px) {
@@ -1091,11 +528,6 @@
                 flex-direction: column;
             }
 
-            .search-container input,
-            .search-container select {
-                min-width: 100%;
-            }
-
             table {
                 font-size: 12px;
             }
@@ -1104,88 +536,8 @@
                 padding: 8px 5px;
             }
 
-            .student-form {
+            .status-grid, .sync-actions-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                margin: 5% auto;
-                padding: 15px;
-                width: 98%;
-            }
-
-            #qrScanner {
-                height: 250px;
-            }
-
-            .scanner-frame {
-                width: 180px;
-                height: 180px;
-            }
-
-            .scores-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .top-save-btn {
-                width: 90%;
-                top: 60px;
-                padding: 10px 20px;
-                font-size: 14px;
-            }
-
-            .stats-tabs,
-            .months-tabs {
-                flex-direction: column;
-            }
-
-            .stats-tab,
-            .month-tab {
-                text-align: center;
-                border-bottom: none;
-                border-right: 3px solid transparent;
-                margin-bottom: 5px;
-            }
-
-            .stats-tab.active,
-            .month-tab.active {
-                border-right-color: inherit;
-                border-bottom: none;
-            }
-
-            .month-tab {
-                margin: 2px 0;
-            }
-
-            .month-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .month-card {
-                padding: 20px 15px;
-            }
-            
-            .status-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .sync-actions-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .sync-history-table {
-                font-size: 12px;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .edit-form-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
-            }
-            
-            .month-section {
-                margin-bottom: 0;
             }
         }
     </style>
@@ -1234,25 +586,25 @@
                     <div class="month-card month-1" onclick="selectMonth(1)">
                         <div class="month-icon">📘</div>
                         <h3>الشهر الأول</h3>
-                        <p>إدارة وتعديل درجات الشهر الأول (مواظبة، شفهي، واجبات، تحريري)</p>
+                        <p>إدارة وتعديل درجات الشهر الأول</p>
                     </div>
                     
                     <div class="month-card month-2" onclick="selectMonth(2)">
                         <div class="month-icon">📗</div>
                         <h3>الشهر الثاني</h3>
-                        <p>إدارة وتعديل درجات الشهر الثاني (مواظبة، شفهي، واجبات، تحريري)</p>
+                        <p>إدارة وتعديل درجات الشهر الثاني</p>
                     </div>
                     
                     <div class="month-card month-3" onclick="selectMonth(3)">
                         <div class="month-icon">📙</div>
                         <h3>الشهر الثالث</h3>
-                        <p>إدارة وتعديل درجات الشهر الثالث (مواظبة، شفهي، واجبات، تحريري)</p>
+                        <p>إدارة وتعديل درجات الشهر الثالث</p>
                     </div>
                     
                     <div class="month-card all-months" onclick="selectMonth('all')">
                         <div class="month-icon">📚</div>
                         <h3>جميع الشهور</h3>
-                        <p>عرض وإدارة جميع الشهور في جدول واحد شامل</p>
+                        <p>عرض وإدارة جميع الشهور في جدول واحد</p>
                     </div>
                 </div>
             </div>
@@ -1261,32 +613,23 @@
         <!-- نافذة العمل للشهر الأول -->
         <div id="month1Workspace" class="month-workspace">
             <div class="controls">
-                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة لاختيار الشهر</button>
+                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة</button>
                 <button class="btn btn-logout" id="logoutBtn1">تسجيل الخروج</button>
                 <div style="color: #2c3e50; font-weight: bold;">
-                    <span>المعلم: </span>
-                    <span id="currentTeacher1"></span>
-                    <span> | عدد الطلاب: </span>
-                    <span id="studentsCount1">0</span>
+                    <span>المعلم: </span><span id="currentTeacher1"></span>
+                    <span> | الطلاب: </span><span id="studentsCount1">0</span>
                 </div>
             </div>
 
             <div class="current-month-header month-1">
                 <h2>📘 الشهر الأول - إدارة الدرجات</h2>
-                <p>يمكنك هنا إدارة وتعديل درجات الشهر الأول للطلاب</p>
             </div>
 
             <div class="search-container">
-                <input type="text" id="searchNameInput1" placeholder="🔍 تصفية عن طريق جزء من الاسم...">
+                <input type="text" id="searchNameInput1" placeholder="🔍 بحث بالاسم...">
                 <select id="classNameFilter1">
                     <option value="">جميع الشعب</option>
                 </select>
-                <button class="btn" id="qrScanBtn1" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
-                    📷 مسح QR Code
-                </button>
-                <button class="btn" id="showStatsBtn1" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                    📈 عرض الإحصائيات
-                </button>
                 <button class="btn" id="manageSyncBtn1" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
                     ⚙️ إدارة المزامنة
                 </button>
@@ -1304,7 +647,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Barcode</th>
+                            <th>الباركود</th>
                             <th>اسم الطالب</th>
                             <th>الشعبة</th>
                             <th>مواظبة 1</th>
@@ -1317,11 +660,7 @@
                         </tr>
                     </thead>
                     <tbody id="month1TableBody">
-                        <tr>
-                            <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
-                                ⏳ جاري تحميل البيانات...
-                            </td>
-                        </tr>
+                        <tr><td colspan="11" style="text-align: center; color: #666; padding: 40px;">⏳ جاري تحميل البيانات...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1330,32 +669,23 @@
         <!-- نافذة العمل للشهر الثاني -->
         <div id="month2Workspace" class="month-workspace">
             <div class="controls">
-                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة لاختيار الشهر</button>
+                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة</button>
                 <button class="btn btn-logout" id="logoutBtn2">تسجيل الخروج</button>
                 <div style="color: #2c3e50; font-weight: bold;">
-                    <span>المعلم: </span>
-                    <span id="currentTeacher2"></span>
-                    <span> | عدد الطلاب: </span>
-                    <span id="studentsCount2">0</span>
+                    <span>المعلم: </span><span id="currentTeacher2"></span>
+                    <span> | الطلاب: </span><span id="studentsCount2">0</span>
                 </div>
             </div>
 
             <div class="current-month-header month-2">
                 <h2>📗 الشهر الثاني - إدارة الدرجات</h2>
-                <p>يمكنك هنا إدارة وتعديل درجات الشهر الثاني للطلاب</p>
             </div>
 
             <div class="search-container">
-                <input type="text" id="searchNameInput2" placeholder="🔍 تصفية عن طريق جزء من الاسم...">
+                <input type="text" id="searchNameInput2" placeholder="🔍 بحث بالاسم...">
                 <select id="classNameFilter2">
                     <option value="">جميع الشعب</option>
                 </select>
-                <button class="btn" id="qrScanBtn2" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
-                    📷 مسح QR Code
-                </button>
-                <button class="btn" id="showStatsBtn2" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                    📈 عرض الإحصائيات
-                </button>
                 <button class="btn" id="manageSyncBtn2" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
                     ⚙️ إدارة المزامنة
                 </button>
@@ -1373,7 +703,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Barcode</th>
+                            <th>الباركود</th>
                             <th>اسم الطالب</th>
                             <th>الشعبة</th>
                             <th>مواظبة 2</th>
@@ -1386,11 +716,7 @@
                         </tr>
                     </thead>
                     <tbody id="month2TableBody">
-                        <tr>
-                            <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
-                                ⏳ جاري تحميل البيانات...
-                            </td>
-                        </tr>
+                        <tr><td colspan="11" style="text-align: center; color: #666; padding: 40px;">⏳ جاري تحميل البيانات...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1399,32 +725,23 @@
         <!-- نافذة العمل للشهر الثالث -->
         <div id="month3Workspace" class="month-workspace">
             <div class="controls">
-                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة لاختيار الشهر</button>
+                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة</button>
                 <button class="btn btn-logout" id="logoutBtn3">تسجيل الخروج</button>
                 <div style="color: #2c3e50; font-weight: bold;">
-                    <span>المعلم: </span>
-                    <span id="currentTeacher3"></span>
-                    <span> | عدد الطلاب: </span>
-                    <span id="studentsCount3">0</span>
+                    <span>المعلم: </span><span id="currentTeacher3"></span>
+                    <span> | الطلاب: </span><span id="studentsCount3">0</span>
                 </div>
             </div>
 
             <div class="current-month-header month-3">
                 <h2>📙 الشهر الثالث - إدارة الدرجات</h2>
-                <p>يمكنك هنا إدارة وتعديل درجات الشهر الثالث للطلاب</p>
             </div>
 
             <div class="search-container">
-                <input type="text" id="searchNameInput3" placeholder="🔍 تصفية عن طريق جزء من الاسم...">
+                <input type="text" id="searchNameInput3" placeholder="🔍 بحث بالاسم...">
                 <select id="classNameFilter3">
                     <option value="">جميع الشعب</option>
                 </select>
-                <button class="btn" id="qrScanBtn3" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
-                    📷 مسح QR Code
-                </button>
-                <button class="btn" id="showStatsBtn3" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                    📈 عرض الإحصائيات
-                </button>
                 <button class="btn" id="manageSyncBtn3" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
                     ⚙️ إدارة المزامنة
                 </button>
@@ -1442,7 +759,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Barcode</th>
+                            <th>الباركود</th>
                             <th>اسم الطالب</th>
                             <th>الشعبة</th>
                             <th>مواظبة 3</th>
@@ -1455,11 +772,7 @@
                         </tr>
                     </thead>
                     <tbody id="month3TableBody">
-                        <tr>
-                            <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
-                                ⏳ جاري تحميل البيانات...
-                            </td>
-                        </tr>
+                        <tr><td colspan="11" style="text-align: center; color: #666; padding: 40px;">⏳ جاري تحميل البيانات...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1468,32 +781,23 @@
         <!-- نافذة العمل لجميع الشهور -->
         <div id="allMonthsWorkspace" class="month-workspace">
             <div class="controls">
-                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة لاختيار الشهر</button>
+                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة</button>
                 <button class="btn btn-logout" id="logoutBtnAll">تسجيل الخروج</button>
                 <div style="color: #2c3e50; font-weight: bold;">
-                    <span>المعلم: </span>
-                    <span id="currentTeacherAll"></span>
-                    <span> | عدد الطلاب: </span>
-                    <span id="studentsCountAll">0</span>
+                    <span>المعلم: </span><span id="currentTeacherAll"></span>
+                    <span> | الطلاب: </span><span id="studentsCountAll">0</span>
                 </div>
             </div>
 
             <div class="current-month-header all-months">
                 <h2>📚 جميع الشهور - عرض شامل</h2>
-                <p>عرض شامل لجميع درجات الطلاب في الأشهر الثلاثة</p>
             </div>
 
             <div class="search-container">
-                <input type="text" id="searchNameInputAll" placeholder="🔍 تصفية عن طريق جزء من الاسم...">
+                <input type="text" id="searchNameInputAll" placeholder="🔍 بحث بالاسم...">
                 <select id="classNameFilterAll">
                     <option value="">جميع الشعب</option>
                 </select>
-                <button class="btn" id="qrScanBtnAll" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
-                    📷 مسح QR Code
-                </button>
-                <button class="btn" id="showStatsBtnAll" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                    📈 عرض الإحصائيات
-                </button>
                 <button class="btn" id="manageSyncBtnAll" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
                     ⚙️ إدارة المزامنة
                 </button>
@@ -1511,36 +815,17 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Barcode</th>
+                            <th>الباركود</th>
                             <th>اسم الطالب</th>
                             <th>الشعبة</th>
-                            <th>مواظبة 1</th>
-                            <th>شفهي 1</th>
-                            <th>واجبات 1</th>
-                            <th>تحريري 1</th>
-                            <th>المجموع 1</th>
-                            <th>محصلة 1</th>
-                            <th>مواظبة 2</th>
-                            <th>شفهي 2</th>
-                            <th>واجبات 2</th>
-                            <th>تحريري 2</th>
-                            <th>المجموع 2</th>
-                            <th>محصلة 2</th>
-                            <th>مواظبة 3</th>
-                            <th>واجبات 3</th>
-                            <th>شفهي 3</th>
-                            <th>تحريري 3</th>
-                            <th>المجموع 3</th>
-                            <th>محصلة 3</th>
+                            <th>مواظبة 1</th><th>شفهي 1</th><th>واجبات 1</th><th>تحريري 1</th><th>المجموع 1</th><th>محصلة 1</th>
+                            <th>مواظبة 2</th><th>شفهي 2</th><th>واجبات 2</th><th>تحريري 2</th><th>المجموع 2</th><th>محصلة 2</th>
+                            <th>مواظبة 3</th><th>واجبات 3</th><th>شفهي 3</th><th>تحريري 3</th><th>المجموع 3</th><th>محصلة 3</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="studentsTableBody">
-                        <tr>
-                            <td colspan="23" style="text-align: center; color: #666; padding: 40px;">
-                                ⏳ جاري تحميل البيانات...
-                            </td>
-                        </tr>
+                        <tr><td colspan="23" style="text-align: center; color: #666; padding: 40px;">⏳ جاري تحميل البيانات...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1550,160 +835,19 @@
             ⏳ جاري تحميل البيانات...
         </div>
 
-        <!-- نافذة ماسح QR Code -->
-        <div id="qrModal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal" onclick="closeModal('qrModal')">&times;</span>
-                <h3>📷 مسح QR Code الطالب</h3>
-                <div class="qr-scanner-container">
-                    <div id="qrScanner">
-                        <span>جاري تشغيل الكاميرا...</span>
-                    </div>
-                    <div class="scanner-overlay">
-                        <div class="scanner-frame"></div>
-                    </div>
-                    <button class="btn btn-warning" id="stopScannerBtn">⏹️ إيقاف الماسح</button>
-                    <div id="qrResult" class="qr-result hidden">
-                        <p id="qrResultText"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- نافذة الإحصائيات -->
-        <div id="statsModal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal" onclick="closeModal('statsModal')">&times;</span>
-                <h3>📊 إحصائيات الطلاب المفلترين (المعلم: <span id="statsTeacherId"></span>)</h3>
-                
-                <!-- تبويبات للإحصائيات -->
-                <div class="stats-tabs">
-                    <button class="stats-tab active" onclick="openStatsTab('overall')">المعدل العام</button>
-                    <button class="stats-tab" onclick="openStatsTab('month1')">الشهر الأول</button>
-                    <button class="stats-tab" onclick="openStatsTab('month2')">الشهر الثاني</button>
-                    <button class="stats-tab" onclick="openStatsTab('month3')">الشهر الثالث</button>
-                </div>
-                
-                <!-- المعدل العام -->
-                <div id="overallStats" class="stats-tab-content active">
-                    <h4>المعدل العام لجميع الأشهر</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>العدد الكلي</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="totalStudentsCount">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsOverallLess5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsOverall5to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsOverall11to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsOverall16to20">0</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- الشهر الأول -->
-                <div id="month1Stats" class="stats-tab-content">
-                    <h4>إحصائيات الشهر الأول</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth1Less5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth15to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth111to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth116to20">0</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- الشهر الثاني -->
-                <div id="month2Stats" class="stats-tab-content">
-                    <h4>إحصائيات الشهر الثاني</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth2Less5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth25to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth211to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth216to20">0</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- الشهر الثالث -->
-                <div id="month3Stats" class="stats-tab-content">
-                    <h4>إحصائيات الشهر الثالث</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth3Less5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth35to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth311to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth316to20">0</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- نافذة التعديل المخصصة للشهر -->
+        <!-- نافذة التعديل -->
         <div id="editModal" class="modal">
             <div class="modal-content">
                 <span class="close-modal" onclick="closeModal('editModal')">&times;</span>
-                <div class="edit-modal-header">
-                    <h3>✏️ تعديل درجات الطالب: <span id="currentStudentName"></span></h3>
-                    <div class="current-month-indicator" id="currentMonthIndicator">الشهر الأول</div>
-                    <button type="button" class="top-save-btn" onclick="saveAllEdits()">
-                        ✅ حفظ التعديلات
-                    </button>
+                <h3>✏️ تعديل درجات الطالب</h3>
+                <div id="editFormContainer">
+                    <!-- سيتم تعبئة المحتوى ديناميكياً -->
                 </div>
-                
-                <input type="hidden" id="editStudentId">
-                <input type="hidden" id="currentEditMonth">
-                
-                <div class="edit-form-grid" id="editFormContainer">
-                    <!-- سيتم تعبئة المحتوى ديناميكياً بناءً على الشهر المحدد -->
-                </div>
+                <button class="btn btn-success" onclick="saveAllEdits()" style="margin-top: 20px;">💾 حفظ التعديلات</button>
             </div>
         </div>
 
-        <!-- نافذة إدارة المزامنة المتقدمة -->
+        <!-- نافذة إدارة المزامنة -->
         <div id="syncManagementModal" class="modal">
             <div class="modal-content">
                 <span class="close-modal" onclick="closeModal('syncManagementModal')">&times;</span>
@@ -1718,35 +862,25 @@
                                 <span class="status-value" id="syncPendingCount">0</span>
                             </div>
                             <div class="status-item">
-                                <span class="status-label">تم مزامنتها:</span>
-                                <span class="status-value" id="syncCompletedCount">0</span>
-                            </div>
-                            <div class="status-item">
-                                <span class="status-label">فشلت:</span>
+                                <span class="status-label">التعديلات الفاشلة:</span>
                                 <span class="status-value" id="syncFailedCount">0</span>
                             </div>
                             <div class="status-item">
                                 <span class="status-label">آخر مزامنة:</span>
                                 <span class="status-value" id="lastSyncTime">لم تتم</span>
                             </div>
+                            <div class="status-item">
+                                <span class="status-label">حالة الاتصال:</span>
+                                <span class="status-value" id="connectionState">غير معروف</span>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="sync-actions-grid">
-                        <button class="btn btn-warning" onclick="forceReSync()">
-                            🔄 إعادة مزامنة الكل
-                        </button>
-                        <button class="btn" style="background: linear-gradient(135deg, #3498db, #2980b9);" 
-                                onclick="verifySyncStatus()">
-                            🔍 التحقق من المزامنة
-                        </button>
-                        <button class="btn btn-success" onclick="syncMissingData()">
-                            📤 مزامنة المفقود فقط
-                        </button>
-                        <button class="btn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);" 
-                                onclick="showSyncHistory()">
-                            📋 سجل المزامنات
-                        </button>
+                        <button class="btn btn-warning" onclick="forceReSync()">🔄 إعادة مزامنة الكل</button>
+                        <button class="btn" style="background: linear-gradient(135deg, #3498db, #2980b9);" onclick="verifySyncStatus()">🔍 التحقق من المزامنة</button>
+                        <button class="btn btn-success" onclick="syncMissingData()">📤 مزامنة المفقود</button>
+                        <button class="btn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);" onclick="showBackupOptions()">💾 النسخ الاحتياطي</button>
                     </div>
                     
                     <div class="sync-details-section">
@@ -1755,73 +889,21 @@
                             <!-- سيتم تعبئة التفاصيل ديناميكياً -->
                         </div>
                     </div>
-                    
-                    <div class="sync-options">
-                        <h4>⚙️ خيارات المزامنة</h4>
-                        <div class="option-item">
-                            <input type="checkbox" id="autoRetryFailed" checked>
-                            <label for="autoRetryFailed">إعادة محاولة المزامنات الفاشلة تلقائياً</label>
-                        </div>
-                        <div class="option-item">
-                            <input type="checkbox" id="verifyAfterSync" checked>
-                            <label for="verifyAfterSync">التحقق من المزامنة بعد كل عملية</label>
-                        </div>
-                        <div class="option-item">
-                            <label for="retryInterval">فترة إعادة المحاولة (ثانية):</label>
-                            <select id="retryInterval">
-                                <option value="5">5</option>
-                                <option value="10" selected>10</option>
-                                <option value="30">30</option>
-                                <option value="60">60</option>
-                            </select>
-                        </div>
-                    </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- نافذة سجل المزامنات -->
-        <div id="syncHistoryModal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal" onclick="closeModal('syncHistoryModal')">&times;</span>
-                <h3>📋 سجل عمليات المزامنة</h3>
-                <div class="sync-history-container">
-                    <table class="sync-history-table">
-                        <thead>
-                            <tr>
-                                <th>التاريخ</th>
-                                <th>النوع</th>
-                                <th>العدد</th>
-                                <th>الحالة</th>
-                                <th>التفاصيل</th>
-                            </tr>
-                        </thead>
-                        <tbody id="syncHistoryBody">
-                            <!-- سيتم تعبئة السجل ديناميكياً -->
-                        </tbody>
-                    </table>
-                </div>
-                <button class="btn" onclick="clearSyncHistory()" style="margin-top: 15px;">
-                    🗑️ مسح السجل
-                </button>
             </div>
         </div>
     </div>
 
-    <!-- إضافة مكتبة jsQR لمسح QR Code -->
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-
     <script>
-        // JavaScript Code الكامل مع إصلاح مشكلة المزامنة
-
         // ========== الإعدادات والمتغيرات الرئيسية ==========
         const LOCAL_STORAGE_KEY = 'studentsData';
         const PENDING_UPDATES_KEY = 'pendingUpdates';
+        const FAILED_UPDATES_KEY = 'failedUpdates';
         const TEACHER_SESSION_KEY = 'teacherSession';
         const SYNC_HISTORY_KEY = 'syncHistory';
-        const FAILED_UPDATES_KEY = 'failedUpdates';
-        const SYNC_VERIFICATION_KEY = 'syncVerification';
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwcaLokiABRJmf9LzZOAskFoKhdLvOeoFHXt9-a5zAb5eTSMwqyNCzgB_HDOsWF9-hO/exec'; 
+        const BACKUP_HISTORY_KEY = 'backupHistory';
+        
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwcaLokiABRJmf9LzZOAskFoKhdLvOeoFHXt9-a5zAb5eTSMwqyNCzgB_HDOsWF9-hO/exec';
         
         const STUDENT_PROPERTIES = {
             'ID': 'id',
@@ -1849,7 +931,7 @@
             'محصلة3': 'result3'
         };
 
-        // ========== العناصر الرئيسية في الصفحة ==========
+        // ========== العناصر الرئيسية ==========
         const teacherIdInput = document.getElementById('teacherId');
         const loginSection = document.getElementById('loginSection');
         const monthSelectionSection = document.getElementById('monthSelectionSection');
@@ -1859,9 +941,7 @@
         const loginBtn = document.getElementById('loginBtn');
         const retryBtn = document.getElementById('retryBtn');
         const useLocalDataBtn = document.getElementById('useLocalDataBtn');
-        const installBtn = document.getElementById('installBtn');
         const debugInfo = document.getElementById('debugInfo');
-        const pwaStatus = document.getElementById('pwaStatus');
 
         // ========== المتغيرات العامة ==========
         let currentTeacherId = '';
@@ -1869,1143 +949,117 @@
         let pendingUpdates = [];
         let failedUpdates = [];
         let syncHistory = [];
-        let syncVerification = {};
-        let isSyncing = false; 
-        let isVerifying = false;
-        let autoSyncInterval; 
-        let retryInterval = 10000; // 10 ثواني
+        let isSyncing = false;
+        let autoSyncInterval;
         let currentMonth = 1;
-        let qrScanner = null;
-        let qrStream = null;
         let deferredPrompt = null;
-        let retryAttempts = 0;
-        const MAX_RETRY_ATTEMPTS = 3;
 
-        // ========== إدارة الجلسة والتسجيل التلقائي ==========
-        function initializeSession() {
-            console.log('تهيئة نظام الجلسة...');
-            
-            // تحميل البيانات التاريخية
-            syncHistory = loadSyncHistory();
-            failedUpdates = loadFailedUpdates();
-            syncVerification = loadSyncVerification();
-            
-            // تحميل بيانات الجلسة السابقة
-            const sessionData = loadTeacherSession();
-            if (sessionData && sessionData.teacherId) {
-                currentTeacherId = sessionData.teacherId;
-                teacherIdInput.value = currentTeacherId;
-                console.log('تم تحميل جلسة المعلم السابقة:', currentTeacherId);
-                
-                // محاولة الدخول التلقائي
-                setTimeout(() => {
-                    autoLogin();
-                }, 1000);
-            }
-        }
-
-        function saveTeacherSession(teacherId) {
+        // ========== نظام النسخ الاحتياطي وحماية البيانات ==========
+        
+        function createBackup() {
             try {
-                const sessionData = {
-                    teacherId: teacherId,
+                const backup = {
                     timestamp: new Date().toISOString(),
-                    lastLogin: new Date().toISOString()
+                    teacherId: currentTeacherId,
+                    students: JSON.parse(JSON.stringify(allStudents)),
+                    pendingUpdates: JSON.parse(JSON.stringify(pendingUpdates)),
+                    failedUpdates: JSON.parse(JSON.stringify(failedUpdates)),
+                    syncHistory: JSON.parse(JSON.stringify(syncHistory))
                 };
-                localStorage.setItem(TEACHER_SESSION_KEY, JSON.stringify(sessionData));
-                console.log('تم حفظ جلسة المعلم:', teacherId);
-                return true;
+                
+                const backupKey = `backup_${currentTeacherId}_${Date.now()}`;
+                localStorage.setItem(backupKey, JSON.stringify(backup));
+                
+                // حفظ في سجل النسخ الاحتياطية
+                const backups = JSON.parse(localStorage.getItem(BACKUP_HISTORY_KEY) || '[]');
+                backups.push({
+                    key: backupKey,
+                    timestamp: backup.timestamp,
+                    teacherId: currentTeacherId,
+                    studentCount: allStudents.length,
+                    pendingCount: pendingUpdates.length
+                });
+                
+                // حفظ فقط آخر 10 نسخ
+                if (backups.length > 10) {
+                    const oldestBackup = backups.shift();
+                    localStorage.removeItem(oldestBackup.key);
+                }
+                
+                localStorage.setItem(BACKUP_HISTORY_KEY, JSON.stringify(backups));
+                
+                console.log('✅ تم إنشاء نسخة احتياطية:', backupKey);
+                return backupKey;
+                
             } catch (error) {
-                console.error('فشل في حفظ جلسة المعلم:', error);
-                return false;
-            }
-        }
-
-        function loadTeacherSession() {
-            try {
-                const data = localStorage.getItem(TEACHER_SESSION_KEY);
-                return data ? JSON.parse(data) : null;
-            } catch (error) {
-                console.error('فشل في تحميل جلسة المعلم:', error);
+                console.error('❌ فشل في إنشاء النسخة الاحتياطية:', error);
                 return null;
             }
         }
 
-        function clearTeacherSession() {
+        function restoreFromBackup(backupKey) {
             try {
-                localStorage.removeItem(TEACHER_SESSION_KEY);
-                console.log('تم مسح جلسة المعلم');
-                return true;
-            } catch (error) {
-                console.error('فشل في مسح جلسة المعلم:', error);
-                return false;
-            }
-        }
-
-        async function autoLogin() {
-            console.log('محاولة الدخول التلقائي...');
-            
-            // أولاً حاول استخدام البيانات المحلية
-            const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (localData) {
-                try {
-                    const parsedData = JSON.parse(localData);
-                    const filteredStudents = parsedData.students ? 
-                        parsedData.students.filter(s => s.teacherId === currentTeacherId) : [];
-
-                    if (filteredStudents.length > 0) {
-                        allStudents = filteredStudents;
-                        welcomeTeacherName.textContent = currentTeacherId;
-                        
-                        populateClassFilters(); 
-                        
-                        loginSection.classList.add('hidden');
-                        monthSelectionSection.classList.remove('hidden');
-                        showSuccess(`👋 تم الدخول التلقائي (المعلم: ${currentTeacherId})`);
-                        updateDebugInfo('✅ الدخول التلقائي ناجح من البيانات المحلية');
-                        return true;
-                    }
-                } catch (error) {
-                    console.error('خطأ في الدخول التلقائي:', error);
+                const backupData = localStorage.getItem(backupKey);
+                if (!backupData) {
+                    showError('❌ النسخة الاحتياطية غير موجودة');
+                    return false;
                 }
-            }
-            
-            // إذا لم تنجح البيانات المحلية، حاول الاتصال بالسيرفر
-            updateDebugInfo('🔄 محاولة الاتصال بالسيرفر للدخول التلقائي...');
-            const success = await fetchDataFromSheet(currentTeacherId, false);
-            if (success) {
-                showSuccess(`👋 تم الدخول التلقائي (المعلم: ${currentTeacherId})`);
-                updateDebugInfo('✅ الدخول التلقائي ناجح من السيرفر');
-            } else {
-                updateDebugInfo('❌ فشل الدخول التلقائي');
-            }
-            
-            return success;
-        }
-
-        // ========== نظام PWA والتثبيت ==========
-        function initializePWA() {
-            console.log('🚀 تهيئة نظام PWA لتطبيق grades...');
-            window.installButton = document.getElementById('installBtn');
-            
-            // تسجيل Service Worker مع النطاق المحدد
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/grades/service-worker.js', {
-                    scope: '/grades/'
-                })
-                .then(function(registration) {
-                    console.log('✅ Service Worker للتطبيق grades مسجل بنجاح:', registration);
-                    updatePWAStatus('✅ Service Worker نشط - تطبيق النتائج');
-                })
-                .catch(function(error) {
-                    console.log('❌ فشل تسجيل Service Worker:', error);
-                    updatePWAStatus('❌ Service Worker غير نشط');
-                });
-            } else {
-                updatePWAStatus('❌ المتصفح لا يدعم Service Worker');
-            }
-
-            // حدث قبل التثبيت
-            window.addEventListener('beforeinstallprompt', (e) => {
-                console.log('🎯 حدث beforeinstallprompt تم تشغيله');
-                e.preventDefault();
-                window.deferredPrompt = e;
-                showInstallButton();
-                updatePWAStatus('📲 التطبيق جاهز للتثبيت');
-            });
-
-            // حدث بعد التثبيت
-            window.addEventListener('appinstalled', (evt) => {
-                console.log('🎉 تم تثبيت التطبيق بنجاح');
-                hideInstallButton();
-                window.deferredPrompt = null;
-                updatePWAStatus('✅ التطبيق مثبت');
-            });
-
-            // التحقق إذا كان التطبيق مثبتاً بالفعل
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                console.log('📱 التطبيق يعمل في وضع PWA');
-                hideInstallButton();
-                updatePWAStatus('✅ التطبيق مثبت ويعمل');
-            }
-
-            // زر التثبيت
-            if (window.installButton) {
-                window.installButton.addEventListener('click', installPWA);
-            }
-        }
-
-        async function installPWA() {
-            if (!window.deferredPrompt) {
-                console.log('❌ لا يوجد prompt للتثبيت');
-                return;
-            }
-
-            console.log('🔄 بدء عملية التثبيت...');
-            
-            try {
-                window.deferredPrompt.prompt();
-                const { outcome } = await window.deferredPrompt.userChoice;
-                console.log(`نتيجة التثبيت: ${outcome}`);
                 
-                if (outcome === 'accepted') {
-                    console.log('✅ تم قبول تثبيت التطبيق');
-                    showSuccess('✅ تم تثبيت التطبيق بنجاح!');
-                } else {
-                    console.log('❌ تم رفض التثبيت');
-                }
-            } catch (error) {
-                console.log('❌ خطأ في عملية التثبيت:', error);
-            }
-            
-            window.deferredPrompt = null;
-            hideInstallButton();
-        }
-
-        function showInstallButton() {
-            if (window.installButton) {
-                window.installButton.style.display = 'block';
-                console.log('👆 زر التثبيت معروض الآن');
-            }
-        }
-
-        function hideInstallButton() {
-            if (window.installButton) {
-                window.installButton.style.display = 'none';
-                console.log('❌ زر التثبيت مخفي الآن');
-            }
-        }
-
-        function updatePWAStatus(message) {
-            const pwaStatus = document.getElementById('pwaStatus');
-            if (pwaStatus) {
-                pwaStatus.textContent = `حالة PWA: ${message}`;
-            }
-        }
-
-        function updateDebugInfo(message) {
-            if (debugInfo) {
-                debugInfo.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
-                debugInfo.scrollTop = debugInfo.scrollHeight;
-            }
-        }
-
-        // ========== إصلاح مشكلة الشهور ==========
-        function initializeMonthSystem() {
-            console.log('بدء تهيئة نظام الشهور...');
-            
-            // ربط أحداث جميع أزرار الشهور
-            document.querySelectorAll('.month-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    const month = this.classList.contains('month-1') ? 1 : 
-                                 this.classList.contains('month-2') ? 2 : 
-                                 this.classList.contains('month-3') ? 3 : 'all';
-                    selectMonth(month);
-                });
-            });
-            
-            // ربط أحداث العودة
-            document.querySelectorAll('.back-to-selection').forEach(btn => {
-                btn.addEventListener('click', backToMonthSelection);
-            });
-            
-            console.log('تم تهيئة نظام الشهور بنجاح');
-        }
-
-        function selectMonth(month) {
-            currentMonth = month;
-            
-            // إخفاء جميع نوافذ العمل
-            document.querySelectorAll('.month-workspace').forEach(workspace => {
-                workspace.classList.remove('active');
-            });
-            
-            // إظهار نافذة العمل المحددة
-            const workspaceId = month === 'all' ? 'allMonthsWorkspace' : `month${month}Workspace`;
-            document.getElementById(workspaceId).classList.add('active');
-            
-            // إخفاء نافذة اختيار الشهر
-            monthSelectionSection.classList.add('hidden');
-            
-            // تحديث اسم المعلم في نافذة العمل
-            document.querySelectorAll('#currentTeacher1, #currentTeacher2, #currentTeacher3, #currentTeacherAll').forEach(element => {
-                element.textContent = currentTeacherId;
-            });
-            
-            // تحديث عرض البيانات للشهر المحدد
-            updateDisplayedStudents();
-            
-            console.log(`تم اختيار الشهر: ${month}`);
-        }
-
-        function backToMonthSelection() {
-            // إخفاء جميع نوافذ العمل
-            document.querySelectorAll('.month-workspace').forEach(workspace => {
-                workspace.classList.remove('active');
-            });
-            
-            // إظهار نافذة اختيار الشهر
-            monthSelectionSection.classList.remove('hidden');
-        }
-
-        // ========== نظام المزامنة المتقدم ==========
-        function initializeSyncManagement() {
-            console.log('تهيئة نظام إدارة المزامنة...');
-            
-            // تحميل التعديلات المعلقة والفاشلة
-            pendingUpdates = loadPendingUpdates();
-            updatePendingCount();
-            
-            // ربط أحداث أزرار إدارة المزامنة
-            for (let i = 1; i <= 3; i++) {
-                const btn = document.getElementById(`manageSyncBtn${i}`);
-                if (btn) btn.addEventListener('click', showSyncManagement);
-            }
-            
-            const allBtn = document.getElementById('manageSyncBtnAll');
-            if (allBtn) allBtn.addEventListener('click', showSyncManagement);
-            
-            // بدء مراقبة المزامنة
-            startSyncMonitoring();
-        }
-
-        function showSyncManagement() {
-            updateSyncManagementUI();
-            document.getElementById('syncManagementModal').style.display = 'block';
-        }
-
-        function updateSyncManagementUI() {
-            // تحديث الإحصائيات
-            document.getElementById('syncPendingCount').textContent = pendingUpdates.length;
-            document.getElementById('syncFailedCount').textContent = failedUpdates.length;
-            
-            // حساب التعديلات المكتملة
-            const completedCount = syncHistory.filter(h => h.status === 'success').reduce((sum, h) => sum + (h.count || 0), 0);
-            document.getElementById('syncCompletedCount').textContent = completedCount;
-            
-            // تحديث وقت آخر مزامنة
-            const lastSuccess = syncHistory.filter(h => h.status === 'success').sort((a, b) => 
-                new Date(b.timestamp) - new Date(a.timestamp)
-            )[0];
-            
-            document.getElementById('lastSyncTime').textContent = lastSuccess ? 
-                new Date(lastSuccess.timestamp).toLocaleString('ar-SA') : 'لم تتم';
-            
-            // تحديث تفاصيل التعديلات المعلقة
-            updateSyncDetailsList();
-        }
-
-        function updateSyncDetailsList() {
-            const container = document.getElementById('syncDetailsList');
-            container.innerHTML = '';
-            
-            if (pendingUpdates.length === 0 && failedUpdates.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666;">لا توجد تعديلات معلقة</p>';
-                return;
-            }
-            
-            // عرض التعديلات المعلقة
-            pendingUpdates.forEach((update, index) => {
-                const student = allStudents.find(s => s.id === update.id);
-                const detailItem = document.createElement('div');
-                detailItem.className = 'sync-detail-item';
-                detailItem.innerHTML = `
-                    <div class="sync-detail-info">
-                        <strong>${student ? student.studentName : 'طالب غير معروف'}</strong>
-                        <div style="font-size: 12px; color: #666;">
-                            ${Object.keys(update).filter(k => !['row', 'id', 'error', 'retryCount'].includes(k)).join(', ')}
-                        </div>
-                    </div>
-                    <span class="sync-detail-status status-pending">⏳ معلق</span>
-                `;
-                container.appendChild(detailItem);
-            });
-            
-            // عرض التعديلات الفاشلة
-            failedUpdates.forEach((update, index) => {
-                const student = allStudents.find(s => s.id === update.id);
-                const detailItem = document.createElement('div');
-                detailItem.className = 'sync-detail-item';
-                detailItem.innerHTML = `
-                    <div class="sync-detail-info">
-                        <strong>${student ? student.studentName : 'طالب غير معروف'}</strong>
-                        <div style="font-size: 12px; color: #666;">
-                            ${update.error || 'خطأ غير معروف'}
-                        </div>
-                    </div>
-                    <span class="sync-detail-status status-failed">❌ فشل</span>
-                    <button class="btn" style="padding: 3px 8px; font-size: 12px;" 
-                            onclick="retryFailedUpdate(${index})">
-                        🔄 إعادة
-                    </button>
-                `;
-                container.appendChild(detailItem);
-            });
-        }
-
-        // ========== دوال إعادة المزامنة ==========
-        async function forceReSync() {
-            if (!confirm('هل تريد إعادة مزامنة جميع التعديلات المعلقة والفاشلة؟')) return;
-            
-            const allUpdates = [...pendingUpdates, ...failedUpdates];
-            if (allUpdates.length === 0) {
-                showSuccess('لا توجد تعديلات لإعادة المزامنة');
-                return;
-            }
-            
-            showLoading(true, `🔄 جاري إعادة مزامنة ${allUpdates.length} تعديل...`);
-            
-            // تنظيف القوائم
-            pendingUpdates = [];
-            failedUpdates = [];
-            savePendingUpdates();
-            saveFailedUpdates();
-            
-            // إضافة للقائمة المعلقة للمزامنة الجديدة
-            pendingUpdates = allUpdates;
-            savePendingUpdates();
-            
-            // بدء المزامنة
-            const success = await syncPendingUpdates(false);
-            
-            if (success) {
-                showSuccess(`✅ تمت إعادة مزامنة ${allUpdates.length} تعديل بنجاح`);
-                updateSyncManagementUI();
-            }
-        }
-
-        async function syncMissingData() {
-            // التحقق من البيانات المفقودة
-            showLoading(true, '🔍 جاري البحث عن بيانات مفقودة...');
-            
-            try {
-                // جلب البيانات من السيرفر للمقارنة
-                const response = await fetch(WEB_APP_URL);
-                const data = await response.json();
+                const backup = JSON.parse(backupData);
                 
-                if (data.status === 'success' && data.data) {
-                    const serverData = mapData(data.data);
-                    const serverStudents = serverData.filter(s => s.teacherId === currentTeacherId);
+                if (confirm(`هل تريد استعادة النسخة الاحتياطية من ${new Date(backup.timestamp).toLocaleString('ar-SA')}؟\n\nعدد الطلاب: ${backup.students.length}\nالتعديلات المعلقة: ${backup.pendingUpdates.length}`)) {
+                    allStudents = backup.students || [];
+                    pendingUpdates = backup.pendingUpdates || [];
+                    failedUpdates = backup.failedUpdates || [];
+                    syncHistory = backup.syncHistory || [];
                     
-                    let missingCount = 0;
-                    
-                    // المقارنة مع البيانات المحلية
-                    serverStudents.forEach(serverStudent => {
-                        const localStudent = allStudents.find(s => s.id === serverStudent.id);
-                        if (localStudent) {
-                            // التحقق من اختلاف الدرجات
-                            const fields = [
-                                'attendance1', 'oral1', 'homework1', 'written1',
-                                'attendance2', 'oral2', 'homework2', 'written2',
-                                'attendance3', 'homework3', 'oral3', 'written3'
-                            ];
-                            
-                            fields.forEach(field => {
-                                const serverValue = formatGrade(serverStudent[field]);
-                                const localValue = formatGrade(localStudent[field]);
-                                
-                                if (serverValue !== localValue) {
-                                    missingCount++;
-                                    // إضافة للتعديلات المعلقة
-                                    const update = {
-                                        row: localStudent.originalRowIndex,
-                                        id: localStudent.id,
-                                        [field]: localValue
-                                    };
-                                    
-                                    // تجنب التكرار
-                                    const exists = pendingUpdates.some(u => 
-                                        u.id === update.id && u[field] === update[field]
-                                    );
-                                    
-                                    if (!exists) {
-                                        pendingUpdates.push(update);
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    
-                    savePendingUpdates();
-                    
-                    if (missingCount > 0) {
-                        showSuccess(`🔍 تم العثور على ${missingCount} بيانات مفقودة`);
-                        updateSyncManagementUI();
-                        await syncPendingUpdates(false);
-                    } else {
-                        showSuccess('✅ جميع البيانات متزامنة، لا توجد بيانات مفقودة');
-                    }
-                }
-            } catch (error) {
-                showError('❌ فشل في البحث عن البيانات المفقودة: ' + error.message);
-            }
-        }
-
-        async function verifySyncStatus() {
-            if (isVerifying) return;
-            
-            isVerifying = true;
-            showLoading(true, '🔍 جاري التحقق من حالة المزامنة...');
-            
-            try {
-                const response = await fetch(WEB_APP_URL);
-                const data = await response.json();
-                
-                if (data.status === 'success' && data.data) {
-                    const serverData = mapData(data.data);
-                    const serverStudents = serverData.filter(s => s.teacherId === currentTeacherId);
-                    
-                    let verified = 0;
-                    let failed = 0;
-                    const verificationResults = [];
-                    
-                    // التحقق من كل طالب
-                    allStudents.forEach(localStudent => {
-                        const serverStudent = serverStudents.find(s => s.id === localStudent.id);
-                        
-                        if (!serverStudent) {
-                            failed++;
-                            verificationResults.push({
-                                id: localStudent.id,
-                                name: localStudent.studentName,
-                                status: 'missing',
-                                message: 'الطالب غير موجود على السيرفر'
-                            });
-                            return;
-                        }
-                        
-                        // التحقق من تطابق الدرجات
-                        const fields = [
-                            'attendance1', 'oral1', 'homework1', 'written1',
-                            'attendance2', 'oral2', 'homework2', 'written2',
-                            'attendance3', 'homework3', 'oral3', 'written3'
-                        ];
-                        
-                        const mismatches = fields.filter(field => {
-                            const serverValue = formatGrade(serverStudent[field]);
-                            const localValue = formatGrade(localStudent[field]);
-                            return serverValue !== localValue;
-                        });
-                        
-                        if (mismatches.length === 0) {
-                            verified++;
-                            verificationResults.push({
-                                id: localStudent.id,
-                                name: localStudent.studentName,
-                                status: 'verified',
-                                message: 'مطابق'
-                            });
-                        } else {
-                            failed++;
-                            verificationResults.push({
-                                id: localStudent.id,
-                                name: localStudent.studentName,
-                                status: 'mismatch',
-                                message: `اختلاف في: ${mismatches.join(', ')}`
-                            });
-                        }
-                    });
-                    
-                    // حفظ نتائج التحقق
-                    syncVerification = {
-                        timestamp: new Date().toISOString(),
-                        verified,
-                        failed,
-                        total: allStudents.length,
-                        results: verificationResults
-                    };
-                    saveSyncVerification();
-                    
-                    showLoading(false);
-                    
-                    // عرض النتائج
-                    alertWithHTML('نتائج التحقق', `
-                        <h4>نتائج التحقق:</h4>
-                        <div style="margin: 15px 0;">
-                            <span class="badge badge-success">✅ مطابق: ${verified}</span>
-                            <span class="badge badge-danger">❌ غير مطابق: ${failed}</span>
-                            <span class="badge badge-info">📊 الإجمالي: ${allStudents.length}</span>
-                        </div>
-                        ${failed > 0 ? 
-                            `<button class="btn btn-warning" onclick="fixVerificationIssues()" style="margin-top: 10px;">
-                                🔧 إصلاح المشكلات تلقائياً
-                            </button>` : 
-                            ''
-                        }
-                    `);
-                    
-                }
-            } catch (error) {
-                showError('❌ فشل في التحقق من المزامنة: ' + error.message);
-            } finally {
-                isVerifying = false;
-            }
-        }
-
-        async function fixVerificationIssues() {
-            if (!confirm('سيتم إصلاح جميع المشكلات تلقائياً. هل تريد المتابعة؟')) return;
-            
-            showLoading(true, '🔧 جاري إصلاح المشكلات...');
-            
-            try {
-                const response = await fetch(WEB_APP_URL);
-                const data = await response.json();
-                
-                if (data.status === 'success' && data.data) {
-                    const serverData = mapData(data.data);
-                    const serverStudents = serverData.filter(s => s.teacherId === currentTeacherId);
-                    
-                    let fixedCount = 0;
-                    
-                    // تحديث البيانات المحلية لتصبح مثل السيرفر
-                    allStudents.forEach(localStudent => {
-                        const serverStudent = serverStudents.find(s => s.id === localStudent.id);
-                        if (serverStudent) {
-                            const fields = [
-                                'attendance1', 'oral1', 'homework1', 'written1',
-                                'attendance2', 'oral2', 'homework2', 'written2',
-                                'attendance3', 'homework3', 'oral3', 'written3'
-                            ];
-                            
-                            fields.forEach(field => {
-                                const serverValue = formatGrade(serverStudent[field]);
-                                const localValue = formatGrade(localStudent[field]);
-                                
-                                if (serverValue !== localValue) {
-                                    localStudent[field] = serverValue;
-                                    fixedCount++;
-                                }
-                            });
-                            
-                            // إعادة حساب المجاميع
-                            for (let i = 1; i <= 3; i++) {
-                                localStudent[`total${i}`] = calculateTotal(localStudent, i);
-                                localStudent[`result${i}`] = calculateResult(localStudent[`total${i}`]);
-                            }
-                        }
-                    });
-                    
-                    // حفظ التغييرات
                     saveDataToLocalStorage();
+                    savePendingUpdates();
+                    saveFailedUpdates();
+                    saveSyncHistory();
+                    
                     updateDisplayedStudents();
+                    updatePendingCount();
+                    updateSyncManagementUI();
                     
-                    showSuccess(`✅ تم إصلاح ${fixedCount} مشكلة بنجاح`);
-                    
-                    // التحقق مرة أخرى
-                    setTimeout(verifySyncStatus, 1000);
+                    showSuccess('✅ تم استعادة النسخة الاحتياطية بنجاح');
+                    return true;
                 }
+                
+                return false;
             } catch (error) {
-                showError('❌ فشل في إصلاح المشكلات: ' + error.message);
+                console.error('❌ فشل في استعادة النسخة الاحتياطية:', error);
+                showError('فشل في استعادة النسخة الاحتياطية: ' + error.message);
+                return false;
             }
         }
 
-        // ========== دوال السجل والتاريخ ==========
-        function showSyncHistory() {
-            updateSyncHistoryUI();
-            document.getElementById('syncHistoryModal').style.display = 'block';
-        }
-
-        function updateSyncHistoryUI() {
-            const tbody = document.getElementById('syncHistoryBody');
-            tbody.innerHTML = '';
+        function showBackupOptions() {
+            const backups = JSON.parse(localStorage.getItem(BACKUP_HISTORY_KEY) || '[]')
+                .filter(b => b.teacherId === currentTeacherId)
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             
-            if (syncHistory.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align: center; color: #666; padding: 20px;">
-                            لا توجد سجلات مزامنة
-                        </td>
-                    </tr>
-                `;
+            if (backups.length === 0) {
+                alert('لا توجد نسخ احتياطية متاحة');
                 return;
             }
             
-            // عرض آخر 50 سجل
-            syncHistory.slice(0, 50).forEach(record => {
-                const row = document.createElement('tr');
-                
-                let statusBadge = '';
-                if (record.status === 'success') {
-                    statusBadge = '<span class="badge badge-success">✅ ناجح</span>';
-                } else if (record.status === 'partial') {
-                    statusBadge = '<span class="badge badge-warning">⚠️ جزئي</span>';
-                } else {
-                    statusBadge = '<span class="badge badge-danger">❌ فشل</span>';
-                }
-                
-                row.innerHTML = `
-                    <td>${new Date(record.timestamp).toLocaleString('ar-SA')}</td>
-                    <td>${record.type || 'مزامنة'}</td>
-                    <td>${record.count || 0}</td>
-                    <td>${statusBadge}</td>
-                    <td>${record.details || ''}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function addToSyncHistory(type, status, count, details = '') {
-            const record = {
-                timestamp: new Date().toISOString(),
-                type,
-                status,
-                count,
-                details,
-                teacherId: currentTeacherId
-            };
-            
-            syncHistory.unshift(record);
-            
-            // حفظ فقط آخر 100 سجل
-            if (syncHistory.length > 100) {
-                syncHistory = syncHistory.slice(0, 100);
-            }
-            
-            saveSyncHistory();
-        }
-
-        function clearSyncHistory() {
-            if (confirm('هل تريد مسح سجل المزامنات بالكامل؟')) {
-                syncHistory = [];
-                saveSyncHistory();
-                updateSyncHistoryUI();
-                showSuccess('تم مسح سجل المزامنات');
-            }
-        }
-
-        // ========== دوال التخزين المحلي ==========
-        function saveSyncHistory() {
-            try {
-                localStorage.setItem(SYNC_HISTORY_KEY, JSON.stringify(syncHistory));
-                return true;
-            } catch (error) {
-                console.error('فشل في حفظ سجل المزامنات:', error);
-                return false;
-            }
-        }
-
-        function loadSyncHistory() {
-            try {
-                const data = localStorage.getItem(SYNC_HISTORY_KEY);
-                return data ? JSON.parse(data) : [];
-            } catch (error) {
-                return [];
-            }
-        }
-
-        function saveFailedUpdates() {
-            try {
-                localStorage.setItem(FAILED_UPDATES_KEY, JSON.stringify(failedUpdates));
-                return true;
-            } catch (error) {
-                console.error('فشل في حفظ التعديلات الفاشلة:', error);
-                return false;
-            }
-        }
-
-        function loadFailedUpdates() {
-            try {
-                const data = localStorage.getItem(FAILED_UPDATES_KEY);
-                return data ? JSON.parse(data) : [];
-            } catch (error) {
-                return [];
-            }
-        }
-
-        function saveSyncVerification() {
-            try {
-                localStorage.setItem(SYNC_VERIFICATION_KEY, JSON.stringify(syncVerification));
-                return true;
-            } catch (error) {
-                console.error('فشل في حفظ نتائج التحقق:', error);
-                return false;
-            }
-        }
-
-        function loadSyncVerification() {
-            try {
-                const data = localStorage.getItem(SYNC_VERIFICATION_KEY);
-                return data ? JSON.parse(data) : {};
-            } catch (error) {
-                return {};
-            }
-        }
-
-        // ========== دوال المساعدة ==========
-        function startSyncMonitoring() {
-            // مراقبة المزامنة كل 30 ثانية
-            setInterval(() => {
-                if (navigator.onLine && pendingUpdates.length > 0) {
-                    attemptAutoSync();
-                }
-                
-                // إعادة محاولة التعديلات الفاشلة كل دقيقة
-                if (document.getElementById('autoRetryFailed')?.checked && failedUpdates.length > 0) {
-                    retryFailedUpdates();
-                }
-            }, 30000);
-        }
-
-        async function retryFailedUpdates() {
-            if (failedUpdates.length === 0 || retryAttempts >= MAX_RETRY_ATTEMPTS) return;
-            
-            retryAttempts++;
-            console.log(`محاولة إعادة التعديلات الفاشلة (المحاولة ${retryAttempts})`);
-            
-            const toRetry = [...failedUpdates];
-            failedUpdates = [];
-            saveFailedUpdates();
-            
-            pendingUpdates.push(...toRetry);
-            savePendingUpdates();
-            
-            await syncPendingUpdates(true);
-            retryAttempts = 0;
-        }
-
-        async function retryFailedUpdate(index) {
-            const update = failedUpdates[index];
-            if (!update) return;
-            
-            // نقل من الفاشلة إلى المعلقة
-            failedUpdates.splice(index, 1);
-            saveFailedUpdates();
-            
-            pendingUpdates.push(update);
-            savePendingUpdates();
-            
-            // بدء المزامنة
-            await syncPendingUpdates(true);
-            updateSyncManagementUI();
-        }
-
-        function alertWithHTML(title, htmlContent) {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'block';
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 500px;">
-                    <span class="close-modal" onclick="this.parentElement.parentElement.remove()">&times;</span>
-                    <h3>${title}</h3>
-                    ${htmlContent}
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // ========== نظام مسح QR Code ==========
-        function initializeQRScanner() {
-            console.log('تهيئة ماسح QR Code...');
-            
-            // ربط أحداث أزرار المسح لجميع الشهور
-            for (let i = 1; i <= 3; i++) {
-                const btn = document.getElementById(`qrScanBtn${i}`);
-                if (btn) btn.addEventListener('click', () => startQRScanner(i));
-            }
-            
-            // زر المسح لجميع الشهور
-            const allBtn = document.getElementById('qrScanBtnAll');
-            if (allBtn) allBtn.addEventListener('click', () => startQRScanner('all'));
-            
-            // زر إيقاف المسح
-            const stopBtn = document.getElementById('stopScannerBtn');
-            if (stopBtn) stopBtn.addEventListener('click', stopQRScanner);
-        }
-
-        async function startQRScanner(month) {
-            console.log(`بدء المسح للشهر: ${month}`);
-            
-            try {
-                // طلب إذن الكاميرا
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment" } 
-                });
-                
-                qrStream = stream;
-                const videoElement = document.createElement('video');
-                const canvasElement = document.createElement('canvas');
-                const canvas = canvasElement.getContext('2d');
-                
-                const scannerContainer = document.getElementById('qrScanner');
-                scannerContainer.innerHTML = '';
-                scannerContainer.appendChild(videoElement);
-                
-                videoElement.srcObject = stream;
-                videoElement.setAttribute("playsinline", true);
-                videoElement.play();
-                
-                // عرض نافذة المسح
-                document.getElementById('qrModal').style.display = 'block';
-                document.getElementById('qrResult').classList.add('hidden');
-                
-                function scanFrame() {
-                    if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
-                        canvasElement.height = videoElement.videoHeight;
-                        canvasElement.width = videoElement.videoWidth;
-                        canvas.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-                        
-                        const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-                        const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                            inversionAttempts: "dontInvert",
-                        });
-                        
-                        if (code) {
-                            console.log('تم مسح الكود:', code.data);
-                            handleScannedBarcode(code.data, month);
-                        }
-                    }
-                    
-                    if (qrScanner !== null) {
-                        requestAnimationFrame(scanFrame);
-                    }
-                }
-                
-                qrScanner = true;
-                requestAnimationFrame(scanFrame);
-                
-            } catch (err) {
-                console.error('خطأ في تشغيل الكاميرا:', err);
-                showError('❌ لا يمكن الوصول إلى الكاميرا. تأكد من منح الإذن.');
-            }
-        }
-
-        function handleScannedBarcode(barcode, month) {
-            console.log('البحث عن الباركود:', barcode);
-            
-            // البحث عن الطالب باستخدام الباركود
-            const student = allStudents.find(s => {
-                // تنظيف الباركود من المسافات والحروف الخاصة
-                const cleanBarcode = s.barcode ? s.barcode.toString().trim().replace(/\s+/g, '') : '';
-                const scannedBarcode = barcode.toString().trim().replace(/\s+/g, '');
-                return cleanBarcode === scannedBarcode;
+            let backupList = 'النسخ الاحتياطية المتاحة:\n\n';
+            backups.forEach((backup, index) => {
+                backupList += `${index + 1}. ${new Date(backup.timestamp).toLocaleString('ar-SA')}\n`;
+                backupList += `   الطلاب: ${backup.studentCount} | التعديلات: ${backup.pendingCount}\n\n`;
             });
             
-            const resultDiv = document.getElementById('qrResult');
-            const resultText = document.getElementById('qrResultText');
+            const backupIndex = prompt(`${backupList}أدخل رقم النسخة التي تريد استعادتها (1-${backups.length}):`);
             
-            if (student) {
-                resultText.textContent = `✅ تم العثور على الطالب: ${student.studentName} (${student.barcode})`;
-                resultDiv.className = 'qr-result success';
-                stopQRScanner();
-                closeModal('qrModal');
-                
-                // فتح نافذة التعديل للطالب
-                setTimeout(() => {
-                    openEditModal(student.id);
-                }, 1000);
-            } else {
-                resultText.textContent = `❌ لا يوجد طالب بهذا الباركود: ${barcode}`;
-                resultDiv.className = 'qr-result error';
-            }
-            
-            resultDiv.classList.remove('hidden');
-        }
-
-        function stopQRScanner() {
-            if (qrStream) {
-                qrStream.getTracks().forEach(track => track.stop());
-                qrStream = null;
-            }
-            qrScanner = null;
-            
-            const scannerContainer = document.getElementById('qrScanner');
-            scannerContainer.innerHTML = '<span>جاري تشغيل الكاميرا...</span>';
-        }
-
-        // ========== نظام الإحصائيات ==========
-        function initializeStatistics() {
-            console.log('تهيئة نظام الإحصائيات...');
-            
-            // ربط أحداث أزرار الإحصائيات لجميع الشهور
-            for (let i = 1; i <= 3; i++) {
-                const btn = document.getElementById(`showStatsBtn${i}`);
-                const allBtn = document.getElementById('showStatsBtnAll');
-                
-                if (btn) btn.addEventListener('click', () => showStatistics(i));
-                if (allBtn) allBtn.addEventListener('click', () => showStatistics('all'));
-            }
-            
-            // ربط أحداث تبويبات الإحصائيات
-            document.querySelectorAll('.stats-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabName = this.textContent.trim();
-                    openStatsTab(
-                        tabName.includes('الأول') ? 'month1' :
-                        tabName.includes('الثاني') ? 'month2' :
-                        tabName.includes('الثالث') ? 'month3' : 'overall'
-                    );
-                });
-            });
-        }
-
-        function showStatistics(month) {
-            console.log(`عرض إحصائيات الشهر: ${month}`);
-            
-            // تحديث اسم المعلم في الإحصائيات
-            document.getElementById('statsTeacherId').textContent = currentTeacherId;
-            
-            // حساب الإحصائيات
-            calculateAllStatistics();
-            
-            // عرض النافذة
-            document.getElementById('statsModal').style.display = 'block';
-        }
-
-        function calculateAllStatistics() {
-            const searchTerm = document.getElementById(`searchNameInput${currentMonth}`)?.value.trim().toLowerCase() || '';
-            const selectedClass = document.getElementById(`classNameFilter${currentMonth}`)?.value || '';
-
-            const filteredStudents = allStudents.filter(student => {
-                const studentName = student.studentName ? student.studentName.toLowerCase() : '';
-                const matchesName = searchTerm === '' || studentName.includes(searchTerm);
-                const matchesClass = selectedClass === '' || student.className === selectedClass;
-                return matchesName && matchesClass;
-            });
-
-            // تحديث العدد الكلي
-            document.getElementById('totalStudentsCount').textContent = filteredStudents.length;
-            
-            // حساب إحصائيات كل شهر
-            calculateMonthStatistics(filteredStudents, 1);
-            calculateMonthStatistics(filteredStudents, 2);
-            calculateMonthStatistics(filteredStudents, 3);
-            calculateOverallStatistics(filteredStudents);
-        }
-
-        function calculateMonthStatistics(students, month) {
-            const ranges = {
-                less5: 0,   // أقل من 5
-                from5to10: 0, // من 5 إلى 10
-                from11to15: 0, // من 11 إلى 15  
-                from16to20: 0  // من 16 إلى 20
-            };
-            
-            students.forEach(student => {
-                const total = parseFloat(student[`total${month}`]) || 0;
-                
-                if (total < 5) ranges.less5++;
-                else if (total >= 5 && total <= 10) ranges.from5to10++;
-                else if (total >= 11 && total <= 15) ranges.from11to15++;
-                else if (total >= 16 && total <= 20) ranges.from16to20++;
-            });
-            
-            // تحديث واجهة المستخدم
-            document.getElementById(`statsMonth${month}Less5`).textContent = ranges.less5;
-            document.getElementById(`statsMonth${month}5to10`).textContent = ranges.from5to10;
-            document.getElementById(`statsMonth${month}11to15`).textContent = ranges.from11to15;
-            document.getElementById(`statsMonth${month}16to20`).textContent = ranges.from16to20;
-        }
-
-        function calculateOverallStatistics(students) {
-            const ranges = {
-                less5: 0,
-                from5to10: 0, 
-                from11to15: 0,
-                from16to20: 0
-            };
-            
-            students.forEach(student => {
-                // حساب المعدل العام من الأشهر الثلاثة
-                const total1 = parseFloat(student.total1) || 0;
-                const total2 = parseFloat(student.total2) || 0;
-                const total3 = parseFloat(student.total3) || 0;
-                
-                const overallAverage = (total1 + total2 + total3) / 3;
-                
-                if (overallAverage < 5) ranges.less5++;
-                else if (overallAverage >= 5 && overallAverage <= 10) ranges.from5to10++;
-                else if (overallAverage >= 11 && overallAverage <= 15) ranges.from11to15++;
-                else if (overallAverage >= 16 && overallAverage <= 20) ranges.from16to20++;
-            });
-            
-            // تحديث واجهة المستخدم
-            document.getElementById('statsOverallLess5').textContent = ranges.less5;
-            document.getElementById('statsOverall5to10').textContent = ranges.from5to10;
-            document.getElementById('statsOverall11to15').textContent = ranges.from11to15;
-            document.getElementById('statsOverall16to20').textContent = ranges.from16to20;
-        }
-
-        function openStatsTab(tabName) {
-            // إخفاء جميع المحتويات
-            document.querySelectorAll('.stats-tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // إلغاء تنشيط جميع الأزرار
-            document.querySelectorAll('.stats-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // إظهار المحتوى المحدد
-            document.getElementById(`${tabName}Stats`).classList.add('active');
-            
-            // تنشيط الزر المحدد
-            document.querySelector(`.stats-tab[onclick*="${tabName}"]`).classList.add('active');
-        }
-
-        // ========== نظام التخزين المحلي ==========
-        function initializeLocalStorage() {
-            console.log('تهيئة نظام التخزين المحلي...');
-            
-            // اختبار سعة التخزين المحلي
-            try {
-                localStorage.setItem('storage_test', 'test');
-                localStorage.removeItem('storage_test');
-                console.log('✅ التخزين المحلي يعمل بشكل صحيح');
-            } catch (e) {
-                console.error('❌ مشكلة في التخزين المحلي:', e);
-                showError('⚠️ التخزين المحلي غير متوفر. قد لا يتم حفظ البيانات.');
+            if (backupIndex && !isNaN(backupIndex) && backupIndex >= 1 && backupIndex <= backups.length) {
+                const selectedBackup = backups[backupIndex - 1];
+                restoreFromBackup(selectedBackup.key);
             }
         }
 
-        function savePendingUpdates() {
-            try {
-                localStorage.setItem(PENDING_UPDATES_KEY, JSON.stringify(pendingUpdates));
-                updatePendingCount();
-                return true;
-            } catch (error) {
-                showError('فشل في حفظ التعديلات المعلقة: ' + error.message);
-                return false;
-            }
-        }
-
-        function loadPendingUpdates() {
-            try {
-                const data = localStorage.getItem(PENDING_UPDATES_KEY);
-                return data ? JSON.parse(data) : [];
-            } catch (error) {
-                return [];
-            }
-        }
-
-        function saveDataToLocalStorage() {
-            try {
-                const dataToSave = {
-                    students: allStudents,
-                    teacherId: currentTeacherId,
-                    timestamp: new Date().toISOString()
-                };
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
-                return true;
-            } catch (error) {
-                showError('فشل في حفظ البيانات المحلية: ' + error.message);
-                return false;
-            }
-        }
-
-        function updatePendingCount() {
-            const count = pendingUpdates.length;
-            // تحديث جميع عدادات التعديلات المعلقة
-            document.querySelectorAll('#pendingCount1, #pendingCount2, #pendingCount3, #pendingCountAll').forEach(span => {
-                span.textContent = count;
-                if (count > 0) {
-                    span.classList.remove('hidden');
-                } else {
-                    span.classList.add('hidden');
-                }
-            });
-        }
-
-        // ========== دوال المزامنة المحسنة ==========
+        // ========== نظام المزامنة المحسّن ==========
+        
         async function syncPendingUpdates(isAuto = false) {
             if (pendingUpdates.length === 0 || isSyncing) {
                 if (!isAuto && pendingUpdates.length === 0) {
@@ -3018,12 +1072,10 @@
             const updatesToSync = [...pendingUpdates];
             const totalCount = updatesToSync.length;
 
-            showLoading(true, `☁️ جاري مزامنة ${totalCount} تعديل مع Google Sheets...`);
+            showLoading(true, `☁️ جاري مزامنة ${totalCount} تعديل...`);
             
             // تحديث حالة المزامنة
-            document.querySelectorAll('[id^="syncStatus"]').forEach(status => {
-                status.textContent = `المزامنة التلقائية: جاري المزامنة (${totalCount})...`;
-            });
+            updateAllSyncStatuses(`جاري المزامنة (${totalCount})...`);
             
             // تعطيل أزرار المزامنة
             document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
@@ -3056,29 +1108,20 @@
                 if (data.status === 'success') {
                     const successCount = data.updatedCount || totalCount;
                     
-                    // إزالت التعديلات التي تمت مزامنتها
+                    // إزالة التعديلات التي تمت مزامنتها
                     pendingUpdates = pendingUpdates.filter(update => 
                         !updatesToSync.some(synced => synced.id === update.id)
                     );
                     
                     savePendingUpdates();
                     
-                    // إضافة للسجل
-                    addToSyncHistory(
-                        isAuto ? 'مزامنة تلقائية' : 'مزامنة يدوية',
-                        'success',
-                        successCount,
-                        `تمت مزامنة ${successCount} من ${totalCount} تعديل`
-                    );
+                    // تسجيل النجاح
+                    addToSyncHistory('مزامنة', 'success', successCount, `تمت مزامنة ${successCount} تعديل`);
                     
                     showSuccess(`✅ تم مزامنة ${successCount} خلية بنجاح!`);
                     
                     // تحديث البيانات من السيرفر
-                    if (document.getElementById('verifyAfterSync')?.checked) {
-                        setTimeout(verifySyncStatus, 2000);
-                    } else {
-                        await fetchDataFromSheet(currentTeacherId, false);
-                    }
+                    await fetchDataFromSheet(currentTeacherId, false);
                     
                     return true;
                     
@@ -3092,13 +1135,8 @@
                     
                     saveFailedUpdates();
                     
-                    // إضافة للسجل
-                    addToSyncHistory(
-                        isAuto ? 'مزامنة تلقائية' : 'مزامنة يدوية',
-                        'failed',
-                        0,
-                        data.error || 'فشل المزامنة'
-                    );
+                    // تسجيل الفشل
+                    addToSyncHistory('مزامنة', 'failed', 0, data.error || 'فشل المزامنة');
                     
                     showError(`❌ فشلت المزامنة: ${data.error || 'خطأ غير معروف.'}`);
                     return false;
@@ -3120,13 +1158,8 @@
                 
                 saveFailedUpdates();
                 
-                // إضافة للسجل
-                addToSyncHistory(
-                    isAuto ? 'مزامنة تلقائية' : 'مزامنة يدوية',
-                    'failed',
-                    0,
-                    error.message
-                );
+                // تسجيل الفشل
+                addToSyncHistory('مزامنة', 'failed', 0, error.message);
                 
                 showError('❌ خطأ في الاتصال أثناء المزامنة: ' + error.message);
                 return false;
@@ -3138,56 +1171,225 @@
             }
         }
 
-        function updateAutoSyncStatus() {
-            const hasPending = pendingUpdates.length > 0;
-            const isOnline = navigator.onLine;
-
-            let statusText = 'المزامنة التلقائية: متوقفة';
-            let statusColor = '#666';
-
-            if (hasPending && isOnline) {
-                statusText = `المزامنة التلقائية: قيد التشغيل (تعديلات: ${pendingUpdates.length})`;
-                statusColor = '#27ae60';
-            } else if (hasPending && !isOnline) {
-                statusText = `المزامنة التلقائية: متوقفة (لا يوجد إنترنت)`;
-                statusColor = '#f39c12';
+        async function forceReSync() {
+            if (!confirm('هل تريد إعادة مزامنة جميع التعديلات المعلقة والفاشلة؟\n\nسيتم إعادة محاولة مزامنة جميع التعديلات غير المكتملة.')) return;
+            
+            showLoading(true, '🔄 جاري إعادة المزامنة...');
+            
+            try {
+                // دمج التعديلات المعلقة والفاشلة
+                const allUpdates = [...pendingUpdates, ...failedUpdates];
+                
+                if (allUpdates.length === 0) {
+                    showSuccess('لا توجد تعديلات لإعادة المزامنة');
+                    return;
+                }
+                
+                // مسح القوائم
+                pendingUpdates = [];
+                failedUpdates = [];
+                
+                // إضافة جميع التعديلات للقائمة المعلقة
+                pendingUpdates = allUpdates;
+                
+                savePendingUpdates();
+                saveFailedUpdates();
+                
+                // بدء المزامنة
+                const success = await syncPendingUpdates(false);
+                
+                if (success) {
+                    showSuccess(`✅ تمت إعادة مزامنة ${allUpdates.length} تعديل بنجاح`);
+                }
+                
+            } catch (error) {
+                showError('❌ فشلت إعادة المزامنة: ' + error.message);
+            } finally {
+                showLoading(false);
             }
-
-            // تحديث جميع حالات المزامنة
-            document.querySelectorAll('[id^="syncStatus"]').forEach(status => {
-                status.textContent = statusText;
-                status.style.color = statusColor;
-            });
         }
 
-        function attemptAutoSync() {
-            if (navigator.onLine && pendingUpdates.length > 0 && !isSyncing) {
-                console.log('المزامنة التلقائية: محاولة مزامنة التعديلات...');
-                syncPendingUpdates(true);
+        async function verifySyncStatus() {
+            showLoading(true, '🔍 جاري التحقق من حالة المزامنة...');
+            
+            try {
+                // جلب البيانات من السيرفر
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.data) {
+                    const serverData = mapData(data.data);
+                    const serverStudents = serverData.filter(s => s.teacherId === currentTeacherId);
+                    
+                    let mismatched = 0;
+                    let matched = 0;
+                    
+                    // مقارنة البيانات
+                    allStudents.forEach(localStudent => {
+                        const serverStudent = serverStudents.find(s => s.id === localStudent.id);
+                        
+                        if (serverStudent) {
+                            const fields = [
+                                'attendance1', 'oral1', 'homework1', 'written1',
+                                'attendance2', 'oral2', 'homework2', 'written2',
+                                'attendance3', 'homework3', 'oral3', 'written3'
+                            ];
+                            
+                            const differences = fields.filter(field => {
+                                const localValue = formatGrade(localStudent[field]);
+                                const serverValue = formatGrade(serverStudent[field]);
+                                return localValue !== serverValue;
+                            });
+                            
+                            if (differences.length > 0) {
+                                mismatched++;
+                                console.log(`⚠️ اختلاف في الطالب ${localStudent.studentName}:`, differences);
+                            } else {
+                                matched++;
+                            }
+                        } else {
+                            mismatched++;
+                            console.log(`⚠️ الطالب ${localStudent.studentName} غير موجود على السيرفر`);
+                        }
+                    });
+                    
+                    showLoading(false);
+                    
+                    if (mismatched === 0) {
+                        showSuccess('✅ جميع البيانات متزامنة مع السيرفر');
+                    } else {
+                        const message = `تم العثور على ${mismatched} طالب بهم اختلافات\n` +
+                                      `و ${matched} طالب متطابقين\n\n` +
+                                      'هل تريد تصحيح الاختلافات تلقائياً؟';
+                        
+                        if (confirm(message)) {
+                            fixSyncDifferences(serverStudents);
+                        }
+                    }
+                }
+            } catch (error) {
+                showError('❌ فشل في التحقق من المزامنة: ' + error.message);
             }
         }
 
-        function startAutoSync() {
-            if (autoSyncInterval) clearInterval(autoSyncInterval);
-            autoSyncInterval = setInterval(attemptAutoSync, 30000); 
-            attemptAutoSync(); 
+        async function syncMissingData() {
+            showLoading(true, '🔍 جاري البحث عن بيانات مفقودة...');
+            
+            try {
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.data) {
+                    const serverData = mapData(data.data);
+                    const serverStudents = serverData.filter(s => s.teacherId === currentTeacherId);
+                    
+                    let missingUpdates = 0;
+                    
+                    // البحث عن اختلافات
+                    serverStudents.forEach(serverStudent => {
+                        const localStudent = allStudents.find(s => s.id === serverStudent.id);
+                        
+                        if (localStudent) {
+                            const fields = [
+                                'attendance1', 'oral1', 'homework1', 'written1',
+                                'attendance2', 'oral2', 'homework2', 'written2',
+                                'attendance3', 'homework3', 'oral3', 'written3'
+                            ];
+                            
+                            fields.forEach(field => {
+                                const serverValue = formatGrade(serverStudent[field]);
+                                const localValue = formatGrade(localStudent[field]);
+                                
+                                if (serverValue !== localValue) {
+                                    missingUpdates++;
+                                    
+                                    // إضافة للتعديلات المعلقة إذا كان الفرق من السيرفر
+                                    const update = {
+                                        row: localStudent.originalRowIndex,
+                                        id: localStudent.id,
+                                        [field]: serverValue
+                                    };
+                                    
+                                    // تجنب التكرار
+                                    const exists = pendingUpdates.some(u => 
+                                        u.id === update.id && u[field] === update[field]
+                                    );
+                                    
+                                    if (!exists) {
+                                        pendingUpdates.push(update);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    
+                    savePendingUpdates();
+                    
+                    if (missingUpdates > 0) {
+                        showSuccess(`🔍 تم العثور على ${missingUpdates} اختلاف`);
+                        await syncPendingUpdates(false);
+                    } else {
+                        showSuccess('✅ جميع البيانات متزامنة');
+                    }
+                }
+            } catch (error) {
+                showError('❌ فشل في البحث عن البيانات المفقودة: ' + error.message);
+            }
         }
 
-        // ========== دوال المساعدة الأساسية ==========
+        function fixSyncDifferences(serverStudents) {
+            showLoading(true, '🔧 جاري تصحيح الاختلافات...');
+            
+            try {
+                let fixedCount = 0;
+                
+                allStudents.forEach(localStudent => {
+                    const serverStudent = serverStudents.find(s => s.id === localStudent.id);
+                    
+                    if (serverStudent) {
+                        const fields = [
+                            'attendance1', 'oral1', 'homework1', 'written1',
+                            'attendance2', 'oral2', 'homework2', 'written2',
+                            'attendance3', 'homework3', 'oral3', 'written3'
+                        ];
+                        
+                        fields.forEach(field => {
+                            const serverValue = formatGrade(serverStudent[field]);
+                            const localValue = formatGrade(localStudent[field]);
+                            
+                            if (serverValue !== localValue) {
+                                localStudent[field] = serverValue;
+                                fixedCount++;
+                            }
+                        });
+                        
+                        // إعادة حساب المجاميع
+                        for (let i = 1; i <= 3; i++) {
+                            localStudent[`total${i}`] = calculateTotal(localStudent, i);
+                            localStudent[`result${i}`] = calculateResult(localStudent[`total${i}`]);
+                        }
+                    }
+                });
+                
+                saveDataToLocalStorage();
+                updateDisplayedStudents();
+                
+                showSuccess(`✅ تم تصحيح ${fixedCount} اختلاف`);
+                
+            } catch (error) {
+                showError('❌ فشل في تصحيح الاختلافات: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // ========== دوال المساعدة ==========
+        
         function formatGrade(value) {
-            if (value === null || value === undefined || value === '') {
-                return ''; 
-            }
+            if (value === null || value === undefined || value === '') return '';
             const strValue = value.toString().trim();
             const numValue = parseFloat(strValue);
-            
-            if (isNaN(numValue)) {
-                return '';
-            }
-            if (numValue % 1 !== 0) {
-                 return numValue.toFixed(1);
-            }
-            return numValue.toString();
+            return isNaN(numValue) ? '' : numValue.toFixed(1);
         }
 
         function calculateTotal(student, term) {
@@ -3200,8 +1402,7 @@
 
         function calculateResult(total) {
             const value = parseFloat(total) || 0;
-            const result = (value / 5).toFixed(1);
-            return result;
+            return (value / 5).toFixed(1);
         }
 
         function getResultClass(result) {
@@ -3212,37 +1413,93 @@
             return 'result-cell result-poor';
         }
 
-        function calculateMonthTotal(month) {
-            const fields = {
-                1: ['attendance1', 'oral1', 'homework1', 'written1'],
-                2: ['attendance2', 'oral2', 'homework2', 'written2'],
-                3: ['attendance3', 'homework3', 'oral3', 'written3']
-            };
-            
-            let total = 0;
-            fields[month].forEach(field => {
-                const value = parseFloat(document.getElementById(`edit${field}`).value) || 0;
-                total += value;
-            });
-            
-            const result = calculateResult(total);
-            
-            document.getElementById(`totalDisplay${month}`).textContent = total.toFixed(1);
-            document.getElementById(`resultDisplay${month}`).textContent = result;
-        }
-
-        // ========== دوال واجهة المستخدم ==========
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.style.display = 'none';
-                if (modalId === 'qrModal') {
-                    stopQRScanner();
-                }
+        // ========== دوال التخزين المحلي ==========
+        
+        function saveDataToLocalStorage() {
+            try {
+                const dataToSave = {
+                    students: allStudents,
+                    teacherId: currentTeacherId,
+                    timestamp: new Date().toISOString(),
+                    version: '2.0.0'
+                };
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
+                return true;
+            } catch (error) {
+                console.error('❌ فشل في حفظ البيانات المحلية:', error);
+                return false;
             }
         }
 
-        function showLoading(show, message = '⏳ جاري تحميل البيانات...') {
+        function savePendingUpdates() {
+            try {
+                localStorage.setItem(PENDING_UPDATES_KEY, JSON.stringify(pendingUpdates));
+                updatePendingCount();
+                return true;
+            } catch (error) {
+                console.error('❌ فشل في حفظ التعديلات المعلقة:', error);
+                return false;
+            }
+        }
+
+        function saveFailedUpdates() {
+            try {
+                localStorage.setItem(FAILED_UPDATES_KEY, JSON.stringify(failedUpdates));
+                return true;
+            } catch (error) {
+                console.error('❌ فشل في حفظ التعديلات الفاشلة:', error);
+                return false;
+            }
+        }
+
+        function saveSyncHistory() {
+            try {
+                localStorage.setItem(SYNC_HISTORY_KEY, JSON.stringify(syncHistory));
+                return true;
+            } catch (error) {
+                console.error('❌ فشل في حفظ سجل المزامنة:', error);
+                return false;
+            }
+        }
+
+        function loadPendingUpdates() {
+            try {
+                const data = localStorage.getItem(PENDING_UPDATES_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function loadFailedUpdates() {
+            try {
+                const data = localStorage.getItem(FAILED_UPDATES_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function loadSyncHistory() {
+            try {
+                const data = localStorage.getItem(SYNC_HISTORY_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function updatePendingCount() {
+            const count = pendingUpdates.length;
+            document.querySelectorAll('[id^="pendingCount"]').forEach(span => {
+                span.textContent = count;
+                span.classList.toggle('hidden', count === 0);
+            });
+        }
+
+        // ========== دوال واجهة المستخدم ==========
+        
+        function showLoading(show, message = '⏳ جاري التحميل...') {
             if (show) {
                 loadingDiv.classList.remove('hidden');
                 loadingDiv.innerHTML = `<p>${message}</p>`;
@@ -3255,6 +1512,7 @@
         function showError(message) {
             showLoading(true, '❌ ' + message);
             loadingDiv.className = 'loading error';
+            setTimeout(() => loadingDiv.classList.add('hidden'), 3000);
         }
 
         function showSuccess(message) {
@@ -3263,107 +1521,56 @@
             setTimeout(() => loadingDiv.classList.add('hidden'), 3000);
         }
 
-        function updateConnectionStatus(message, type = 'info') {
-            const colors = {
-                info: '#fff3cd',
-                success: '#d4edda',
-                error: '#f8d7da',
-                warning: '#ffe0b2'
-            };
-            const borderColors = {
-                info: '#ffeaa7',
-                success: '#c3e6cb',
-                error: '#f5c6cb',
-                warning: '#ffc107'
-            };
-
-            connectionStatus.innerHTML = message;
-            connectionStatus.style.background = colors[type] || colors.info;
-            connectionStatus.style.border = `1px solid ${borderColors[type] || borderColors.info}`;
-            connectionStatus.style.padding = '10px';
-            connectionStatus.style.borderRadius = '5px';
-            connectionStatus.style.margin = '10px 0';
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
-        function enableLogin(enable = true) {
-            loginBtn.disabled = !enable;
-            if (enable) {
-                updateConnectionStatus('✅ تم التحقق من اتصال Google Sheets. يمكنك الدخول الآن.', 'success');
-            }
-        }
-
-        // ========== دوال إدارة البيانات ==========
-        function mapData(data) {
-            const scoreKeys = ['attendance', 'oral', 'homework', 'written'];
-            
-            return data.map(item => {
-                const newItem = {
-                    originalRowIndex: item.originalRowIndex
-                };
-                
-                for (const [arabicKey, jsKey] of Object.entries(STUDENT_PROPERTIES)) {
-                    const foundKey = Object.keys(item).find(sheetKey => 
-                        sheetKey.trim().replace(/\s+/g, ' ') === arabicKey.trim().replace(/\s+/g, ' ')
-                    );
-                    
-                    if (foundKey) {
-                        let value = item[foundKey];
-                        
-                        if (jsKey.includes('total') || jsKey.includes('result')) {
-                            newItem[jsKey] = (value !== undefined && value !== '') ? value : 0;
-                        } else if (scoreKeys.some(key => jsKey.startsWith(key))) {
-                            newItem[jsKey] = (value !== undefined && value !== '') ? value : "";
-                        } else {
-                            newItem[jsKey] = (value !== undefined && value !== '') ? value : '';
-                        }
-                    } else {
-                        if (jsKey.includes('total') || jsKey.includes('result')) {
-                            newItem[jsKey] = 0;
-                        } else if (scoreKeys.some(key => jsKey.startsWith(key))) {
-                            newItem[jsKey] = "";
-                        } else {
-                            newItem[jsKey] = '';
-                        }
-                    }
-                }
-                
-                newItem.id = newItem.id ? newItem.id.toString().trim() : '';
-                newItem.teacherId = newItem.teacherId ? newItem.teacherId.toString().trim() : '';
-                newItem.barcode = newItem.barcode ? newItem.barcode.toString().trim() : '';
-                
-                return newItem;
+        function updateAllSyncStatuses(message) {
+            document.querySelectorAll('[id^="syncStatus"]').forEach(status => {
+                status.textContent = message;
             });
         }
 
+        function updateAutoSyncStatus() {
+            const hasPending = pendingUpdates.length > 0;
+            const isOnline = navigator.onLine;
+            
+            let statusText = 'المزامنة التلقائية: متوقفة';
+            
+            if (hasPending && isOnline) {
+                statusText = `المزامنة التلقائية: جاهزة (${pendingUpdates.length})`;
+            } else if (hasPending && !isOnline) {
+                statusText = 'المزامنة التلقائية: بانتظار الاتصال';
+            }
+            
+            updateAllSyncStatuses(statusText);
+        }
+
         // ========== دوال عرض الجداول ==========
+        
         function renderMonth1Table(students = allStudents) {
             const tbody = document.getElementById('month1TableBody');
             tbody.innerHTML = '';
             
-            if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: #e74c3c; padding: 40px;">لا توجد بيانات طلاب مطابقة للفلترة.</td></tr>`;
-                return;
-            }
-            
             students.forEach(student => {
                 const total1 = calculateTotal(student, 1);
                 const result1 = calculateResult(total1);
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.id}</td>
-                    <td>${student.barcode}</td>
-                    <td class="student-name" onclick="openEditModal('${student.id}')">${student.studentName}</td>
-                    <td>${student.className}</td>
-                    <td>${formatGrade(student.attendance1)}</td>
-                    <td>${formatGrade(student.oral1)}</td>
-                    <td>${formatGrade(student.homework1)}</td>
-                    <td>${formatGrade(student.written1)}</td>
-                    <td>${total1}</td>
-                    <td class="${getResultClass(result1)}">${result1}</td>
-                    <td><button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button></td>
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${student.id}</td>
+                        <td>${student.barcode}</td>
+                        <td class="student-name" onclick="openEditModal('${student.id}')">${student.studentName}</td>
+                        <td>${student.className}</td>
+                        <td>${formatGrade(student.attendance1)}</td>
+                        <td>${formatGrade(student.oral1)}</td>
+                        <td>${formatGrade(student.homework1)}</td>
+                        <td>${formatGrade(student.written1)}</td>
+                        <td>${total1}</td>
+                        <td class="${getResultClass(result1)}">${result1}</td>
+                        <td><button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button></td>
+                    </tr>
                 `;
-                tbody.appendChild(row);
             });
             
             document.getElementById('studentsCount1').textContent = students.length;
@@ -3373,30 +1580,25 @@
             const tbody = document.getElementById('month2TableBody');
             tbody.innerHTML = '';
             
-            if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: #e74c3c; padding: 40px;">لا توجد بيانات طلاب مطابقة للفلترة.</td></tr>`;
-                return;
-            }
-            
             students.forEach(student => {
                 const total2 = calculateTotal(student, 2);
                 const result2 = calculateResult(total2);
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.id}</td>
-                    <td>${student.barcode}</td>
-                    <td class="student-name" onclick="openEditModal('${student.id}')">${student.studentName}</td>
-                    <td>${student.className}</td>
-                    <td>${formatGrade(student.attendance2)}</td>
-                    <td>${formatGrade(student.oral2)}</td>
-                    <td>${formatGrade(student.homework2)}</td>
-                    <td>${formatGrade(student.written2)}</td>
-                    <td>${total2}</td>
-                    <td class="${getResultClass(result2)}">${result2}</td>
-                    <td><button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button></td>
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${student.id}</td>
+                        <td>${student.barcode}</td>
+                        <td class="student-name" onclick="openEditModal('${student.id}')">${student.studentName}</td>
+                        <td>${student.className}</td>
+                        <td>${formatGrade(student.attendance2)}</td>
+                        <td>${formatGrade(student.oral2)}</td>
+                        <td>${formatGrade(student.homework2)}</td>
+                        <td>${formatGrade(student.written2)}</td>
+                        <td>${total2}</td>
+                        <td class="${getResultClass(result2)}">${result2}</td>
+                        <td><button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button></td>
+                    </tr>
                 `;
-                tbody.appendChild(row);
             });
             
             document.getElementById('studentsCount2').textContent = students.length;
@@ -3406,30 +1608,25 @@
             const tbody = document.getElementById('month3TableBody');
             tbody.innerHTML = '';
             
-            if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: #e74c3c; padding: 40px;">لا توجد بيانات طلاب مطابقة للفلترة.</td></tr>`;
-                return;
-            }
-            
             students.forEach(student => {
                 const total3 = calculateTotal(student, 3);
                 const result3 = calculateResult(total3);
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.id}</td>
-                    <td>${student.barcode}</td>
-                    <td class="student-name" onclick="openEditModal('${student.id}')">${student.studentName}</td>
-                    <td>${student.className}</td>
-                    <td>${formatGrade(student.attendance3)}</td>
-                    <td>${formatGrade(student.homework3)}</td>
-                    <td>${formatGrade(student.oral3)}</td>
-                    <td>${formatGrade(student.written3)}</td>
-                    <td>${total3}</td>
-                    <td class="${getResultClass(result3)}">${result3}</td>
-                    <td><button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button></td>
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${student.id}</td>
+                        <td>${student.barcode}</td>
+                        <td class="student-name" onclick="openEditModal('${student.id}')">${student.studentName}</td>
+                        <td>${student.className}</td>
+                        <td>${formatGrade(student.attendance3)}</td>
+                        <td>${formatGrade(student.homework3)}</td>
+                        <td>${formatGrade(student.oral3)}</td>
+                        <td>${formatGrade(student.written3)}</td>
+                        <td>${total3}</td>
+                        <td class="${getResultClass(result3)}">${result3}</td>
+                        <td><button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button></td>
+                    </tr>
                 `;
-                tbody.appendChild(row);
             });
             
             document.getElementById('studentsCount3').textContent = students.length;
@@ -3439,11 +1636,6 @@
             const tbody = document.getElementById('studentsTableBody');
             tbody.innerHTML = '';
             
-            if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="23" style="text-align: center; color: #e74c3c; padding: 40px;">لا توجد بيانات طلاب مطابقة للفلترة.</td></tr>`;
-                return;
-            }
-            
             students.forEach(student => {
                 const total1 = calculateTotal(student, 1);
                 const result1 = calculateResult(total1);
@@ -3451,134 +1643,298 @@
                 const result2 = calculateResult(total2);
                 const total3 = calculateTotal(student, 3);
                 const result3 = calculateResult(total3);
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.id}</td>
-                    <td>${student.barcode}</td>
-                    <td class="student-name" onclick="openEditModal('${student.id}')">${student.studentName}</td>
-                    <td>${student.className}</td>
-                    <td>${formatGrade(student.attendance1)}</td>
-                    <td>${formatGrade(student.oral1)}</td>
-                    <td>${formatGrade(student.homework1)}</td>
-                    <td>${formatGrade(student.written1)}</td>
-                    <td>${total1}</td>
-                    <td class="${getResultClass(result1)}">${result1}</td>
-                    <td>${formatGrade(student.attendance2)}</td>
-                    <td>${formatGrade(student.oral2)}</td>
-                    <td>${formatGrade(student.homework2)}</td>
-                    <td>${formatGrade(student.written2)}</td>
-                    <td>${total2}</td>
-                    <td class="${getResultClass(result2)}">${result2}</td>
-                    <td>${formatGrade(student.attendance3)}</td>
-                    <td>${formatGrade(student.homework3)}</td>
-                    <td>${formatGrade(student.oral3)}</td>
-                    <td>${formatGrade(student.written3)}</td>
-                    <td>${total3}</td>
-                    <td class="${getResultClass(result3)}">${result3}</td>
-                    <td><button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button></td>
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${student.id}</td>
+                        <td>${student.barcode}</td>
+                        <td class="student-name" onclick="openEditModal('${student.id}')">${student.studentName}</td>
+                        <td>${student.className}</td>
+                        <td>${formatGrade(student.attendance1)}</td>
+                        <td>${formatGrade(student.oral1)}</td>
+                        <td>${formatGrade(student.homework1)}</td>
+                        <td>${formatGrade(student.written1)}</td>
+                        <td>${total1}</td>
+                        <td class="${getResultClass(result1)}">${result1}</td>
+                        <td>${formatGrade(student.attendance2)}</td>
+                        <td>${formatGrade(student.oral2)}</td>
+                        <td>${formatGrade(student.homework2)}</td>
+                        <td>${formatGrade(student.written2)}</td>
+                        <td>${total2}</td>
+                        <td class="${getResultClass(result2)}">${result2}</td>
+                        <td>${formatGrade(student.attendance3)}</td>
+                        <td>${formatGrade(student.homework3)}</td>
+                        <td>${formatGrade(student.oral3)}</td>
+                        <td>${formatGrade(student.written3)}</td>
+                        <td>${total3}</td>
+                        <td class="${getResultClass(result3)}">${result3}</td>
+                        <td><button class="edit-btn" onclick="openEditModal('${student.id}')">تعديل</button></td>
+                    </tr>
                 `;
-                tbody.appendChild(row);
             });
             
             document.getElementById('studentsCountAll').textContent = students.length;
         }
 
         function updateDisplayedStudents() {
-            const searchTerm = document.getElementById(`searchNameInput${currentMonth}`)?.value.trim().toLowerCase() || '';
+            const searchTerm = document.getElementById(`searchNameInput${currentMonth}`)?.value.toLowerCase() || '';
             const selectedClass = document.getElementById(`classNameFilter${currentMonth}`)?.value || '';
-
-            let filteredStudents = allStudents.filter(student => {
-                const studentName = student.studentName ? student.studentName.toLowerCase() : '';
-                const matchesName = searchTerm === '' || studentName.includes(searchTerm);
+            
+            const filtered = allStudents.filter(student => {
+                const matchesName = student.studentName.toLowerCase().includes(searchTerm);
                 const matchesClass = selectedClass === '' || student.className === selectedClass;
                 return matchesName && matchesClass;
             });
-
-            // تحديث الجدول المناسب بناءً على الشهر الحالي
-            switch (currentMonth) {
-                case 1:
-                    renderMonth1Table(filteredStudents);
-                    break;
-                case 2:
-                    renderMonth2Table(filteredStudents);
-                    break;
-                case 3:
-                    renderMonth3Table(filteredStudents);
-                    break;
-                case 'all':
-                    renderAllMonthsTable(filteredStudents);
-                    break;
+            
+            switch(currentMonth) {
+                case 1: renderMonth1Table(filtered); break;
+                case 2: renderMonth2Table(filtered); break;
+                case 3: renderMonth3Table(filtered); break;
+                case 'all': renderAllMonthsTable(filtered); break;
             }
         }
 
         function populateClassFilters() {
-            const classNames = [...new Set(allStudents.map(s => s.className).filter(c => c && c.trim() !== ''))];
+            const classes = [...new Set(allStudents.map(s => s.className).filter(c => c))];
             
-            // تحديث جميع فلاتر الشعب
             for (let i = 1; i <= 3; i++) {
                 const filter = document.getElementById(`classNameFilter${i}`);
                 if (filter) {
-                    filter.innerHTML = '<option value="">كل الشعب</option>';
-                    classNames.sort().forEach(className => {
-                        const option = document.createElement('option');
-                        option.value = className;
-                        option.textContent = className;
-                        filter.appendChild(option);
-                    });
+                    filter.innerHTML = '<option value="">جميع الشعب</option>' +
+                        classes.map(c => `<option value="${c}">${c}</option>`).join('');
                 }
             }
             
-            // تحديث فلتر جميع الشهور
             const allFilter = document.getElementById('classNameFilterAll');
             if (allFilter) {
-                allFilter.innerHTML = '<option value="">كل الشعب</option>';
-                classNames.sort().forEach(className => {
-                    const option = document.createElement('option');
-                    option.value = className;
-                    option.textContent = className;
-                    allFilter.appendChild(option);
-                });
+                allFilter.innerHTML = '<option value="">جميع الشعب</option>' +
+                    classes.map(c => `<option value="${c}">${c}</option>`).join('');
             }
         }
 
-        // ========== دوال الدخول والتحميل ==========
-        async function fetchDataFromSheet(teacherId, showLoadingScreen = true) {
-            if (showLoadingScreen) showLoading(true, '⏳ جاري تحميل البيانات من Google Sheets...');
+        // ========== دوال نافذة التعديل ==========
+        
+        function openEditModal(studentId) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const container = document.getElementById('editFormContainer');
+            container.innerHTML = `
+                <h4>✏️ تعديل درجات: ${student.studentName}</h4>
+                <input type="hidden" id="editStudentId" value="${student.id}">
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0;">
+                    <div>
+                        <label>مواظبة 1:</label>
+                        <input type="number" id="editAttendance1" value="${formatGrade(student.attendance1)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>شفهي 1:</label>
+                        <input type="number" id="editOral1" value="${formatGrade(student.oral1)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>واجبات 1:</label>
+                        <input type="number" id="editHomework1" value="${formatGrade(student.homework1)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>تحريري 1:</label>
+                        <input type="number" id="editWritten1" value="${formatGrade(student.written1)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>مواظبة 2:</label>
+                        <input type="number" id="editAttendance2" value="${formatGrade(student.attendance2)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>شفهي 2:</label>
+                        <input type="number" id="editOral2" value="${formatGrade(student.oral2)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>واجبات 2:</label>
+                        <input type="number" id="editHomework2" value="${formatGrade(student.homework2)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>تحريري 2:</label>
+                        <input type="number" id="editWritten2" value="${formatGrade(student.written2)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>مواظبة 3:</label>
+                        <input type="number" id="editAttendance3" value="${formatGrade(student.attendance3)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>واجبات 3:</label>
+                        <input type="number" id="editHomework3" value="${formatGrade(student.homework3)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>شفهي 3:</label>
+                        <input type="number" id="editOral3" value="${formatGrade(student.oral3)}" step="0.1" min="0" max="5">
+                    </div>
+                    <div>
+                        <label>تحريري 3:</label>
+                        <input type="number" id="editWritten3" value="${formatGrade(student.written3)}" step="0.1" min="0" max="5">
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function saveAllEdits() {
+            const studentId = document.getElementById('editStudentId').value;
+            const student = allStudents.find(s => s.id === studentId);
+            
+            if (!student) {
+                showError('❌ لم يتم العثور على الطالب');
+                return;
+            }
+            
+            const updateData = {
+                row: student.originalRowIndex,
+                id: student.id
+            };
+            
+            const fields = [
+                'attendance1', 'oral1', 'homework1', 'written1',
+                'attendance2', 'oral2', 'homework2', 'written2',
+                'attendance3', 'homework3', 'oral3', 'written3'
+            ];
+            
+            let changesMade = false;
+            
+            fields.forEach(field => {
+                const input = document.getElementById(`edit${field.charAt(0).toUpperCase() + field.slice(1)}`);
+                const oldValue = formatGrade(student[field]);
+                const newValue = formatGrade(input.value);
+                
+                if (oldValue !== newValue) {
+                    student[field] = newValue;
+                    updateData[field] = newValue;
+                    changesMade = true;
+                }
+            });
+            
+            if (changesMade) {
+                // إعادة حساب المجاميع
+                for (let i = 1; i <= 3; i++) {
+                    student[`total${i}`] = calculateTotal(student, i);
+                    student[`result${i}`] = calculateResult(student[`total${i}`]);
+                }
+                
+                // إضافة للتعديلات المعلقة
+                pendingUpdates = pendingUpdates.filter(u => u.id !== student.id);
+                pendingUpdates.push(updateData);
+                
+                // حفظ البيانات
+                saveDataToLocalStorage();
+                savePendingUpdates();
+                
+                // تحديث العرض
+                updateDisplayedStudents();
+                
+                // إنشاء نسخة احتياطية
+                createBackup();
+                
+                closeModal('editModal');
+                showSuccess('✅ تم حفظ التعديلات وإضافتها للمزامنة');
+                
+                // محاولة المزامنة التلقائية
+                attemptAutoSync();
+            } else {
+                closeModal('editModal');
+                showSuccess('👍 لم تكن هناك تعديلات جديدة');
+            }
+        }
+
+        // ========== دوال المزامنة التلقائية ==========
+        
+        function attemptAutoSync() {
+            if (navigator.onLine && pendingUpdates.length > 0 && !isSyncing) {
+                syncPendingUpdates(true);
+            }
+        }
+
+        function startAutoSync() {
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            autoSyncInterval = setInterval(attemptAutoSync, 30000);
+            attemptAutoSync();
+        }
+
+        // ========== دوال إدارة الجلسة ==========
+        
+        function saveTeacherSession(teacherId) {
+            try {
+                const sessionData = {
+                    teacherId: teacherId,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem(TEACHER_SESSION_KEY, JSON.stringify(sessionData));
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function loadTeacherSession() {
+            try {
+                const data = localStorage.getItem(TEACHER_SESSION_KEY);
+                return data ? JSON.parse(data) : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // ========== دوال تحميل البيانات ==========
+        
+        function mapData(data) {
+            return data.map((item, index) => {
+                const newItem = {
+                    originalRowIndex: index + 2
+                };
+                
+                for (const [arabicKey, jsKey] of Object.entries(STUDENT_PROPERTIES)) {
+                    const foundKey = Object.keys(item).find(sheetKey => 
+                        sheetKey.trim() === arabicKey.trim()
+                    );
+                    
+                    if (foundKey) {
+                        newItem[jsKey] = item[foundKey] || '';
+                    } else {
+                        newItem[jsKey] = '';
+                    }
+                }
+                
+                return newItem;
+            });
+        }
+
+        async function fetchDataFromSheet(teacherId, showLoading = true) {
+            if (showLoading) showLoading(true, '⏳ جاري تحميل البيانات...');
             
             try {
                 const response = await fetch(WEB_APP_URL);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
                 const data = await response.json();
-
+                
                 if (data.status === 'success' && data.data) {
                     const mappedData = mapData(data.data);
-                    
-                    allStudents = mappedData.filter(student => student.teacherId === teacherId);
+                    allStudents = mappedData.filter(s => s.teacherId === teacherId);
                     
                     currentTeacherId = teacherId;
                     welcomeTeacherName.textContent = teacherId;
                     
-                    populateClassFilters(); 
+                    populateClassFilters();
                     
-                    if (showLoadingScreen) {
+                    if (showLoading) {
                         showLoading(false);
-                        // الانتقال إلى نافذة اختيار الشهر بعد التحميل
                         loginSection.classList.add('hidden');
                         monthSelectionSection.classList.remove('hidden');
-                        showSuccess(`مرحباً بك يا ${teacherId}! تم تحميل البيانات بنجاح.`);
+                        showSuccess(`مرحباً ${teacherId}! تم تحميل البيانات`);
                     }
-
+                    
                     return true;
                 } else {
-                    throw new Error(data.error || 'فشلت عملية جلب البيانات من Google Sheet.');
+                    throw new Error(data.error || 'فشل تحميل البيانات');
                 }
-
             } catch (error) {
-                if (showLoadingScreen) showError('❌ فشل في تحميل البيانات: ' + error.message);
+                if (showLoading) showError('❌ فشل تحميل البيانات: ' + error.message);
                 return false;
             }
         }
@@ -3586,362 +1942,326 @@
         async function login(useLocal = false) {
             const teacherId = teacherIdInput.value.trim();
             if (!teacherId) {
-                alert('الرجاء إدخال معرف المعلم.');
+                alert('الرجاء إدخال معرف المعلم');
                 return;
             }
-
-            let success = false;
             
             if (useLocal) {
-                try {
-                    const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-                    if (localData) {
+                const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (localData) {
+                    try {
                         const parsedData = JSON.parse(localData);
-                        const filteredStudents = parsedData.students ? 
-                            parsedData.students.filter(s => s.teacherId === teacherId) : [];
-
-                        if (filteredStudents.length > 0) {
-                            allStudents = filteredStudents;
+                        if (parsedData.teacherId === teacherId) {
+                            allStudents = parsedData.students || [];
                             currentTeacherId = teacherId;
                             welcomeTeacherName.textContent = teacherId;
                             
-                            // حفظ الجلسة
-                            saveTeacherSession(teacherId);
-                            
-                            populateClassFilters(); 
-                            
+                            populateClassFilters();
                             loginSection.classList.add('hidden');
                             monthSelectionSection.classList.remove('hidden');
-                            showSuccess(`💾 تم التحميل من الذاكرة المحلية (المعلم: ${teacherId}).`);
-                            success = true;
-                        } else {
-                            alert('لا توجد بيانات سابقة محفوظة محلياً لهذا المعرف.');
+                            
+                            // تحميل التعديلات المعلقة والفاشلة
+                            pendingUpdates = loadPendingUpdates();
+                            failedUpdates = loadFailedUpdates();
+                            syncHistory = loadSyncHistory();
+                            
+                            updatePendingCount();
+                            showSuccess('💾 تم التحميل من البيانات المحلية');
+                            return true;
                         }
-                    } else {
-                        alert('لا توجد بيانات سابقة مخزنة محلياً على الإطلاق.');
+                    } catch (error) {
+                        alert('خطأ في قراءة البيانات المحلية');
                     }
-                } catch (error) {
-                    alert('خطأ في قراءة البيانات المحلية: ' + error.message);
+                } else {
+                    alert('لا توجد بيانات محلية');
                 }
-
             } else {
-                success = await fetchDataFromSheet(teacherId);
+                const success = await fetchDataFromSheet(teacherId);
                 if (success) {
-                    // حفظ الجلسة بعد الدخول الناجح
                     saveTeacherSession(teacherId);
+                    saveDataToLocalStorage();
                 }
+                return success;
             }
-
-            return success;
+            return false;
         }
 
         async function initializeData() {
-            const url = `${WEB_APP_URL}`;
             try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP Status: ${response.status}`);
-                
+                const response = await fetch(WEB_APP_URL);
                 const data = await response.json();
                 
                 if (data.status === 'success') {
-                    enableLogin(true);
+                    loginBtn.disabled = false;
+                    updateConnectionStatus('✅ تم الاتصال بـ Google Sheets', 'success');
                 } else {
-                    throw new Error(data.error || 'Apps Script returned an unknown error.');
+                    throw new Error(data.error);
                 }
             } catch (error) {
-                enableLogin(false);
-                updateConnectionStatus(`❌ فشل في الاتصال بـ Google Sheets: ${error.message}.`, 'error');
+                loginBtn.disabled = true;
+                updateConnectionStatus('❌ فشل الاتصال بـ Google Sheets', 'error');
             }
         }
 
-        // ========== دوال نافذة التعديل المخصصة ==========
-        function openEditModal(studentId) {
-            const targetId = studentId.toString().trim(); 
-            const student = allStudents.find(s => s.id && s.id.toString().trim() === targetId);
-            
-            if (!student) {
-                showError(`❌ لم يتم العثور على الطالب. الـ ID المستهدف: "${targetId}".`);
-                return;
-            }
-            
-            // تعبئة البيانات الأساسية
-            document.getElementById('currentStudentName').textContent = student.studentName;
-            document.getElementById('editStudentId').value = student.id;
-            document.getElementById('currentEditMonth').value = currentMonth;
-            
-            // تحديث مؤشر الشهر الحالي
-            const monthNames = {
-                1: 'الشهر الأول',
-                2: 'الشهر الثاني', 
-                3: 'الشهر الثالث',
-                'all': 'جميع الشهور'
+        function updateConnectionStatus(message, type = 'info') {
+            const colors = {
+                info: '#fff3cd',
+                success: '#d4edda',
+                error: '#f8d7da'
             };
-            document.getElementById('currentMonthIndicator').textContent = monthNames[currentMonth];
             
-            // إنشاء محتوى نافذة التعديل بناءً على الشهر المحدد
-            createEditFormContent(student, currentMonth);
-            
-            // عرض النافذة
-            document.getElementById('editModal').style.display = 'block';
+            connectionStatus.innerHTML = message;
+            connectionStatus.style.background = colors[type] || colors.info;
+            connectionStatus.style.padding = '10px';
+            connectionStatus.style.borderRadius = '5px';
+            connectionStatus.style.margin = '10px 0';
         }
 
-        function createEditFormContent(student, month) {
-            const container = document.getElementById('editFormContainer');
+        // ========== دوال نظام الشهور ==========
+        
+        function selectMonth(month) {
+            currentMonth = month;
+            
+            document.querySelectorAll('.month-workspace').forEach(w => {
+                w.classList.remove('active');
+            });
+            
+            const workspaceId = month === 'all' ? 'allMonthsWorkspace' : `month${month}Workspace`;
+            document.getElementById(workspaceId).classList.add('active');
+            
+            monthSelectionSection.classList.add('hidden');
+            
+            updateDisplayedStudents();
+        }
+
+        function backToMonthSelection() {
+            document.querySelectorAll('.month-workspace').forEach(w => {
+                w.classList.remove('active');
+            });
+            
+            monthSelectionSection.classList.remove('hidden');
+        }
+
+        // ========== دوال إدارة المزامنة ==========
+        
+        function showSyncManagement() {
+            updateSyncManagementUI();
+            document.getElementById('syncManagementModal').style.display = 'block';
+        }
+
+        function updateSyncManagementUI() {
+            document.getElementById('syncPendingCount').textContent = pendingUpdates.length;
+            document.getElementById('syncFailedCount').textContent = failedUpdates.length;
+            document.getElementById('connectionState').textContent = navigator.onLine ? 'متصل' : 'غير متصل';
+            
+            // آخر مزامنة ناجحة
+            const lastSuccess = syncHistory.filter(h => h.status === 'success').sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            )[0];
+            
+            document.getElementById('lastSyncTime').textContent = lastSuccess ? 
+                new Date(lastSuccess.timestamp).toLocaleString('ar-SA') : 'لم تتم';
+            
+            updateSyncDetailsList();
+        }
+
+        function updateSyncDetailsList() {
+            const container = document.getElementById('syncDetailsList');
             container.innerHTML = '';
             
-            if (month === 'all') {
-                // عرض جميع الشهور
-                for (let i = 1; i <= 3; i++) {
-                    container.appendChild(createMonthSection(student, i));
-                }
-            } else {
-                // عرض الشهر المحدد فقط
-                container.appendChild(createMonthSection(student, month));
-            }
-        }
-
-        function createMonthSection(student, month) {
-            const section = document.createElement('div');
-            section.className = 'month-section';
-            
-            const monthNames = {
-                1: '📘 الشهر الأول',
-                2: '📗 الشهر الثاني',
-                3: '📙 الشهر الثالث'
-            };
-            
-            const fields = {
-                1: ['attendance1', 'oral1', 'homework1', 'written1'],
-                2: ['attendance2', 'oral2', 'homework2', 'written2'],
-                3: ['attendance3', 'homework3', 'oral3', 'written3']
-            };
-            
-            const fieldLabels = {
-                'attendance1': 'مواظبة 1', 'oral1': 'شفهي 1', 'homework1': 'واجبات 1', 'written1': 'تحريري 1',
-                'attendance2': 'مواظبة 2', 'oral2': 'شفهي 2', 'homework2': 'واجبات 2', 'written2': 'تحريري 2',
-                'attendance3': 'مواظبة 3', 'homework3': 'واجبات 3', 'oral3': 'شفهي 3', 'written3': 'تحريري 3'
-            };
-            
-            section.innerHTML = `
-                <div class="month-title">${monthNames[month]}</div>
-                <div class="scores-grid">
-                    ${fields[month].map(field => `
-                        <div class="score-group">
-                            <label for="edit${field}">${fieldLabels[field]}:</label>
-                            <input type="number" id="edit${field}" min="0" max="5" step="0.1" 
-                                   value="${formatGrade(student[field])}" 
-                                   oninput="calculateMonthTotal(${month})">
-                        </div>
-                    `).join('')}
-                    <div class="total-display">
-                        <span class="label">المجموع: </span>
-                        <span class="value" id="totalDisplay${month}">${calculateTotal(student, month)}</span>
-                    </div>
-                    <div class="result-display">
-                        <span class="label">المحصلة: </span>
-                        <span class="value" id="resultDisplay${month}">${calculateResult(calculateTotal(student, month))}</span>
-                    </div>
-                </div>
-            `;
-            
-            return section;
-        }
-
-        // ========== دوال حفظ التعديلات المفقودة ==========
-        function saveAllEdits() {
-            const studentId = document.getElementById('editStudentId').value;
-            const currentMonth = document.getElementById('currentEditMonth').value;
-            const idToFind = studentId.toString().trim(); 
-            const student = allStudents.find(s => s.id && s.id.toString().trim() === idToFind);
-
-            if (!student) {
-                showError('❌ خطأ: لم يتم العثور على الطالب في البيانات المحلية للحفظ. (ID: ' + idToFind + ')');
+            if (pendingUpdates.length === 0 && failedUpdates.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">لا توجد تعديلات معلقة</p>';
                 return;
             }
-
-            const updateData = {
-                row: student.originalRowIndex, 
-                id: student.id,
-            };
-
-            let changesMade = false;
-
-            // تحديد الحقول التي يجب جمعها بناءً على الشهر الحالي
-            let fieldsToCheck = [];
-            if (currentMonth === 'all') {
-                // جمع جميع الحقول للأشهر الثلاثة
-                fieldsToCheck = [
-                    'attendance1', 'oral1', 'homework1', 'written1',
-                    'attendance2', 'oral2', 'homework2', 'written2', 
-                    'attendance3', 'homework3', 'oral3', 'written3'
-                ];
-            } else {
-                // جمع الحقول الخاصة بالشهر الحالي فقط
-                const monthFields = {
-                    1: ['attendance1', 'oral1', 'homework1', 'written1'],
-                    2: ['attendance2', 'oral2', 'homework2', 'written2'],
-                    3: ['attendance3', 'homework3', 'oral3', 'written3']
-                };
-                fieldsToCheck = monthFields[currentMonth];
-            }
-
-            // جمع التعديلات
-            fieldsToCheck.forEach(field => {
-                const inputElement = document.getElementById(`edit${field}`);
-                if (inputElement) {
-                    const oldValue = student[field]; 
-                    const newValue = inputElement.value;
-                    
-                    const newFormatted = newValue.toString().trim();
-                    const oldFormatted = oldValue ? oldValue.toString().trim() : '';
-                    
-                    if (oldFormatted !== newFormatted) {
-                        student[field] = newFormatted;
-                        updateData[field] = newFormatted; 
-                        changesMade = true;
-                    }
-                }
+            
+            pendingUpdates.forEach(update => {
+                const student = allStudents.find(s => s.id === update.id);
+                container.innerHTML += `
+                    <div style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+                        <div>
+                            <strong>${student ? student.studentName : 'غير معروف'}</strong>
+                            <div style="font-size: 12px; color: #666;">
+                                ${Object.keys(update).filter(k => !['row', 'id'].includes(k)).join(', ')}
+                            </div>
+                        </div>
+                        <span style="background: #ffeaa7; color: #e67e22; padding: 3px 8px; border-radius: 4px; font-size: 12px;">
+                            ⏳ معلق
+                        </span>
+                    </div>
+                `;
             });
-
-            // إعادة حساب المجاميع والمحصلات
-            for(let i = 1; i <= 3; i++) {
-                student[`total${i}`] = calculateTotal(student, i);
-                student[`result${i}`] = calculateResult(student[`total${i}`]);
-            }
-
-            if (changesMade) {
-                // إضافة التعديلات إلى قائمة الانتظار
-                pendingUpdates = pendingUpdates.filter(update => update.id !== student.id);
-                pendingUpdates.push(updateData);
-                
-                // حفظ التعديلات محلياً
-                savePendingUpdates();
-                saveDataToLocalStorage();
-                
-                // تحديث العرض
-                updateDisplayedStudents(); 
-                
-                // إغلاق النافذة وإظهار رسالة النجاح
-                closeModal('editModal');
-                showSuccess('✅ تم حفظ التعديلات للطالب محلياً وإضافتها للمزامنة.');
-                
-                // محاولة المزامنة التلقائية
-                attemptAutoSync();
-            } else {
-                closeModal('editModal');
-                showSuccess('👍 لم يتم إجراء تعديلات جديدة لحفظها.');
-            }
+            
+            failedUpdates.forEach(update => {
+                const student = allStudents.find(s => s.id === update.id);
+                container.innerHTML += `
+                    <div style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${student ? student.studentName : 'غير معروف'}</strong>
+                            <div style="font-size: 12px; color: #666;">
+                                ${update.error || 'خطأ غير معروف'}
+                            </div>
+                        </div>
+                        <div>
+                            <span style="background: #f8d7da; color: #e74c3c; padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-left: 5px;">
+                                ❌ فشل
+                            </span>
+                            <button onclick="retryFailedUpdate('${update.id}')" style="background: #3498db; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                                🔄 إعادة
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
-        // ========== التهيئة النهائية للتطبيق ==========
+        function retryFailedUpdate(updateId) {
+            const failedUpdate = failedUpdates.find(u => u.id === updateId);
+            if (!failedUpdate) return;
+            
+            failedUpdates = failedUpdates.filter(u => u.id !== updateId);
+            pendingUpdates.push(failedUpdate);
+            
+            saveFailedUpdates();
+            savePendingUpdates();
+            
+            updateSyncManagementUI();
+            attemptAutoSync();
+        }
+
+        function addToSyncHistory(type, status, count, details) {
+            syncHistory.push({
+                timestamp: new Date().toISOString(),
+                type,
+                status,
+                count,
+                details,
+                teacherId: currentTeacherId
+            });
+            
+            saveSyncHistory();
+        }
+
+        // ========== التهيئة الرئيسية ==========
+        
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('بدء تهيئة التطبيق...');
+            console.log('🚀 بدء تشغيل النظام...');
             
-            // تحميل التعديلات المعلقة
-            pendingUpdates = loadPendingUpdates();
-            updatePendingCount();
+            // تحميل البيانات المحلية
+            const sessionData = loadTeacherSession();
+            if (sessionData && sessionData.teacherId) {
+                currentTeacherId = sessionData.teacherId;
+                teacherIdInput.value = currentTeacherId;
+                
+                // محاولة التحميل التلقائي
+                setTimeout(() => {
+                    const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                    if (localData) {
+                        const parsedData = JSON.parse(localData);
+                        if (parsedData.teacherId === currentTeacherId) {
+                            allStudents = parsedData.students || [];
+                            pendingUpdates = loadPendingUpdates();
+                            failedUpdates = loadFailedUpdates();
+                            syncHistory = loadSyncHistory();
+                            
+                            welcomeTeacherName.textContent = currentTeacherId;
+                            populateClassFilters();
+                            updatePendingCount();
+                            
+                            loginSection.classList.add('hidden');
+                            monthSelectionSection.classList.remove('hidden');
+                            
+                            showSuccess('👋 تم الدخول التلقائي');
+                        }
+                    }
+                }, 1000);
+            }
             
-            // تهيئة جميع الأنظمة
-            initializeSession(); // إدارة الجلسة أولاً
-            initializePWA(); // ثم نظام PWA
-            initializeMonthSystem();
-            initializeQRScanner();
-            initializeStatistics();
-            initializeLocalStorage();
-            initializeSyncManagement();
-            
-            // ربط أحداث الدخول والتحميل
+            // ربط الأحداث
             loginBtn.addEventListener('click', () => login(false));
             useLocalDataBtn.addEventListener('click', () => login(true));
             retryBtn.addEventListener('click', initializeData);
-
-            // ربط أحداث البحث والفلترة
-            setupSearchAndFilters();
+            
+            // ربط أحداث إدارة المزامنة
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`manageSyncBtn${i}`);
+                if (btn) btn.addEventListener('click', showSyncManagement);
+            }
+            document.getElementById('manageSyncBtnAll').addEventListener('click', showSyncManagement);
             
             // ربط أحداث المزامنة
             document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
                 btn.addEventListener('click', () => syncPendingUpdates(false));
             });
-
-            // ربط أحداث تسجيل الخروج
-            document.querySelectorAll('[id^="logoutBtn"]').forEach(btn => {
-                btn.addEventListener('click', handleLogout);
-            });
-
-            // مراقبة حالة الاتصال بالإنترنت
-            window.addEventListener('online', () => {
-                console.log('الاتصال بالإنترنت متاح - محاولة المزامنة...');
-                updateDebugInfo('🌐 الاتصال بالإنترنت متاح');
-                attemptAutoSync();
-            });
-
-            window.addEventListener('offline', () => {
-                console.log('الاتصال بالإنترنت مقطوع');
-                updateDebugInfo('❌ الاتصال بالإنترنت مقطوع');
-                updateAutoSyncStatus();
-            });
-
-            // بدء التهيئة
-            initializeData();
-            startAutoSync();
             
-            console.log('✅ تم تهيئة التطبيق بنجاح');
-            updateDebugInfo('✅ التطبيق جاهز للاستخدام');
-        });
-
-        function setupSearchAndFilters() {
-            // ربط أحداث البحث والفلترة لكل شهر
+            // ربط أحداث البحث
             for (let i = 1; i <= 3; i++) {
                 const searchInput = document.getElementById(`searchNameInput${i}`);
                 const classFilter = document.getElementById(`classNameFilter${i}`);
                 
-                if (searchInput) {
-                    searchInput.addEventListener('input', updateDisplayedStudents);
-                }
-                if (classFilter) {
-                    classFilter.addEventListener('change', updateDisplayedStudents);
-                }
+                if (searchInput) searchInput.addEventListener('input', updateDisplayedStudents);
+                if (classFilter) classFilter.addEventListener('change', updateDisplayedStudents);
             }
-
-            // ربط أحداث البحث والفلترة لجميع الشهور
+            
             const searchInputAll = document.getElementById('searchNameInputAll');
             const classFilterAll = document.getElementById('classNameFilterAll');
             
-            if (searchInputAll) {
-                searchInputAll.addEventListener('input', updateDisplayedStudents);
-            }
-            if (classFilterAll) {
-                classFilterAll.addEventListener('change', updateDisplayedStudents);
-            }
+            if (searchInputAll) searchInputAll.addEventListener('input', updateDisplayedStudents);
+            if (classFilterAll) classFilterAll.addEventListener('change', updateDisplayedStudents);
+            
+            // مراقبة الاتصال بالإنترنت
+            window.addEventListener('online', () => {
+                updateDebugInfo('🌐 الاتصال بالإنترنت متاح');
+                attemptAutoSync();
+            });
+            
+            window.addEventListener('offline', () => {
+                updateDebugInfo('❌ الاتصال بالإنترنت مقطوع');
+                updateAutoSyncStatus();
+            });
+            
+            // بدء التهيئة
+            initializeData();
+            startAutoSync();
+            
+            console.log('✅ تم تهيئة النظام بنجاح');
+            updateDebugInfo('✅ النظام جاهز للاستخدام');
+        });
+
+        function updateDebugInfo(message) {
+            debugInfo.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
         }
 
         function handleLogout() {
-            // حفظ أي تعديلات معلقة قبل الخروج
-            if (pendingUpdates.length > 0) {
-                savePendingUpdates();
-                saveDataToLocalStorage();
-            }
+            // إنشاء نسخة احتياطية قبل الخروج
+            createBackup();
             
             // مسح الجلسة
-            clearTeacherSession();
+            localStorage.removeItem(TEACHER_SESSION_KEY);
             
             // العودة لشاشة الدخول
             loginSection.classList.remove('hidden');
             monthSelectionSection.classList.add('hidden');
-            document.querySelectorAll('.month-workspace').forEach(workspace => {
-                workspace.classList.remove('active');
+            document.querySelectorAll('.month-workspace').forEach(w => {
+                w.classList.remove('active');
             });
+            
             allStudents = [];
             teacherIdInput.value = '';
-            showSuccess('تم تسجيل الخروج بنجاح.');
+            
+            showSuccess('تم تسجيل الخروج بنجاح');
         }
 
-        // تحسين دورة حياة الصفحة
-        window.addEventListener('beforeunload', () => {
+        // ربط أحداث تسجيل الخروج
+        document.querySelectorAll('[id^="logoutBtn"]').forEach(btn => {
+            btn.addEventListener('click', handleLogout);
+        });
+
+        // منع فقدان البيانات عند إغلاق الصفحة
+        window.addEventListener('beforeunload', (e) => {
             if (pendingUpdates.length > 0) {
-                savePendingUpdates();
-                saveDataToLocalStorage();
-                return 'هناك تعديلات غير محفوظة. هل تريد حقاً مغادرة الصفحة؟';
+                createBackup();
+                e.preventDefault();
+                e.returnValue = 'هناك تعديلات غير محفوظة. هل تريد حقاً مغادرة الصفحة؟';
             }
         });
 
