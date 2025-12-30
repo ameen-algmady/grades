@@ -1188,6 +1188,321 @@
                 margin-bottom: 0;
             }
         }
+        /* زر النسخ الاحتياطي */
+#manualBackupBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 1000;
+    display: none;
+    transition: all 0.3s ease;
+}
+
+#manualBackupBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    background: linear-gradient(135deg, #2980b9, #1c6ea4);
+}
+
+#manualBackupBtn:active {
+    transform: translateY(0);
+}
+
+/* نافذة تأكيد النسخ الاحتياطي */
+#backupModal .modal-content {
+    max-width: 400px;
+}
+
+.backup-success {
+    background: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 1px solid #c3e6cb;
+}
+
+.backup-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin: 15px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+}
+
+.backup-item {
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.backup-item:last-child {
+    border-bottom: none;
+}
+
+.backup-info {
+    flex: 1;
+}
+
+.backup-actions {
+    display: flex;
+    gap: 5px;
+}
+/* تحسين تصميم عناصر التحكم */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+}
+
+.teacher-info-display {
+    color: #2c3e50;
+    font-weight: bold;
+    font-size: 14px;
+    background: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.teacher-info-display span {
+    color: #3498db;
+    font-weight: bold;
+}
+
+/* تصميم شريط الأدوات العلوي */
+.toolbar-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.toolbar-left {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.toolbar-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* تصميم شريط الأدوات السفلي */
+.toolbar-bottom {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.toolbar-bottom.full-width {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* تحسين تصميم حاوية البحث */
+.search-tools-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin: 15px 0;
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+}
+
+.search-tools-container .search-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.search-tools-container label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 3px;
+}
+
+.search-tools-container input,
+.search-tools-container select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.search-tools-container input:focus,
+.search-tools-container select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+}
+
+/* أزرار إضافية */
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.btn-icon:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn-icon.small {
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+/* تحسين تصميم زر المزامنة */
+.sync-btn-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.sync-status-text {
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+    margin-top: 3px;
+}
+
+/* تحسين التصميم للهواتف */
+@media (max-width: 768px) {
+    .toolbar-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .toolbar-left, .toolbar-right {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .toolbar-bottom {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-tools-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .btn-icon {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .teacher-info-display {
+        text-align: center;
+        font-size: 13px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .toolbar-bottom {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .search-tools-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* تحسين تصميم رأس الشهر */
+.current-month-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.current-month-header h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.8em;
+    font-weight: 300;
+}
+
+.current-month-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.95em;
+}
+
+/* ألوان مختلفة لكل شهر */
+.current-month-header.month-1 {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.current-month-header.month-2 {
+    background: linear-gradient(135deg, #27ae60, #229954);
+}
+
+.current-month-header.month-3 {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+.current-month-header.all-months {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
     </style>
 </head>
 <body>
@@ -1258,293 +1573,434 @@
             </div>
         </div>
 
-        <!-- نافذة العمل للشهر الأول -->
-        <div id="month1Workspace" class="month-workspace">
-            <div class="controls">
-                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة لاختيار الشهر</button>
-                <button class="btn btn-logout" id="logoutBtn1">تسجيل الخروج</button>
-                <div style="color: #2c3e50; font-weight: bold;">
-                    <span>المعلم: </span>
-                    <span id="currentTeacher1"></span>
-                    <span> | عدد الطلاب: </span>
-                    <span id="studentsCount1">0</span>
-                </div>
-            </div>
-
-            <div class="current-month-header month-1">
-                <h2>📘 الشهر الأول - إدارة الدرجات</h2>
-                <p>يمكنك هنا إدارة وتعديل درجات الشهر الأول للطلاب</p>
-            </div>
-
-            <div class="search-container">
-                <input type="text" id="searchNameInput1" placeholder="🔍 تصفية عن طريق جزء من الاسم...">
-                <select id="classNameFilter1">
-                    <option value="">جميع الشعب</option>
-                </select>
-                <button class="btn" id="qrScanBtn1" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
-                    📷 مسح QR Code
-                </button>
-                <button class="btn" id="showStatsBtn1" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                    📈 عرض الإحصائيات
-                </button>
-                <button class="btn" id="manageSyncBtn1" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-                    ⚙️ إدارة المزامنة
-                </button>
-                <div class="sync-btn-container">
-                    <button class="btn" id="syncSheetsBtn1" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
-                        ☁️ مزامنة التعديلات
-                    </button>
-                    <div id="syncStatus1">المزامنة التلقائية: متوقفة</div>
-                    <span id="pendingCount1" class="hidden">0</span>
-                </div>
-            </div>
-
-            <div style="overflow-x: auto;">
-                <table class="month-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Barcode</th>
-                            <th>اسم الطالب</th>
-                            <th>الشعبة</th>
-                            <th>مواظبة 1</th>
-                            <th>شفهي 1</th>
-                            <th>واجبات 1</th>
-                            <th>تحريري 1</th>
-                            <th>المجموع 1</th>
-                            <th>محصلة 1</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="month1TableBody">
-                        <tr>
-                            <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
-                                ⏳ جاري تحميل البيانات...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+       <!-- نافذة العمل للشهر الأول -->
+<div id="month1Workspace" class="month-workspace">
+    <!-- شريط الأدوات العلوي -->
+    <div class="toolbar-top">
+        <div class="toolbar-left">
+            <button class="btn back-to-selection" onclick="backToMonthSelection()">
+                <span style="margin-left: 5px;">⬅ العودة</span>
+            </button>
+            <div class="teacher-info-display">
+                <span id="currentTeacher1"></span> | الطلاب: <span id="studentsCount1">0</span>
             </div>
         </div>
+        
+        <div class="toolbar-right">
+            <button class="btn btn-logout" id="logoutBtn1">
+                <span style="margin-left: 5px;">تسجيل الخروج</span>
+            </button>
+        </div>
+    </div>
 
-        <!-- نافذة العمل للشهر الثاني -->
-        <div id="month2Workspace" class="month-workspace">
-            <div class="controls">
-                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة لاختيار الشهر</button>
-                <button class="btn btn-logout" id="logoutBtn2">تسجيل الخروج</button>
-                <div style="color: #2c3e50; font-weight: bold;">
-                    <span>المعلم: </span>
-                    <span id="currentTeacher2"></span>
-                    <span> | عدد الطلاب: </span>
-                    <span id="studentsCount2">0</span>
-                </div>
-            </div>
+    <!-- عنوان الشهر -->
+    <div class="current-month-header month-1">
+        <h2>📘 الشهر الأول - إدارة الدرجات</h2>
+        <p>يمكنك هنا إدارة وتعديل درجات الشهر الأول للطلاب</p>
+    </div>
 
-            <div class="current-month-header month-2">
-                <h2>📗 الشهر الثاني - إدارة الدرجات</h2>
-                <p>يمكنك هنا إدارة وتعديل درجات الشهر الثاني للطلاب</p>
-            </div>
+    <!-- شريط الأدوات السفلي (أيقونتين في الصف) -->
+    <div class="toolbar-bottom">
+        <!-- الصف الأول -->
+        <button class="btn-icon" id="manageSyncBtn1" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+            <span>⚙️</span>
+            <span>إدارة المزامنة</span>
+        </button>
+        
+        <button class="btn-icon" id="showStatsBtn1" style="background: linear-gradient(135deg, #27ae60, #229954);">
+            <span>📈</span>
+            <span>الإحصائيات</span>
+        </button>
+        
+        <div class="sync-btn-container">
+            <button class="btn-icon" id="syncSheetsBtn1" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                <span>☁️</span>
+                <span>مزامنة التعديلات</span>
+                <span id="pendingCount1" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-right: 5px;">0</span>
+            </button>
+            <div class="sync-status-text" id="syncStatus1">المزامنة: متوقفة</div>
+        </div>
+    </div>
 
-            <div class="search-container">
-                <input type="text" id="searchNameInput2" placeholder="🔍 تصفية عن طريق جزء من الاسم...">
-                <select id="classNameFilter2">
-                    <option value="">جميع الشعب</option>
-                </select>
-                <button class="btn" id="qrScanBtn2" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
-                    📷 مسح QR Code
-                </button>
-                <button class="btn" id="showStatsBtn2" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                    📈 عرض الإحصائيات
-                </button>
-                <button class="btn" id="manageSyncBtn2" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-                    ⚙️ إدارة المزامنة
-                </button>
-                <div class="sync-btn-container">
-                    <button class="btn" id="syncSheetsBtn2" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
-                        ☁️ مزامنة التعديلات
-                    </button>
-                    <div id="syncStatus2">المزامنة التلقائية: متوقفة</div>
-                    <span id="pendingCount2" class="hidden">0</span>
-                </div>
-            </div>
+    <!-- أدوات البحث والتصفية -->
+    <div class="search-tools-container">
+        <!-- التصفية حسب الشعبة -->
+        <div class="search-group">
+            <label for="classNameFilter1">🔍 التصفية حسب الشعبة</label>
+            <select id="classNameFilter1">
+                <option value="">جميع الشعب</option>
+            </select>
+        </div>
+        
+        <!-- مسح QR Code -->
+        <div class="search-group">
+            <label for="qrScanBtn1">📷 مسح الباركود</label>
+            <button class="btn-icon" id="qrScanBtn1" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
+            </button>
+        </div>
+        
+        <!-- البحث بالاسم -->
+        <div class="search-group">
+            <label for="searchNameInput1">🔎 البحث بالاسم</label>
+            <input type="text" id="searchNameInput1" placeholder="أدخل جزء من اسم الطالب...">
+        </div>
+    </div>
 
-            <div style="overflow-x: auto;">
-                <table class="month-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Barcode</th>
-                            <th>اسم الطالب</th>
-                            <th>الشعبة</th>
-                            <th>مواظبة 2</th>
-                            <th>شفهي 2</th>
-                            <th>واجبات 2</th>
-                            <th>تحريري 2</th>
-                            <th>المجموع 2</th>
-                            <th>محصلة 2</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="month2TableBody">
-                        <tr>
-                            <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
-                                ⏳ جاري تحميل البيانات...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <!-- الجدول -->
+    <div style="overflow-x: auto;">
+        <table class="month-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Barcode</th>
+                    <th>اسم الطالب</th>
+                    <th>الشعبة</th>
+                    <th>مواظبة 1</th>
+                    <th>شفهي 1</th>
+                    <th>واجبات 1</th>
+                    <th>تحريري 1</th>
+                    <th>المجموع 1</th>
+                    <th>محصلة 1</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="month1TableBody">
+                <tr>
+                    <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
+                        ⏳ جاري تحميل البيانات...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- نافذة العمل للشهر الثاني -->
+<div id="month2Workspace" class="month-workspace">
+    <!-- شريط الأدوات العلوي -->
+    <div class="toolbar-top">
+        <div class="toolbar-left">
+            <button class="btn back-to-selection" onclick="backToMonthSelection()">
+                <span style="margin-left: 5px;">⬅ العودة</span>
+            </button>
+            <div class="teacher-info-display">
+                <span id="currentTeacher2"></span> | الطلاب: <span id="studentsCount2">0</span>
             </div>
         </div>
+        
+        <div class="toolbar-right">
+            <button class="btn btn-logout" id="logoutBtn2">
+                <span style="margin-left: 5px;">تسجيل الخروج</span>
+            </button>
+        </div>
+    </div>
 
-        <!-- نافذة العمل للشهر الثالث -->
-        <div id="month3Workspace" class="month-workspace">
-            <div class="controls">
-                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة لاختيار الشهر</button>
-                <button class="btn btn-logout" id="logoutBtn3">تسجيل الخروج</button>
-                <div style="color: #2c3e50; font-weight: bold;">
-                    <span>المعلم: </span>
-                    <span id="currentTeacher3"></span>
-                    <span> | عدد الطلاب: </span>
-                    <span id="studentsCount3">0</span>
-                </div>
-            </div>
+    <!-- عنوان الشهر -->
+    <div class="current-month-header month-2">
+        <h2>📗 الشهر الثاني - إدارة الدرجات</h2>
+        <p>يمكنك هنا إدارة وتعديل درجات الشهر الثاني للطلاب</p>
+    </div>
 
-            <div class="current-month-header month-3">
-                <h2>📙 الشهر الثالث - إدارة الدرجات</h2>
-                <p>يمكنك هنا إدارة وتعديل درجات الشهر الثالث للطلاب</p>
-            </div>
+    <!-- شريط الأدوات السفلي (أيقونتين في الصف) -->
+    <div class="toolbar-bottom">
+        <!-- الصف الأول -->
+        <button class="btn-icon" id="manageSyncBtn2" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+            <span>⚙️</span>
+            <span>إدارة المزامنة</span>
+        </button>
+        
+        <button class="btn-icon" id="showStatsBtn2" style="background: linear-gradient(135deg, #27ae60, #229954);">
+            <span>📈</span>
+            <span>الإحصائيات</span>
+        </button>
+        
+        <div class="sync-btn-container">
+            <button class="btn-icon" id="syncSheetsBtn2" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                <span>☁️</span>
+                <span>مزامنة التعديلات</span>
+                <span id="pendingCount2" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-right: 5px;">0</span>
+            </button>
+            <div class="sync-status-text" id="syncStatus2">المزامنة: متوقفة</div>
+        </div>
+    </div>
 
-            <div class="search-container">
-                <input type="text" id="searchNameInput3" placeholder="🔍 تصفية عن طريق جزء من الاسم...">
-                <select id="classNameFilter3">
-                    <option value="">جميع الشعب</option>
-                </select>
-                <button class="btn" id="qrScanBtn3" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
-                    📷 مسح QR Code
-                </button>
-                <button class="btn" id="showStatsBtn3" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                    📈 عرض الإحصائيات
-                </button>
-                <button class="btn" id="manageSyncBtn3" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-                    ⚙️ إدارة المزامنة
-                </button>
-                <div class="sync-btn-container">
-                    <button class="btn" id="syncSheetsBtn3" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
-                        ☁️ مزامنة التعديلات
-                    </button>
-                    <div id="syncStatus3">المزامنة التلقائية: متوقفة</div>
-                    <span id="pendingCount3" class="hidden">0</span>
-                </div>
-            </div>
+    <!-- أدوات البحث والتصفية -->
+    <div class="search-tools-container">
+        <!-- التصفية حسب الشعبة -->
+        <div class="search-group">
+            <label for="classNameFilter2">🔍 التصفية حسب الشعبة</label>
+            <select id="classNameFilter2">
+                <option value="">جميع الشعب</option>
+            </select>
+        </div>
+        
+        <!-- مسح QR Code -->
+        <div class="search-group">
+            <label for="qrScanBtn2">📷 مسح الباركود</label>
+            <button class="btn-icon" id="qrScanBtn2" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
+            </button>
+        </div>
+        
+        <!-- البحث بالاسم -->
+        <div class="search-group">
+            <label for="searchNameInput2">🔎 البحث بالاسم</label>
+            <input type="text" id="searchNameInput2" placeholder="أدخل جزء من اسم الطالب...">
+        </div>
+    </div>
 
-            <div style="overflow-x: auto;">
-                <table class="month-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Barcode</th>
-                            <th>اسم الطالب</th>
-                            <th>الشعبة</th>
-                            <th>مواظبة 3</th>
-                            <th>واجبات 3</th>
-                            <th>شفهي 3</th>
-                            <th>تحريري 3</th>
-                            <th>المجموع 3</th>
-                            <th>محصلة 3</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="month3TableBody">
-                        <tr>
-                            <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
-                                ⏳ جاري تحميل البيانات...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <!-- الجدول -->
+    <div style="overflow-x: auto;">
+        <table class="month-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Barcode</th>
+                    <th>اسم الطالب</th>
+                    <th>الشعبة</th>
+                    <th>مواظبة 2</th>
+                    <th>شفهي 2</th>
+                    <th>واجبات 2</th>
+                    <th>تحريري 2</th>
+                    <th>المجموع 2</th>
+                    <th>محصلة 2</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="month2TableBody">
+                <tr>
+                    <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
+                        ⏳ جاري تحميل البيانات...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- نافذة العمل للشهر الثالث -->
+<div id="month3Workspace" class="month-workspace">
+    <!-- شريط الأدوات العلوي -->
+    <div class="toolbar-top">
+        <div class="toolbar-left">
+            <button class="btn back-to-selection" onclick="backToMonthSelection()">
+                <span style="margin-left: 5px;">⬅ العودة</span>
+            </button>
+            <div class="teacher-info-display">
+                <span id="currentTeacher3"></span> | الطلاب: <span id="studentsCount3">0</span>
             </div>
         </div>
+        
+        <div class="toolbar-right">
+            <button class="btn btn-logout" id="logoutBtn3">
+                <span style="margin-left: 5px;">تسجيل الخروج</span>
+            </button>
+        </div>
+    </div>
 
-        <!-- نافذة العمل لجميع الشهور -->
-        <div id="allMonthsWorkspace" class="month-workspace">
-            <div class="controls">
-                <button class="btn back-to-selection" onclick="backToMonthSelection()">⬅ العودة لاختيار الشهر</button>
-                <button class="btn btn-logout" id="logoutBtnAll">تسجيل الخروج</button>
-                <div style="color: #2c3e50; font-weight: bold;">
-                    <span>المعلم: </span>
-                    <span id="currentTeacherAll"></span>
-                    <span> | عدد الطلاب: </span>
-                    <span id="studentsCountAll">0</span>
-                </div>
-            </div>
+    <!-- عنوان الشهر -->
+    <div class="current-month-header month-3">
+        <h2>📙 الشهر الثالث - إدارة الدرجات</h2>
+        <p>يمكنك هنا إدارة وتعديل درجات الشهر الثالث للطلاب</p>
+    </div>
 
-            <div class="current-month-header all-months">
-                <h2>📚 جميع الشهور - عرض شامل</h2>
-                <p>عرض شامل لجميع درجات الطلاب في الأشهر الثلاثة</p>
-            </div>
+    <!-- شريط الأدوات السفلي (أيقونتين في الصف) -->
+    <div class="toolbar-bottom">
+        <!-- الصف الأول -->
+        <button class="btn-icon" id="manageSyncBtn3" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+            <span>⚙️</span>
+            <span>إدارة المزامنة</span>
+        </button>
+        
+        <button class="btn-icon" id="showStatsBtn3" style="background: linear-gradient(135deg, #27ae60, #229954);">
+            <span>📈</span>
+            <span>الإحصائيات</span>
+        </button>
+        
+        <div class="sync-btn-container">
+            <button class="btn-icon" id="syncSheetsBtn3" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                <span>☁️</span>
+                <span>مزامنة التعديلات</span>
+                <span id="pendingCount3" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-right: 5px;">0</span>
+            </button>
+            <div class="sync-status-text" id="syncStatus3">المزامنة: متوقفة</div>
+        </div>
+    </div>
 
-            <div class="search-container">
-                <input type="text" id="searchNameInputAll" placeholder="🔍 تصفية عن طريق جزء من الاسم...">
-                <select id="classNameFilterAll">
-                    <option value="">جميع الشعب</option>
-                </select>
-                <button class="btn" id="qrScanBtnAll" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
-                    📷 مسح QR Code
-                </button>
-                <button class="btn" id="showStatsBtnAll" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                    📈 عرض الإحصائيات
-                </button>
-                <button class="btn" id="manageSyncBtnAll" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-                    ⚙️ إدارة المزامنة
-                </button>
-                <div class="sync-btn-container">
-                    <button class="btn" id="syncSheetsBtnAll" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
-                        ☁️ مزامنة التعديلات
-                    </button>
-                    <div id="syncStatusAll">المزامنة التلقائية: متوقفة</div>
-                    <span id="pendingCountAll" class="hidden">0</span>
-                </div>
-            </div>
+    <!-- أدوات البحث والتصفية -->
+    <div class="search-tools-container">
+        <!-- التصفية حسب الشعبة -->
+        <div class="search-group">
+            <label for="classNameFilter3">🔍 التصفية حسب الشعبة</label>
+            <select id="classNameFilter3">
+                <option value="">جميع الشعب</option>
+            </select>
+        </div>
+        
+        <!-- مسح QR Code -->
+        <div class="search-group">
+            <label for="qrScanBtn3">📷 مسح الباركود</label>
+            <button class="btn-icon" id="qrScanBtn3" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
+            </button>
+        </div>
+        
+        <!-- البحث بالاسم -->
+        <div class="search-group">
+            <label for="searchNameInput3">🔎 البحث بالاسم</label>
+            <input type="text" id="searchNameInput3" placeholder="أدخل جزء من اسم الطالب...">
+        </div>
+    </div>
 
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Barcode</th>
-                            <th>اسم الطالب</th>
-                            <th>الشعبة</th>
-                            <th>مواظبة 1</th>
-                            <th>شفهي 1</th>
-                            <th>واجبات 1</th>
-                            <th>تحريري 1</th>
-                            <th>المجموع 1</th>
-                            <th>محصلة 1</th>
-                            <th>مواظبة 2</th>
-                            <th>شفهي 2</th>
-                            <th>واجبات 2</th>
-                            <th>تحريري 2</th>
-                            <th>المجموع 2</th>
-                            <th>محصلة 2</th>
-                            <th>مواظبة 3</th>
-                            <th>واجبات 3</th>
-                            <th>شفهي 3</th>
-                            <th>تحريري 3</th>
-                            <th>المجموع 3</th>
-                            <th>محصلة 3</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="studentsTableBody">
-                        <tr>
-                            <td colspan="23" style="text-align: center; color: #666; padding: 40px;">
-                                ⏳ جاري تحميل البيانات...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <!-- الجدول -->
+    <div style="overflow-x: auto;">
+        <table class="month-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Barcode</th>
+                    <th>اسم الطالب</th>
+                    <th>الشعبة</th>
+                    <th>مواظبة 3</th>
+                    <th>واجبات 3</th>
+                    <th>شفهي 3</th>
+                    <th>تحريري 3</th>
+                    <th>المجموع 3</th>
+                    <th>محصلة 3</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="month3TableBody">
+                <tr>
+                    <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
+                        ⏳ جاري تحميل البيانات...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- نافذة العمل لجميع الشهور -->
+<div id="allMonthsWorkspace" class="month-workspace">
+    <!-- شريط الأدوات العلوي -->
+    <div class="toolbar-top">
+        <div class="toolbar-left">
+            <button class="btn back-to-selection" onclick="backToMonthSelection()">
+                <span style="margin-left: 5px;">⬅ العودة</span>
+            </button>
+            <div class="teacher-info-display">
+                <span id="currentTeacherAll"></span> | الطلاب: <span id="studentsCountAll">0</span>
             </div>
         </div>
+        
+        <div class="toolbar-right">
+            <button class="btn btn-logout" id="logoutBtnAll">
+                <span style="margin-left: 5px;">تسجيل الخروج</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- عنوان الشهر -->
+    <div class="current-month-header all-months">
+        <h2>📚 جميع الشهور - عرض شامل</h2>
+        <p>عرض شامل لجميع درجات الطلاب في الأشهر الثلاثة</p>
+    </div>
+
+    <!-- شريط الأدوات السفلي (أيقونتين في الصف) -->
+    <div class="toolbar-bottom">
+        <!-- الصف الأول -->
+        <button class="btn-icon" id="manageSyncBtnAll" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+            <span>⚙️</span>
+            <span>إدارة المزامنة</span>
+        </button>
+        
+        <button class="btn-icon" id="showStatsBtnAll" style="background: linear-gradient(135deg, #27ae60, #229954);">
+            <span>📈</span>
+            <span>الإحصائيات</span>
+        </button>
+        
+        <div class="sync-btn-container">
+            <button class="btn-icon" id="syncSheetsBtnAll" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                <span>☁️</span>
+                <span>مزامنة التعديلات</span>
+                <span id="pendingCountAll" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-right: 5px;">0</span>
+            </button>
+            <div class="sync-status-text" id="syncStatusAll">المزامنة: متوقفة</div>
+        </div>
+    </div>
+
+    <!-- أدوات البحث والتصفية -->
+    <div class="search-tools-container">
+        <!-- التصفية حسب الشعبة -->
+        <div class="search-group">
+            <label for="classNameFilterAll">🔍 التصفية حسب الشعبة</label>
+            <select id="classNameFilterAll">
+                <option value="">جميع الشعب</option>
+            </select>
+        </div>
+        
+        <!-- مسح QR Code -->
+        <div class="search-group">
+            <label for="qrScanBtnAll">📷 مسح الباركود</label>
+            <button class="btn-icon" id="qrScanBtnAll" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
+            </button>
+        </div>
+        
+        <!-- البحث بالاسم -->
+        <div class="search-group">
+            <label for="searchNameInputAll">🔎 البحث بالاسم</label>
+            <input type="text" id="searchNameInputAll" placeholder="أدخل جزء من اسم الطالب...">
+        </div>
+    </div>
+
+    <!-- الجدول -->
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Barcode</th>
+                    <th>اسم الطالب</th>
+                    <th>الشعبة</th>
+                    <th>مواظبة 1</th>
+                    <th>شفهي 1</th>
+                    <th>واجبات 1</th>
+                    <th>تحريري 1</th>
+                    <th>المجموع 1</th>
+                    <th>محصلة 1</th>
+                    <th>مواظبة 2</th>
+                    <th>شفهي 2</th>
+                    <th>واجبات 2</th>
+                    <th>تحريري 2</th>
+                    <th>المجموع 2</th>
+                    <th>محصلة 2</th>
+                    <th>مواظبة 3</th>
+                    <th>واجبات 3</th>
+                    <th>شفهي 3</th>
+                    <th>تحريري 3</th>
+                    <th>المجموع 3</th>
+                    <th>محصلة 3</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="studentsTableBody">
+                <tr>
+                    <td colspan="23" style="text-align: center; color: #666; padding: 40px;">
+                        ⏳ جاري تحميل البيانات...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+                
 
         <div id="loading" class="loading hidden">
             ⏳ جاري تحميل البيانات...
@@ -2950,27 +3406,47 @@
     });
 
     // ========== دوال التهيئة الأساسية ==========
-    function initializeMonthSystem() {
-        console.log('بدء تهيئة نظام الشهور...');
-        
-        // ربط أحداث جميع أزرار الشهور
-        document.querySelectorAll('.month-card').forEach(card => {
-            card.addEventListener('click', function() {
-                const month = this.classList.contains('month-1') ? 1 : 
-                             this.classList.contains('month-2') ? 2 : 
-                             this.classList.contains('month-3') ? 3 : 'all';
-                selectMonth(month);
-            });
+   // في دالة initializeMonthSystem() أضف:
+function initializeMonthSystem() {
+    console.log('بدء تهيئة نظام الشهور...');
+    
+    // ربط أحداث جميع أزرار الشهور
+    document.querySelectorAll('.month-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const month = this.classList.contains('month-1') ? 1 : 
+                         this.classList.contains('month-2') ? 2 : 
+                         this.classList.contains('month-3') ? 3 : 'all';
+            selectMonth(month);
         });
+    });
+    
+    // ربط أحداث العودة
+    document.querySelectorAll('.back-to-selection').forEach(btn => {
+        btn.addEventListener('click', backToMonthSelection);
+    });
+    
+    // ربط أحداث البحث والتصفية الجديدة
+    for (let i = 1; i <= 3; i++) {
+        const searchInput = document.getElementById(`searchNameInput${i}`);
+        const classFilter = document.getElementById(`classNameFilter${i}`);
+        const qrBtn = document.getElementById(`qrScanBtn${i}`);
         
-        // ربط أحداث العودة
-        document.querySelectorAll('.back-to-selection').forEach(btn => {
-            btn.addEventListener('click', backToMonthSelection);
-        });
-        
-        console.log('تم تهيئة نظام الشهور بنجاح');
+        if (searchInput) searchInput.addEventListener('input', updateDisplayedStudents);
+        if (classFilter) classFilter.addEventListener('change', updateDisplayedStudents);
+        if (qrBtn) qrBtn.addEventListener('click', () => startQRScanner(i));
     }
-
+    
+    // ربط أحداث جميع الشهور
+    const searchInputAll = document.getElementById('searchNameInputAll');
+    const classFilterAll = document.getElementById('classNameFilterAll');
+    const qrBtnAll = document.getElementById('qrScanBtnAll');
+    
+    if (searchInputAll) searchInputAll.addEventListener('input', updateDisplayedStudents);
+    if (classFilterAll) classFilterAll.addEventListener('change', updateDisplayedStudents);
+    if (qrBtnAll) qrBtnAll.addEventListener('click', () => startQRScanner('all'));
+    
+    console.log('تم تهيئة نظام الشهور بنجاح');
+}
     function initializeQRScanner() {
         console.log('تهيئة ماسح QR Code...');
         
@@ -4189,9 +4665,654 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ملاحظة: يجب أن تضمن وجود جميع الدوال الأساسية المذكورة في الكود السابق
     // إذا كنت بحاجة لأي منها، أخبرني وسأضيفها
+// ========== نظام النسخ الاحتياطي المحسّن ==========
 
+// زر النسخ الاحتياطي في الصفحة الرئيسية
+let backupButton = null;
+
+function initializeBackupSystem() {
+    console.log('💾 تهيئة نظام النسخ الاحتياطي...');
+    
+    // إنشاء زر النسخ الاحتياطي
+    createBackupButton();
+    
+    // إضافة زر إدارة النسخ في واجهة المعلم
+    addBackupManagementButton();
+    
+    // تحميل النسخ الاحتياطية عند البدء
+    setTimeout(updateBackupList, 1000);
+}
+
+function createBackupButton() {
+    // حذف الزر القديم إذا كان موجوداً
+    const existingBtn = document.getElementById('manualBackupBtn');
+    if (existingBtn) existingBtn.remove();
+    
+    backupButton = document.createElement('button');
+    backupButton.id = 'manualBackupBtn';
+    backupButton.innerHTML = '💾 نسخ احتياطي';
+    backupButton.title = 'إنشاء نسخة احتياطية من جميع البيانات';
+    
+    backupButton.addEventListener('click', function() {
+        showBackupModal();
+    });
+    
+    backupButton.addEventListener('mouseenter', function() {
+        backupButton.style.transform = 'translateY(-2px)';
+        backupButton.style.boxShadow = '0 6px 18px rgba(0,0,0,0.3)';
+    });
+    
+    backupButton.addEventListener('mouseleave', function() {
+        backupButton.style.transform = 'translateY(0)';
+        backupButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+    });
+    
+    document.body.appendChild(backupButton);
+    
+    // تحديث حالة الزر
+    updateBackupButtonState();
+}
+
+function addBackupManagementButton() {
+    // إضافة زر إدارة النسخ في كل قسم
+    for (let i = 1; i <= 3; i++) {
+        const container = document.querySelector(`#month${i}Workspace .search-container`);
+        if (container) {
+            const existingBtn = container.querySelector('.backup-management-btn');
+            if (!existingBtn) {
+                const backupBtn = document.createElement('button');
+                backupBtn.className = 'btn backup-management-btn';
+                backupBtn.innerHTML = '💾 إدارة النسخ';
+                backupBtn.style.background = 'linear-gradient(135deg, #3498db, #2980b9)';
+                backupBtn.style.marginLeft = '10px';
+                backupBtn.addEventListener('click', showBackupModal);
+                container.appendChild(backupBtn);
+            }
+        }
+    }
+    
+    // إضافة زر في قسم جميع الشهور
+    const allContainer = document.querySelector('#allMonthsWorkspace .search-container');
+    if (allContainer) {
+        const existingBtn = allContainer.querySelector('.backup-management-btn');
+        if (!existingBtn) {
+            const backupBtn = document.createElement('button');
+            backupBtn.className = 'btn backup-management-btn';
+            backupBtn.innerHTML = '💾 إدارة النسخ';
+            backupBtn.style.background = 'linear-gradient(135deg, #3498db, #2980b9)';
+            backupBtn.style.marginLeft = '10px';
+            backupBtn.addEventListener('click', showBackupModal);
+            allContainer.appendChild(backupBtn);
+        }
+    }
+}
+
+function updateBackupButtonState() {
+    if (!backupButton) return;
+    
+    if (allStudents.length > 0 && currentTeacherId) {
+        backupButton.style.display = 'block';
+        backupButton.disabled = false;
+        backupButton.title = `إنشاء نسخة احتياطية لـ ${allStudents.length} طالب`;
+    } else {
+        backupButton.style.display = 'none';
+        backupButton.disabled = true;
+        backupButton.title = 'لا توجد بيانات للنسخ الاحتياطي';
+    }
+}
+
+function showBackupModal() {
+    updateBackupList();
+    document.getElementById('backupModal').style.display = 'block';
+    document.getElementById('backupInfo').style.display = 'none';
+}
+
+// ========== وظائف النسخ الاحتياطي الأساسية ==========
+
+function createManualBackup() {
+    console.log('🔄 إنشاء نسخة احتياطية يدوية...');
+    
+    if (!currentTeacherId || allStudents.length === 0) {
+        showBackupMessage('❌ لا توجد بيانات للنسخ الاحتياطي', 'error');
+        return;
+    }
+    
+    const success = backupUserData();
+    
+    if (success) {
+        // إظهار رسالة نجاح
+        showBackupMessage('✅ تم إنشاء نسخة احتياطية بنجاح!', 'success');
+        
+        // تحديث قائمة النسخ
+        updateBackupList();
+        
+        // تحديث زر النسخ الاحتياطي
+        updateBackupButtonState();
+        
+        // إضافة صوت تأكيد (اختياري)
+        playBackupSound();
+        
+        // عرض تفاصيل النسخة الجديدة
+        setTimeout(() => {
+            showBackupDetails();
+        }, 500);
+    } else {
+        showBackupMessage('❌ فشل في إنشاء النسخة الاحتياطية', 'error');
+    }
+}
+
+function backupUserData() {
+    try {
+        console.log('📦 بدء عملية النسخ الاحتياطي...');
+        
+        // بيانات النسخة الاحتياطية
+        const backupData = {
+            timestamp: new Date().toISOString(),
+            teacherId: currentTeacherId,
+            studentCount: allStudents.length,
+            pendingUpdates: pendingUpdates.length,
+            failedUpdates: failedUpdates.length,
+            syncHistoryCount: syncHistory.length,
+            students: JSON.parse(JSON.stringify(allStudents)),
+            pendingUpdates: JSON.parse(JSON.stringify(pendingUpdates)),
+            failedUpdates: JSON.parse(JSON.stringify(failedUpdates)),
+            syncHistory: JSON.parse(JSON.stringify(syncHistory))
+        };
+        
+        // إنشاء مفتاح فريد للنسخة
+        const timestamp = Date.now();
+        const backupKey = `grades_backup_${currentTeacherId}_${timestamp}`;
+        
+        // حفظ النسخة الاحتياطية
+        localStorage.setItem(backupKey, JSON.stringify(backupData));
+        
+        console.log(`✅ تم حفظ النسخة الاحتياطية: ${backupKey}`);
+        console.log(`📊 تفاصيل النسخة: ${allStudents.length} طالب، ${pendingUpdates.length} تعديل معلق`);
+        
+        // حفظ في سجل النسخ
+        saveBackupToHistory(backupKey, backupData);
+        
+        // تنظيم النسخ الاحتياطية
+        organizeBackups();
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ خطأ في النسخ الاحتياطي:', error);
+        return false;
+    }
+}
+
+function saveBackupToHistory(backupKey, backupData) {
+    try {
+        const backupHistory = JSON.parse(localStorage.getItem('backup_history') || '[]');
+        
+        backupHistory.unshift({
+            key: backupKey,
+            timestamp: backupData.timestamp,
+            teacherId: backupData.teacherId,
+            studentCount: backupData.studentCount,
+            size: JSON.stringify(backupData).length
+        });
+        
+        // حفظ فقط آخر 20 سجل
+        if (backupHistory.length > 20) {
+            backupHistory.pop();
+        }
+        
+        localStorage.setItem('backup_history', JSON.stringify(backupHistory));
+        
+    } catch (error) {
+        console.error('❌ خطأ في حفظ سجل النسخ:', error);
+    }
+}
+
+function organizeBackups() {
+    try {
+        // الحصول على جميع مفاتيح النسخ الاحتياطية
+        const allKeys = Object.keys(localStorage);
+        const backupKeys = allKeys.filter(key => key.startsWith('grades_backup_'));
+        
+        // تصفية حسب المعلم الحالي
+        const teacherBackups = backupKeys.filter(key => key.includes(currentTeacherId));
+        
+        // ترتيب حسب التاريخ (الأحدث أولاً)
+        teacherBackups.sort((a, b) => {
+            const timeA = parseInt(a.split('_').pop());
+            const timeB = parseInt(b.split('_').pop());
+            return timeB - timeA;
+        });
+        
+        // حفظ فقط آخر 5 نسخ لكل معلم
+        if (teacherBackups.length > 5) {
+            const toDelete = teacherBackups.slice(5);
+            toDelete.forEach(key => {
+                localStorage.removeItem(key);
+                console.log(`🗑️ تم حذف النسخة القديمة: ${key}`);
+            });
+        }
+        
+        console.log(`📁 إجمالي النسخ للمعلم ${currentTeacherId}: ${teacherBackups.length}`);
+        
+    } catch (error) {
+        console.error('❌ خطأ في تنظيم النسخ:', error);
+    }
+}
+
+// ========== عرض وإدارة النسخ الاحتياطية ==========
+
+function updateBackupList() {
+    const container = document.getElementById('backupList');
+    if (!container) return;
+    
+    try {
+        const allKeys = Object.keys(localStorage);
+        const backupKeys = allKeys.filter(key => key.startsWith('grades_backup_'));
+        
+        // تصفية حسب المعلم الحالي
+        const teacherBackups = currentTeacherId ? 
+            backupKeys.filter(key => key.includes(currentTeacherId)) : 
+            backupKeys;
+        
+        if (teacherBackups.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #666;">لا توجد نسخ احتياطية</p>';
+            return;
+        }
+        
+        // ترتيب حسب التاريخ (الأحدث أولاً)
+        teacherBackups.sort((a, b) => {
+            const timeA = parseInt(a.split('_').pop()) || 0;
+            const timeB = parseInt(b.split('_').pop()) || 0;
+            return timeB - timeA;
+        });
+        
+        let html = '';
+        
+        teacherBackups.forEach((key, index) => {
+            try {
+                const backupData = JSON.parse(localStorage.getItem(key));
+                if (!backupData) return;
+                
+                const date = new Date(backupData.timestamp);
+                const timeStr = date.toLocaleString('ar-SA');
+                
+                html += `
+                    <div class="backup-item">
+                        <div class="backup-info">
+                            <strong>نسخة ${index + 1}</strong>
+                            <div style="font-size: 12px; color: #666;">
+                                ${timeStr}
+                            </div>
+                            <div style="font-size: 11px; color: #888;">
+                                ${backupData.studentCount || 0} طالب | 
+                                ${backupData.pendingUpdates || 0} تعديل معلق
+                            </div>
+                        </div>
+                        <div class="backup-actions">
+                            <button class="btn" style="padding: 5px 10px; font-size: 12px;" 
+                                    onclick="restoreBackup('${key}')" title="استعادة هذه النسخة">
+                                ↩️
+                            </button>
+                            <button class="btn" style="padding: 5px 10px; font-size: 12px; background: #e74c3c;" 
+                                    onclick="deleteBackup('${key}')" title="حذف هذه النسخة">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error(`❌ خطأ في معالجة النسخة ${key}:`, error);
+            }
+        });
+        
+        container.innerHTML = html;
+        
+    } catch (error) {
+        console.error('❌ خطأ في تحديث قائمة النسخ:', error);
+        container.innerHTML = '<p style="text-align: center; color: #e74c3c;">خطأ في تحميل النسخ الاحتياطية</p>';
+    }
+}
+
+function restoreBackup(backupKey) {
+    if (!confirm('هل تريد استعادة هذه النسخة الاحتياطية؟ سيتم استبدال البيانات الحالية.')) {
+        return;
+    }
+    
+    console.log(`🔄 استعادة النسخة: ${backupKey}`);
+    
+    try {
+        const backupData = JSON.parse(localStorage.getItem(backupKey));
+        
+        if (!backupData) {
+            showBackupMessage('❌ النسخة الاحتياطية غير موجودة', 'error');
+            return;
+        }
+        
+        if (backupData.teacherId !== currentTeacherId) {
+            showBackupMessage('❌ هذه النسخة تنتمي لمعلم آخر', 'error');
+            return;
+        }
+        
+        // استعادة البيانات
+        allStudents = backupData.students || [];
+        pendingUpdates = backupData.pendingUpdates || [];
+        failedUpdates = backupData.failedUpdates || [];
+        syncHistory = backupData.syncHistory || [];
+        
+        // حفظ البيانات المستعادة
+        saveDataToLocalStorage();
+        savePendingUpdates();
+        saveFailedUpdates();
+        saveSyncHistory();
+        
+        // تحديث العرض
+        populateClassFilters();
+        updateDisplayedStudents();
+        updatePendingCount();
+        
+        // إظهار رسالة نجاح
+        showBackupMessage(`✅ تم استعادة ${allStudents.length} طالب بنجاح`, 'success');
+        
+        // إعادة تحميل قائمة النسخ
+        updateBackupList();
+        
+        // تحديث زر النسخ الاحتياطي
+        updateBackupButtonState();
+        
+    } catch (error) {
+        console.error('❌ خطأ في استعادة النسخة:', error);
+        showBackupMessage('❌ فشل في استعادة النسخة', 'error');
+    }
+}
+
+function restoreLatestBackup() {
+    const allKeys = Object.keys(localStorage);
+    const backupKeys = allKeys.filter(key => 
+        key.startsWith('grades_backup_') && key.includes(currentTeacherId)
+    );
+    
+    if (backupKeys.length === 0) {
+        showBackupMessage('❌ لا توجد نسخ احتياطية', 'error');
+        return;
+    }
+    
+    // العثور على أحدث نسخة
+    backupKeys.sort((a, b) => {
+        const timeA = parseInt(a.split('_').pop()) || 0;
+        const timeB = parseInt(b.split('_').pop()) || 0;
+        return timeB - timeA;
+    });
+    
+    const latestBackup = backupKeys[0];
+    restoreBackup(latestBackup);
+}
+
+function deleteBackup(backupKey) {
+    if (!confirm('هل تريد حذف هذه النسخة الاحتياطية؟ لا يمكن التراجع عن هذا الإجراء.')) {
+        return;
+    }
+    
+    try {
+        localStorage.removeItem(backupKey);
+        console.log(`🗑️ تم حذف النسخة: ${backupKey}`);
+        
+        // تحديث القائمة
+        updateBackupList();
+        
+        // إظهار رسالة نجاح
+        showBackupMessage('✅ تم حذف النسخة الاحتياطية', 'success');
+        
+    } catch (error) {
+        console.error('❌ خطأ في حذف النسخة:', error);
+        showBackupMessage('❌ فشل في حذف النسخة', 'error');
+    }
+}
+
+// ========== وظائف مساعدة ==========
+
+function showBackupMessage(message, type = 'info') {
+    const statusDiv = document.getElementById('backupStatus');
+    if (!statusDiv) return;
+    
+    const colors = {
+        success: '#d4edda',
+        error: '#f8d7da',
+        info: '#d1ecf1'
+    };
+    
+    const borderColors = {
+        success: '#c3e6cb',
+        error: '#f5c6cb',
+        info: '#bee5eb'
+    };
+    
+    const textColors = {
+        success: '#155724',
+        error: '#721c24',
+        info: '#0c5460'
+    };
+    
+    statusDiv.innerHTML = message;
+    statusDiv.style.background = colors[type] || colors.info;
+    statusDiv.style.border = `1px solid ${borderColors[type] || borderColors.info}`;
+    statusDiv.style.color = textColors[type] || textColors.info;
+    statusDiv.style.padding = '10px';
+    statusDiv.style.borderRadius = '5px';
+    statusDiv.style.textAlign = 'center';
+    statusDiv.style.fontWeight = 'bold';
+    
+    // إخفاء الرسالة بعد 5 ثوانٍ
+    if (type !== 'error') {
+        setTimeout(() => {
+            statusDiv.innerHTML = '';
+            statusDiv.style.background = 'transparent';
+            statusDiv.style.border = 'none';
+            statusDiv.style.padding = '0';
+        }, 5000);
+    }
+}
+
+function showBackupDetails() {
+    const allKeys = Object.keys(localStorage);
+    const backupKeys = allKeys.filter(key => 
+        key.startsWith('grades_backup_') && key.includes(currentTeacherId)
+    );
+    
+    const infoDiv = document.getElementById('backupInfo');
+    const statsDiv = document.getElementById('backupStats');
+    
+    if (!infoDiv || !statsDiv) return;
+    
+    let totalSize = 0;
+    let backupDetails = [];
+    
+    backupKeys.forEach(key => {
+        try {
+            const backupData = localStorage.getItem(key);
+            if (backupData) {
+                const size = backupData.length;
+                totalSize += size;
+                
+                const parsedData = JSON.parse(backupData);
+                backupDetails.push({
+                    key,
+                    timestamp: parsedData.timestamp,
+                    studentCount: parsedData.studentCount || 0,
+                    size: size
+                });
+            }
+        } catch (error) {
+            console.error(`❌ خطأ في تحليل النسخة ${key}:`, error);
+        }
+    });
+    
+    const sizeMB = (totalSize / 1024 / 1024).toFixed(2);
+    
+    statsDiv.innerHTML = `
+        <p>عدد النسخ الاحتياطية: <strong>${backupKeys.length}</strong></p>
+        <p>الحجم الإجمالي: <strong>${sizeMB} ميجابايت</strong></p>
+        <p>المعلم: <strong>${currentTeacherId}</strong></p>
+        <p>عدد الطلاب الحالي: <strong>${allStudents.length}</strong></p>
+        ${backupDetails.length > 0 ? `
+            <p>آخر نسخة: ${new Date(backupDetails[0].timestamp).toLocaleString('ar-SA')}</p>
+        ` : ''}
+    `;
+    
+    infoDiv.style.display = 'block';
+}
+
+function showBackupInfo() {
+    const infoDiv = document.getElementById('backupInfo');
+    if (infoDiv.style.display === 'block') {
+        infoDiv.style.display = 'none';
+    } else {
+        showBackupDetails();
+    }
+}
+
+function playBackupSound() {
+    try {
+        // صوت تأكيد بسيط
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.2);
+        
+    } catch (error) {
+        console.log('ℹ️ لا يمكن تشغيل الصوت:', error);
+    }
+}
+
+// ========== النسخ الاحتياطي التلقائي ==========
+
+function setupAutoBackup() {
+    // نسخ احتياطي تلقائي كل 30 دقيقة
+    setInterval(() => {
+        if (allStudents.length > 0 && currentTeacherId) {
+            console.log('🔄 النسخ الاحتياطي التلقائي...');
+            backupUserData();
+        }
+    }, 30 * 60 * 1000); // 30 دقيقة
+    
+    // نسخ احتياطي عند إضافة تعديلات جديدة
+    let lastPendingCount = pendingUpdates.length;
+    
+    setInterval(() => {
+        if (pendingUpdates.length > lastPendingCount) {
+            console.log('🔄 نسخ احتياطي بسبب تعديلات جديدة...');
+            backupUserData();
+            lastPendingCount = pendingUpdates.length;
+        }
+    }, 10000); // كل 10 ثوانٍ
+}
+
+// ========== النسخ الاحتياطي عند مغادرة الصفحة ==========
+
+window.addEventListener('beforeunload', () => {
+    if (allStudents.length > 0 && currentTeacherId) {
+        console.log('💾 نسخ احتياطي قبل مغادرة الصفحة...');
+        backupUserData();
+    }
+});
+
+// ========== تحديث تهيئة التطبيق ==========
+
+// في دالة document.addEventListener('DOMContentLoaded', () => {
+// أضف هذا:
+function initializeApp() {
+    console.log('🚀 بدء تشغيل التطبيق...');
+    
+    // إنشاء زر النسخ الاحتياطي أولاً
+    createBackupButton();
+    
+    // تهيئة أنظمة الأساسية
+    try {
+        localStorage.setItem('storage_test', 'test');
+        localStorage.removeItem('storage_test');
+        console.log('✅ التخزين المحلي يعمل بشكل صحيح');
+    } catch (e) {
+        console.error('❌ مشكلة في التخزين المحلي:', e);
+        showError('⚠️ التخزين المحلي غير متوفر. قد لا يتم حفظ البيانات.');
+    }
+    
+    // محاولة استعادة الجلسة والبيانات
+    const sessionRestored = initializeSession();
+    
+    // تهيئة PWA
+    initializePWA();
+    
+    // تهيئة نظام النسخ الاحتياطي
+    initializeBackupSystem();
+    
+    // تهيئة باقي الأنظمة
+    initializeMonthSystem();
+    initializeQRScanner();
+    initializeStatistics();
+    initializeSyncManagement();
+    
+    // ربط الأحداث العامة
+    setupGlobalEvents();
+    
+    // تحميل البيانات الأولية
+    loadInitialData();
+    
+    // إعداد النسخ الاحتياطي التلقائي
+    setupAutoBackup();
+    
+    console.log('✅ تم تهيئة التطبيق بنجاح');
+    updateDebugInfo('✅ التطبيق جاهز للاستخدام');
+    
+    // تحديث حالة زر النسخ الاحتياطي بعد 3 ثوانٍ
+    setTimeout(() => {
+        updateBackupButtonState();
+        updateBackupList();
+    }, 3000);
+}
+
+// استبدل document.addEventListener بدالة initializeApp
+document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
-</body>
-</html>
+    <!-- نافذة النسخ الاحتياطي -->
+<div id="backupModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('backupModal')">&times;</span>
+        <h3>💾 إدارة النسخ الاحتياطية</h3>
+        
+        <div id="backupStatus" style="margin: 15px 0; padding: 10px; border-radius: 8px;"></div>
+        
+        <button class="btn btn-success" onclick="createManualBackup()" style="width: 100%; margin-bottom: 15px;">
+            📥 إنشاء نسخة احتياطية جديدة
+        </button>
+        
+        <div class="backup-list" id="backupList">
+            <p style="text-align: center; color: #666;">جاري تحميل النسخ الاحتياطية...</p>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn btn-warning" onclick="restoreLatestBackup()" style="flex: 1;">
+                ↩️ استعادة آخر نسخة
+            </button>
+            <button class="btn" onclick="showBackupInfo()" style="flex: 1; background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                ℹ️ معلومات النسخ
+            </button>
+        </div>
+        
+        <div id="backupInfo" style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; display: none;">
+            <h4>📊 معلومات النسخ الاحتياطية:</h4>
+            <div id="backupStats"></div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
