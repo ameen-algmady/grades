@@ -19,6 +19,8 @@
     
     <!-- Manifest -->
     <link rel="manifest" href="https://raw.githubusercontent.com/yourusername/your-repo/main/manifest.json">
+    <!-- مكتبة SheetJS لإنشاء ملفات Excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <style>
         /* CSS الأصلي (محدث) */
@@ -775,6 +777,108 @@
             margin-left: 10px;
             display: inline-block;
         }
+        /* أزرار Excel */
+.btn-excel {
+    background: linear-gradient(135deg, #27ae60, #229954) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.btn-excel-export {
+    background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.btn-excel-import {
+    background: linear-gradient(135deg, #3498db, #2980b9) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.excel-icon {
+    font-size: 16px;
+    margin-left: 5px;
+}
+
+/* تحسين تصميم نافذة Excel */
+.excel-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.excel-option-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #e0e0e0;
+}
+
+.excel-option-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-color: #27ae60;
+}
+
+.excel-option-card.selected {
+    border-color: #27ae60;
+    background: #f0fff4;
+}
+
+.excel-option-icon {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: #27ae60;
+}
+
+.excel-option-title {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.excel-option-desc {
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
+/* تحسين تصميم جداول Excel */
+.excel-preview {
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 15px 0;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.excel-preview table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.excel-preview th {
+    background: #27ae60;
+    color: white;
+    padding: 8px;
+    position: sticky;
+    top: 0;
+    font-weight: bold;
+}
+
+.excel-preview td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.excel-preview tr:hover {
+    background: #f8f9fa;
+}
 
         /* أنماط جديدة لاختيار الشهر */
         .month-selection {
@@ -1572,6 +1676,114 @@
                 </div>
             </div>
         </div>
+        <!-- نافذة تصدير Excel -->
+<div id="excelExportModal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <span class="close-modal" onclick="closeModal('excelExportModal')">&times;</span>
+        <h3>📊 تصدير إلى Excel</h3>
+        
+        <div class="excel-options">
+            <div class="excel-option-card" onclick="selectExcelOption('currentMonth')">
+                <div class="excel-option-icon">📅</div>
+                <div class="excel-option-title">الشهر الحالي</div>
+                <div class="excel-option-desc">تصدير بيانات الشهر الحالي فقط</div>
+            </div>
+            
+            <div class="excel-option-card" onclick="selectExcelOption('allMonths')">
+                <div class="excel-option-icon">📚</div>
+                <div class="excel-option-title">جميع الشهور</div>
+                <div class="excel-option-desc">تصدير جميع البيانات في ملف واحد</div>
+            </div>
+            
+            <div class="excel-option-card" onclick="selectExcelOption('backupData')">
+                <div class="excel-option-icon">💾</div>
+                <div class="excel-option-title">النسخ الاحتياطية</div>
+                <div class="excel-option-desc">تصدير جميع النسخ الاحتياطية</div>
+            </div>
+        </div>
+        
+        <!-- خيارات التصدير -->
+        <div id="excelOptions" style="display: none;">
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <h4 id="excelOptionTitle"></h4>
+                <div id="excelOptionDetails"></div>
+            </div>
+            
+            <!-- معاينة البيانات -->
+            <div id="excelPreview" class="excel-preview" style="display: none;">
+                <p style="text-align: center; color: #666; padding: 20px;">جاري تحميل المعاينة...</p>
+            </div>
+            
+            <!-- خيارات التنسيق -->
+            <div style="margin: 15px 0;">
+                <h4>خيارات التنسيق:</h4>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="includeTotals" checked>
+                        تضمين المجاميع والمحصلات
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="includeBarcode" checked>
+                        تضمين الباركود
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="formatArabic" checked>
+                        تنسيق عربي
+                    </label>
+                </div>
+            </div>
+            
+            <!-- أزرار التنفيذ -->
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-excel-export" onclick="generateExcelFile()" style="flex: 1;">
+                    📥 تنزيل ملف Excel
+                </button>
+                <button class="btn" onclick="previewExcelData()" style="flex: 1; background: linear-gradient(135deg, #f39c12, #e67e22);">
+                    👁️ معاينة البيانات
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة استيراد Excel -->
+<div id="excelImportModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <span class="close-modal" onclick="closeModal('excelImportModal')">&times;</span>
+        <h3>📥 استيراد من Excel</h3>
+        
+        <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid #3498db;">
+            <h4>تعليمات الاستيراد:</h4>
+            <ol style="margin: 10px 0 0 20px; font-size: 14px;">
+                <li>يجب أن يحتوي الملف على عمود <strong>ID</strong> لتحديد الطلاب</li>
+                <li>يمكن استيراد ملفات <strong>.xlsx</strong> أو <strong>.xls</strong></li>
+                <li>يجب أن تكون الأسماء في أول ورقة في الملف</li>
+                <li>الدرجات يجب أن تكون أرقاماً</li>
+            </ol>
+        </div>
+        
+        <input type="file" id="excelFileInput" accept=".xlsx,.xls" 
+               style="margin: 15px 0; padding: 15px; width: 100%; border: 2px dashed #3498db; border-radius: 8px; cursor: pointer;">
+        
+        <div id="excelImportPreview" style="display: none;">
+            <h4>معاينة البيانات المستوردة:</h4>
+            <div class="excel-preview" id="importPreviewTable"></div>
+            
+            <div style="margin: 15px 0;">
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="confirmImport" onchange="toggleImportButton()">
+                    أتأكد من صحة البيانات وأوافق على الاستيراد
+                </label>
+            </div>
+            
+            <button class="btn btn-excel-import" id="importExcelBtn" disabled onclick="processExcelImport()" style="width: 100%;">
+                ⬆️ استيراد البيانات
+            </button>
+        </div>
+        
+        <div id="importResult" style="margin-top: 15px;"></div>
+    </div>
+</div>
 
        <!-- نافذة العمل للشهر الأول -->
 <div id="month1Workspace" class="month-workspace">
@@ -1592,6 +1804,18 @@
             </button>
         </div>
     </div>
+    <!-- في شريط الأدوات السفلي، أضف: -->
+<div style="display: flex; gap: 5px; flex: 1;">
+    <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
+        <span>📊</span>
+        <span>تصدير Excel</span>
+    </button>
+    
+    <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
+        <span>📥</span>
+        <span>استيراد Excel</span>
+    </button>
+</div>
 
     <!-- عنوان الشهر -->
     <div class="current-month-header month-1">
@@ -1696,6 +1920,18 @@
             </button>
         </div>
     </div>
+    <!-- في شريط الأدوات السفلي، أضف: -->
+<div style="display: flex; gap: 5px; flex: 1;">
+    <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
+        <span>📊</span>
+        <span>تصدير Excel</span>
+    </button>
+    
+    <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
+        <span>📥</span>
+        <span>استيراد Excel</span>
+    </button>
+</div>
 
     <!-- عنوان الشهر -->
     <div class="current-month-header month-2">
@@ -1800,7 +2036,18 @@
             </button>
         </div>
     </div>
-
+         <!-- في شريط الأدوات السفلي، أضف: -->
+<div style="display: flex; gap: 5px; flex: 1;">
+    <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
+        <span>📊</span>
+        <span>تصدير Excel</span>
+    </button>
+    
+    <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
+        <span>📥</span>
+        <span>استيراد Excel</span>
+    </button>
+</div>
     <!-- عنوان الشهر -->
     <div class="current-month-header month-3">
         <h2>📙 الشهر الثالث - إدارة الدرجات</h2>
@@ -1904,7 +2151,18 @@
             </button>
         </div>
     </div>
-
+         <!-- في شريط الأدوات السفلي، أضف: -->
+<div style="display: flex; gap: 5px; flex: 1;">
+    <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
+        <span>📊</span>
+        <span>تصدير Excel</span>
+    </button>
+    
+    <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
+        <span>📥</span>
+        <span>استيراد Excel</span>
+    </button>
+</div>
     <!-- عنوان الشهر -->
     <div class="current-month-header all-months">
         <h2>📚 جميع الشهور - عرض شامل</h2>
@@ -5282,6 +5540,1091 @@ function initializeApp() {
 
 // استبدل document.addEventListener بدالة initializeApp
 document.addEventListener('DOMContentLoaded', initializeApp);
+// ========== نظام تصدير واستيراد Excel ==========
+
+let selectedExcelOption = null;
+let excelDataToExport = null;
+
+function showExcelExportModal() {
+    selectedExcelOption = null;
+    excelDataToExport = null;
+    
+    // إعادة تعيين الخيارات
+    document.querySelectorAll('.excel-option-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    document.getElementById('excelOptions').style.display = 'none';
+    document.getElementById('excelPreview').style.display = 'none';
+    
+    document.getElementById('excelExportModal').style.display = 'block';
+}
+
+function selectExcelOption(option) {
+    selectedExcelOption = option;
+    
+    // تحديث التحديد المرئي
+    document.querySelectorAll('.excel-option-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    const selectedCard = document.querySelector(`.excel-option-card[onclick*="${option}"]`);
+    if (selectedCard) {
+        selectedCard.classList.add('selected');
+    }
+    
+    // تحديث التفاصيل
+    const titleElement = document.getElementById('excelOptionTitle');
+    const detailsElement = document.getElementById('excelOptionDetails');
+    
+    switch(option) {
+        case 'currentMonth':
+            titleElement.textContent = 'تصدير الشهر الحالي';
+            detailsElement.innerHTML = `
+                <p>سيتم تصدير بيانات <strong>${getCurrentMonthName()}</strong></p>
+                <p>عدد الطلاب: <strong>${allStudents.length}</strong></p>
+                <p>سيشمل التصدير: الدرجات، المجاميع، المحصلات</p>
+            `;
+            break;
+            
+        case 'allMonths':
+            titleElement.textContent = 'تصدير جميع الشهور';
+            detailsElement.innerHTML = `
+                <p>سيتم تصدير بيانات جميع الأشهر الثلاثة</p>
+                <p>عدد الطلاب: <strong>${allStudents.length}</strong></p>
+                <p>كل شهر في ورقة منفصلة داخل الملف</p>
+            `;
+            break;
+            
+        case 'backupData':
+            const backupKeys = Object.keys(localStorage).filter(k => k.startsWith('grades_backup_'));
+            titleElement.textContent = 'تصدير النسخ الاحتياطية';
+            detailsElement.innerHTML = `
+                <p>عدد النسخ الاحتياطية: <strong>${backupKeys.length}</strong></p>
+                <p>سيتم تصدير جميع النسخ الاحتياطية المحفوظة</p>
+                <p>كل نسخة في ورقة منفصلة</p>
+            `;
+            break;
+    }
+    
+    document.getElementById('excelOptions').style.display = 'block';
+}
+
+function getCurrentMonthName() {
+    const monthNames = {
+        1: 'الشهر الأول',
+        2: 'الشهر الثاني',
+        3: 'الشهر الثالث',
+        'all': 'جميع الشهور'
+    };
+    return monthNames[currentMonth] || 'غير محدد';
+}
+
+function previewExcelData() {
+    if (!selectedExcelOption) {
+        alert('الرجاء اختيار نوع التصدير أولاً');
+        return;
+    }
+    
+    const previewElement = document.getElementById('excelPreview');
+    previewElement.style.display = 'block';
+    previewElement.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">جاري تحميل المعاينة...</p>';
+    
+    // إنشاء البيانات
+    setTimeout(() => {
+        const data = prepareExcelData();
+        
+        if (!data || data.length === 0) {
+            previewElement.innerHTML = '<p style="text-align: center; color: #e74c3c; padding: 20px;">لا توجد بيانات للعرض</p>';
+            return;
+        }
+        
+        // عرض المعاينة كجدول HTML
+        let html = '<table>';
+        
+        // الرأس
+        html += '<thead><tr>';
+        Object.keys(data[0]).forEach(key => {
+            html += `<th>${key}</th>`;
+        });
+        html += '</tr></thead>';
+        
+        // البيانات
+        html += '<tbody>';
+        data.slice(0, 10).forEach(row => { // عرض أول 10 صفوف فقط
+            html += '<tr>';
+            Object.values(row).forEach(value => {
+                html += `<td>${value || ''}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody>';
+        
+        html += '</table>';
+        
+        if (data.length > 10) {
+            html += `<p style="text-align: center; color: #666; padding: 10px; font-size: 12px;">
+                عرض 10 من ${data.length} صف
+            </p>`;
+        }
+        
+        previewElement.innerHTML = html;
+        
+    }, 500);
+}
+
+function prepareExcelData() {
+    const includeTotals = document.getElementById('includeTotals').checked;
+    const includeBarcode = document.getElementById('includeBarcode').checked;
+    
+    switch(selectedExcelOption) {
+        case 'currentMonth':
+            return prepareCurrentMonthData(includeTotals, includeBarcode);
+            
+        case 'allMonths':
+            return prepareAllMonthsData(includeTotals, includeBarcode);
+            
+        case 'backupData':
+            return prepareBackupData();
+            
+        default:
+            return [];
+    }
+}
+
+function prepareCurrentMonthData(includeTotals = true, includeBarcode = true) {
+    const data = [];
+    
+    allStudents.forEach(student => {
+        const row = {
+            'ID': student.id || '',
+            'اسم الطالب': student.studentName || '',
+            'الشعبة': student.className || ''
+        };
+        
+        if (includeBarcode) {
+            row['الباركود'] = student.barcode || '';
+        }
+        
+        // إضافة درجات الشهر الحالي
+        switch(currentMonth) {
+            case 1:
+                row['مواظبة 1'] = formatGrade(student.attendance1);
+                row['شفهي 1'] = formatGrade(student.oral1);
+                row['واجبات 1'] = formatGrade(student.homework1);
+                row['تحريري 1'] = formatGrade(student.written1);
+                if (includeTotals) {
+                    row['المجموع 1'] = calculateTotal(student, 1);
+                    row['المحصلة 1'] = calculateResult(calculateTotal(student, 1));
+                }
+                break;
+                
+            case 2:
+                row['مواظبة 2'] = formatGrade(student.attendance2);
+                row['شفهي 2'] = formatGrade(student.oral2);
+                row['واجبات 2'] = formatGrade(student.homework2);
+                row['تحريري 2'] = formatGrade(student.written2);
+                if (includeTotals) {
+                    row['المجموع 2'] = calculateTotal(student, 2);
+                    row['المحصلة 2'] = calculateResult(calculateTotal(student, 2));
+                }
+                break;
+                
+            case 3:
+                row['مواظبة 3'] = formatGrade(student.attendance3);
+                row['واجبات 3'] = formatGrade(student.homework3);
+                row['شفهي 3'] = formatGrade(student.oral3);
+                row['تحريري 3'] = formatGrade(student.written3);
+                if (includeTotals) {
+                    row['المجموع 3'] = calculateTotal(student, 3);
+                    row['المحصلة 3'] = calculateResult(calculateTotal(student, 3));
+                }
+                break;
+        }
+        
+        data.push(row);
+    });
+    
+    return data;
+}
+
+function prepareAllMonthsData(includeTotals = true, includeBarcode = true) {
+    const data = [];
+    
+    allStudents.forEach(student => {
+        const row = {
+            'ID': student.id || '',
+            'اسم الطالب': student.studentName || '',
+            'الشعبة': student.className || ''
+        };
+        
+        if (includeBarcode) {
+            row['الباركود'] = student.barcode || '';
+        }
+        
+        // الشهر الأول
+        row['مواظبة 1'] = formatGrade(student.attendance1);
+        row['شفهي 1'] = formatGrade(student.oral1);
+        row['واجبات 1'] = formatGrade(student.homework1);
+        row['تحريري 1'] = formatGrade(student.written1);
+        if (includeTotals) {
+            row['المجموع 1'] = calculateTotal(student, 1);
+            row['المحصلة 1'] = calculateResult(calculateTotal(student, 1));
+        }
+        
+        // الشهر الثاني
+        row['مواظبة 2'] = formatGrade(student.attendance2);
+        row['شفهي 2'] = formatGrade(student.oral2);
+        row['واجبات 2'] = formatGrade(student.homework2);
+        row['تحريري 2'] = formatGrade(student.written2);
+        if (includeTotals) {
+            row['المجموع 2'] = calculateTotal(student, 2);
+            row['المحصلة 2'] = calculateResult(calculateTotal(student, 2));
+        }
+        
+        // الشهر الثالث
+        row['مواظبة 3'] = formatGrade(student.attendance3);
+        row['واجبات 3'] = formatGrade(student.homework3);
+        row['شفهي 3'] = formatGrade(student.oral3);
+        row['تحريري 3'] = formatGrade(student.written3);
+        if (includeTotals) {
+            row['المجموع 3'] = calculateTotal(student, 3);
+            row['المحصلة 3'] = calculateResult(calculateTotal(student, 3));
+        }
+        
+        data.push(row);
+    });
+    
+    return data;
+}
+
+function prepareBackupData() {
+    const data = [];
+    const backupKeys = Object.keys(localStorage).filter(k => k.startsWith('grades_backup_'));
+    
+    backupKeys.forEach(key => {
+        try {
+            const backup = JSON.parse(localStorage.getItem(key));
+            
+            const row = {
+                'اسم الملف': key,
+                'المعلم': backup.teacherId || '',
+                'التاريخ': new Date(backup.timestamp).toLocaleString('ar-SA'),
+                'عدد الطلاب': backup.students?.length || 0,
+                'التعديلات المعلقة': backup.pendingUpdates?.length || 0,
+                'الحالة': 'محفوظة'
+            };
+            
+            data.push(row);
+        } catch (error) {
+            console.error(`خطأ في معالجة النسخة ${key}:`, error);
+        }
+    });
+    
+    return data;
+}
+
+function generateExcelFile() {
+    if (!selectedExcelOption) {
+        alert('الرجاء اختيار نوع التصدير أولاً');
+        return;
+    }
+    
+    try {
+        const workbook = XLSX.utils.book_new();
+        const includeTotals = document.getElementById('includeTotals').checked;
+        const includeBarcode = document.getElementById('includeBarcode').checked;
+        
+        switch(selectedExcelOption) {
+            case 'currentMonth':
+                // ورقة البيانات
+                const currentMonthData = prepareCurrentMonthData(includeTotals, includeBarcode);
+                const currentMonthSheet = XLSX.utils.json_to_sheet(currentMonthData);
+                XLSX.utils.book_append_sheet(workbook, currentMonthSheet, getCurrentMonthName());
+                
+                // ورقة الملخص
+                const summaryData = [
+                    ['ملخص التصدير'],
+                    ['تاريخ التصدير', new Date().toLocaleString('ar-SA')],
+                    ['المعلم', currentTeacherId],
+                    ['الشهر', getCurrentMonthName()],
+                    ['عدد الطلاب', allStudents.length],
+                    ['', ''],
+                    ['إحصائيات الدرجات'],
+                    ['المعدل العام', calculateOverallAverage()]
+                ];
+                const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(workbook, summarySheet, 'ملخص');
+                break;
+                
+            case 'allMonths':
+                // ورقة لكل شهر
+                const allData = prepareAllMonthsData(includeTotals, includeBarcode);
+                const allSheet = XLSX.utils.json_to_sheet(allData);
+                XLSX.utils.book_append_sheet(workbook, allSheet, 'جميع البيانات');
+                
+                // أوراق منفصلة لكل شهر
+                const month1Data = prepareCurrentMonthDataForSheet(1, includeTotals, includeBarcode);
+                const month1Sheet = XLSX.utils.json_to_sheet(month1Data);
+                XLSX.utils.book_append_sheet(workbook, month1Sheet, 'الشهر الأول');
+                
+                const month2Data = prepareCurrentMonthDataForSheet(2, includeTotals, includeBarcode);
+                const month2Sheet = XLSX.utils.json_to_sheet(month2Data);
+                XLSX.utils.book_append_sheet(workbook, month2Sheet, 'الشهر الثاني');
+                
+                const month3Data = prepareCurrentMonthDataForSheet(3, includeTotals, includeBarcode);
+                const month3Sheet = XLSX.utils.json_to_sheet(month3Data);
+                XLSX.utils.book_append_sheet(workbook, month3Sheet, 'الشهر الثالث');
+                break;
+                
+            case 'backupData':
+                const backupData = prepareBackupData();
+                const backupSheet = XLSX.utils.json_to_sheet(backupData);
+                XLSX.utils.book_append_sheet(workbook, backupSheet, 'النسخ الاحتياطية');
+                
+                // تصدير كل نسخة كاملة في ورقة منفصلة
+                const backupKeys = Object.keys(localStorage).filter(k => k.startsWith('grades_backup_'));
+                
+                backupKeys.forEach((key, index) => {
+                    try {
+                        const backup = JSON.parse(localStorage.getItem(key));
+                        if (backup.students && Array.isArray(backup.students)) {
+                            const backupStudents = backup.students.map(student => ({
+                                'ID': student.id,
+                                'اسم الطالب': student.studentName,
+                                'الشعبة': student.className,
+                                'مواظبة 1': student.attendance1,
+                                'شفهي 1': student.oral1,
+                                'واجبات 1': student.homework1,
+                                'تحريري 1': student.written1,
+                                'مواظبة 2': student.attendance2,
+                                'شفهي 2': student.oral2,
+                                'واجبات 2': student.homework2,
+                                'تحريري 2': student.written2,
+                                'مواظبة 3': student.attendance3,
+                                'واجبات 3': student.homework3,
+                                'شفهي 3': student.oral3,
+                                'تحريري 3': student.written3
+                            }));
+                            
+                            const sheet = XLSX.utils.json_to_sheet(backupStudents);
+                            const sheetName = `نسخة ${index + 1}`.substring(0, 31); // Excel limit
+                            XLSX.utils.book_append_sheet(workbook, sheet, sheetName);
+                        }
+                    } catch (error) {
+                        console.error(`خطأ في تصدير النسخة ${key}:`, error);
+                    }
+                });
+                break;
+        }
+        
+        // إنشاء اسم الملف
+        const fileName = `درجات_${currentTeacherId}_${new Date().toISOString().split('T')[0]}.xlsx`;
+        
+        // حفظ الملف
+        XLSX.writeFile(workbook, fileName);
+        
+        // رسالة نجاح
+        setTimeout(() => {
+            alertWithHTML('✅ تم التصدير بنجاح', `
+                <div style="text-align: center;">
+                    <h4>تم إنشاء ملف Excel بنجاح!</h4>
+                    <p>اسم الملف: <strong>${fileName}</strong></p>
+                    <p>يمكنك الآن فتح الملف في برنامج Excel</p>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-success" onclick="closeModal('excelExportModal')" style="width: 100%;">
+                            تم
+                        </button>
+                    </div>
+                </div>
+            `);
+        }, 500);
+        
+    } catch (error) {
+        console.error('❌ خطأ في إنشاء ملف Excel:', error);
+        alert('❌ فشل في إنشاء ملف Excel: ' + error.message);
+    }
+}
+
+function prepareCurrentMonthDataForSheet(month, includeTotals, includeBarcode) {
+    const data = [];
+    
+    allStudents.forEach(student => {
+        const row = {
+            'ID': student.id || '',
+            'اسم الطالب': student.studentName || '',
+            'الشعبة': student.className || ''
+        };
+        
+        if (includeBarcode) {
+            row['الباركود'] = student.barcode || '';
+        }
+        
+        if (month === 1) {
+            row['مواظبة 1'] = formatGrade(student.attendance1);
+            row['شفهي 1'] = formatGrade(student.oral1);
+            row['واجبات 1'] = formatGrade(student.homework1);
+            row['تحريري 1'] = formatGrade(student.written1);
+            if (includeTotals) {
+                row['المجموع 1'] = calculateTotal(student, 1);
+                row['المحصلة 1'] = calculateResult(calculateTotal(student, 1));
+            }
+        } else if (month === 2) {
+            row['مواظبة 2'] = formatGrade(student.attendance2);
+            row['شفهي 2'] = formatGrade(student.oral2);
+            row['واجبات 2'] = formatGrade(student.homework2);
+            row['تحريري 2'] = formatGrade(student.written2);
+            if (includeTotals) {
+                row['المجموع 2'] = calculateTotal(student, 2);
+                row['المحصلة 2'] = calculateResult(calculateTotal(student, 2));
+            }
+        } else if (month === 3) {
+            row['مواظبة 3'] = formatGrade(student.attendance3);
+            row['واجبات 3'] = formatGrade(student.homework3);
+            row['شفهي 3'] = formatGrade(student.oral3);
+            row['تحريري 3'] = formatGrade(student.written3);
+            if (includeTotals) {
+                row['المجموع 3'] = calculateTotal(student, 3);
+                row['المحصلة 3'] = calculateResult(calculateTotal(student, 3));
+            }
+        }
+        
+        data.push(row);
+    });
+    
+    return data;
+}
+
+function calculateOverallAverage() {
+    if (allStudents.length === 0) return 0;
+    
+    let totalSum = 0;
+    let count = 0;
+    
+    allStudents.forEach(student => {
+        for (let i = 1; i <= 3; i++) {
+            const total = parseFloat(calculateTotal(student, i)) || 0;
+            if (total > 0) {
+                totalSum += total;
+                count++;
+            }
+        }
+    });
+    
+    return count > 0 ? (totalSum / count).toFixed(1) : 0;
+}
+
+// ========== نظام استيراد Excel ==========
+
+function showExcelImportModal() {
+    document.getElementById('excelImportModal').style.display = 'block';
+    document.getElementById('excelImportPreview').style.display = 'none';
+    document.getElementById('excelFileInput').value = '';
+    document.getElementById('importResult').innerHTML = '';
+    document.getElementById('confirmImport').checked = false;
+    document.getElementById('importExcelBtn').disabled = true;
+}
+
+function handleExcelFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            
+            // قراءة أول ورقة
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+            
+            if (jsonData.length === 0) {
+                alert('الملف فارغ أو لا يحتوي على بيانات');
+                return;
+            }
+            
+            // عرض المعاينة
+            displayImportPreview(jsonData);
+            
+        } catch (error) {
+            console.error('❌ خطأ في قراءة ملف Excel:', error);
+            alert('❌ ملف Excel تالف أو غير صالح');
+        }
+    };
+    
+    reader.onerror = function() {
+        alert('❌ خطأ في قراءة الملف');
+    };
+    
+    reader.readAsArrayBuffer(file);
+}
+
+function displayImportPreview(data) {
+    const previewElement = document.getElementById('importPreviewTable');
+    let html = '<table>';
+    
+    // عرض أول 10 صفوف
+    const previewRows = Math.min(data.length, 10);
+    
+    for (let i = 0; i < previewRows; i++) {
+        html += '<tr>';
+        const row = data[i];
+        
+        if (Array.isArray(row)) {
+            row.forEach(cell => {
+                const cellContent = cell !== null && cell !== undefined ? String(cell) : '';
+                if (i === 0) {
+                    html += `<th>${cellContent}</th>`;
+                } else {
+                    html += `<td>${cellContent}</td>`;
+                }
+            });
+        }
+        
+        html += '</tr>';
+    }
+    
+    html += '</table>';
+    
+    if (data.length > 10) {
+        html += `<p style="text-align: center; color: #666; padding: 10px; font-size: 12px;">
+            عرض 10 من ${data.length} صف
+        </p>`;
+    }
+    
+    previewElement.innerHTML = html;
+    document.getElementById('excelImportPreview').style.display = 'block';
+}
+
+function toggleImportButton() {
+    const confirmCheckbox = document.getElementById('confirmImport');
+    const importButton = document.getElementById('importExcelBtn');
+    importButton.disabled = !confirmCheckbox.checked;
+}
+
+function processExcelImport() {
+    const fileInput = document.getElementById('excelFileInput');
+    if (!fileInput.files.length) {
+        alert('الرجاء اختيار ملف Excel أولاً');
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+            
+            if (jsonData.length === 0) {
+                alert('الملف لا يحتوي على بيانات');
+                return;
+            }
+            
+            // معالجة البيانات المستوردة
+            const importResult = processImportedData(jsonData);
+            
+            // عرض النتيجة
+            const resultDiv = document.getElementById('importResult');
+            resultDiv.innerHTML = `
+                <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <h4>✅ تم الاستيراد بنجاح</h4>
+                    <p>عدد السجلات المستوردة: <strong>${importResult.importedCount}</strong></p>
+                    <p>عدد السجلات المحدثة: <strong>${importResult.updatedCount}</strong></p>
+                    <p>عدد الأخطاء: <strong>${importResult.errorCount}</strong></p>
+                    ${importResult.errors.length > 0 ? `
+                        <div style="margin-top: 10px; font-size: 12px;">
+                            <strong>الأخطاء:</strong>
+                            <ul style="margin: 5px 0 0 20px;">
+                                ${importResult.errors.map(err => `<li>${err}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // حفظ التحديثات
+            if (importResult.importedCount > 0 || importResult.updatedCount > 0) {
+                saveDataToLocalStorage();
+                // إضافة التعديلات للمزامنة
+                importResult.updatedStudents.forEach(student => {
+                    addStudentToPendingUpdates(student);
+                });
+            }
+            
+            // تحديث العرض
+            setTimeout(() => {
+                updateDisplayedStudents();
+                showSuccess('تم تحديث البيانات من ملف Excel');
+            }, 1000);
+            
+        } catch (error) {
+            console.error('❌ خطأ في معالجة ملف Excel:', error);
+            document.getElementById('importResult').innerHTML = `
+                <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    ❌ فشل في استيراد الملف: ${error.message}
+                </div>
+            `;
+        }
+    };
+    
+    reader.readAsArrayBuffer(file);
+}
+
+function processImportedData(data) {
+    const result = {
+        importedCount: 0,
+        updatedCount: 0,
+        errorCount: 0,
+        errors: [],
+        updatedStudents: []
+    };
+    
+    data.forEach((row, index) => {
+        try {
+            // البحث عن الطالب باستخدام ID
+            const studentId = row.ID || row.id || row['رقم الطالب'] || row['الرقم'] || '';
+            if (!studentId) {
+                result.errorCount++;
+                result.errors.push(`السطر ${index + 1}: لا يوجد ID`);
+                return;
+            }
+            
+            // البحث عن الطالب الموجود
+            const existingIndex = allStudents.findIndex(s => 
+                s.id && s.id.toString() === studentId.toString()
+            );
+            
+            if (existingIndex !== -1) {
+                // تحديث الطالب الموجود
+                const updatedStudent = updateStudentFromExcelRow(allStudents[existingIndex], row);
+                result.updatedCount++;
+                result.updatedStudents.push(updatedStudent);
+            } else {
+                // إضافة طالب جديد
+                const newStudent = createStudentFromExcelRow(row, studentId);
+                if (newStudent) {
+                    allStudents.push(newStudent);
+                    result.importedCount++;
+                }
+            }
+            
+        } catch (error) {
+            result.errorCount++;
+            result.errors.push(`السطر ${index + 1}: ${error.message}`);
+        }
+    });
+    
+    return result;
+}
+
+function updateStudentFromExcelRow(student, row) {
+    // تحديث البيانات الأساسية
+    if (row['اسم الطالب']) student.studentName = row['اسم الطالب'];
+    if (row['الشعبة']) student.className = row['الشعبة'];
+    if (row['الباركود']) student.barcode = row['الباركود'];
+    if (row['معرف المعلم']) student.teacherId = row['معرف المعلم'] || currentTeacherId;
+    
+    // تحديث درجات الشهر الأول
+    if (row['مواظبة 1'] !== undefined) student.attendance1 = formatGrade(row['مواظبة 1']);
+    if (row['شفهي 1'] !== undefined) student.oral1 = formatGrade(row['شفهي 1']);
+    if (row['واجبات 1'] !== undefined) student.homework1 = formatGrade(row['واجبات 1']);
+    if (row['تحريري 1'] !== undefined) student.written1 = formatGrade(row['تحريري 1']);
+    
+    // تحديث درجات الشهر الثاني
+    if (row['مواظبة 2'] !== undefined) student.attendance2 = formatGrade(row['مواظبة 2']);
+    if (row['شفهي 2'] !== undefined) student.oral2 = formatGrade(row['شفهي 2']);
+    if (row['واجبات 2'] !== undefined) student.homework2 = formatGrade(row['واجبات 2']);
+    if (row['تحريري 2'] !== undefined) student.written2 = formatGrade(row['تحريري 2']);
+    
+    // تحديث درجات الشهر الثالث
+    if (row['مواظبة 3'] !== undefined) student.attendance3 = formatGrade(row['مواظبة 3']);
+    if (row['واجبات 3'] !== undefined) student.homework3 = formatGrade(row['واجبات 3']);
+    if (row['شفهي 3'] !== undefined) student.oral3 = formatGrade(row['شفهي 3']);
+    if (row['تحريري 3'] !== undefined) student.written3 = formatGrade(row['تحريري 3']);
+    
+    // إعادة حساب المجاميع
+    for (let i = 1; i <= 3; i++) {
+        student[`total${i}`] = calculateTotal(student, i);
+        student[`result${i}`] = calculateResult(student[`total${i}`]);
+    }
+    
+    return student;
+}
+
+function createStudentFromExcelRow(row, studentId) {
+    // إنشاء طالب جديد
+    const newStudent = {
+        id: studentId,
+        barcode: row['الباركود'] || '',
+        studentName: row['اسم الطالب'] || '',
+        className: row['الشعبة'] || '',
+        teacherId: row['معرف المعلم'] || currentTeacherId,
+        
+        // الشهر الأول
+        attendance1: formatGrade(row['مواظبة 1']) || '',
+        oral1: formatGrade(row['شفهي 1']) || '',
+        homework1: formatGrade(row['واجبات 1']) || '',
+        written1: formatGrade(row['تحريري 1']) || '',
+        total1: 0,
+        result1: 0,
+        
+        // الشهر الثاني
+        attendance2: formatGrade(row['مواظبة 2']) || '',
+        oral2: formatGrade(row['شفهي 2']) || '',
+        homework2: formatGrade(row['واجبات 2']) || '',
+        written2: formatGrade(row['تحريري 2']) || '',
+        total2: 0,
+        result2: 0,
+        
+        // الشهر الثالث
+        attendance3: formatGrade(row['مواظبة 3']) || '',
+        homework3: formatGrade(row['واجبات 3']) || '',
+        oral3: formatGrade(row['شفهي 3']) || '',
+        written3: formatGrade(row['تحريري 3']) || '',
+        total3: 0,
+        result3: 0,
+        
+        originalRowIndex: allStudents.length + 1 // افتراضي
+    };
+    
+    // إعادة حساب المجاميع
+    for (let i = 1; i <= 3; i++) {
+        newStudent[`total${i}`] = calculateTotal(newStudent, i);
+        newStudent[`result${i}`] = calculateResult(newStudent[`total${i}`]);
+    }
+    
+    return newStudent;
+}
+
+function addStudentToPendingUpdates(student) {
+    const updateData = {
+        row: student.originalRowIndex,
+        id: student.id
+    };
+    
+    // إضافة التحديثات للدرجات
+    const scoreFields = [
+        'attendance1', 'oral1', 'homework1', 'written1',
+        'attendance2', 'oral2', 'homework2', 'written2',
+        'attendance3', 'homework3', 'oral3', 'written3'
+    ];
+    
+    scoreFields.forEach(field => {
+        if (student[field] && student[field].toString().trim() !== '') {
+            updateData[field] = student[field];
+        }
+    });
+    
+    // إضافة إلى قائمة التحديثات المعلقة
+    pendingUpdates.push(updateData);
+    savePendingUpdates();
+    updatePendingCount();
+}
+
+// ========== ربط حدث تحميل الملف ==========
+
+document.getElementById('excelFileInput').addEventListener('change', handleExcelFileUpload);
+
+// ========== ربط أزرار Excel بالواجهة ==========
+
+document.addEventListener('DOMContentLoaded', () => {
+    // ربط أزرار التصدير
+    document.querySelectorAll('[onclick="showExcelExportModal()"]').forEach(btn => {
+        btn.addEventListener('click', showExcelExportModal);
+    });
+    
+    // ربط أزرار الاستيراد
+    document.querySelectorAll('[onclick="showExcelImportModal()"]').forEach(btn => {
+        btn.addEventListener('click', showExcelImportModal);
+    });
+    
+    // إضافة أزرار Excel للواجهة إذا لم تكن موجودة
+    addExcelButtonsToUI();
+});
+
+function addExcelButtonsToUI() {
+    // إضافة أزرار Excel لجميع أقسام الشهور
+    for (let i = 1; i <= 3; i++) {
+        const toolbar = document.querySelector(`#month${i}Workspace .toolbar-bottom`);
+        if (toolbar) {
+            // التحقق من وجود الأزرار مسبقاً
+            const existingButtons = toolbar.querySelectorAll('.btn-excel');
+            if (existingButtons.length === 0) {
+                const excelButtons = document.createElement('div');
+                excelButtons.className = 'excel-buttons';
+                excelButtons.style.cssText = 'display: flex; gap: 5px; flex: 1;';
+                excelButtons.innerHTML = `
+                    <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
+                        <span>📊</span>
+                        <span>تصدير Excel</span>
+                    </button>
+                    
+                    <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
+                        <span>📥</span>
+                        <span>استيراد Excel</span>
+                    </button>
+                `;
+                toolbar.appendChild(excelButtons);
+            }
+        }
+    }
+    
+    // إضافة أزرار لقسم جميع الشهور
+    const allToolbar = document.querySelector('#allMonthsWorkspace .toolbar-bottom');
+    if (allToolbar) {
+        const existingButtons = allToolbar.querySelectorAll('.btn-excel');
+        if (existingButtons.length === 0) {
+            const excelButtons = document.createElement('div');
+            excelButtons.className = 'excel-buttons';
+            excelButtons.style.cssText = 'display: flex; gap: 5px; flex: 1;';
+            excelButtons.innerHTML = `
+                <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
+                    <span>📊</span>
+                    <span>تصدير Excel</span>
+                </button>
+                
+                <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
+                    <span>📥</span>
+                    <span>استيراد Excel</span>
+                </button>
+            `;
+            allToolbar.appendChild(excelButtons);
+        }
+    }
+}
+
+// ========== تعطيل زر المزامنة أثناء التصدير ==========
+
+function disableSyncButtons(disable) {
+    document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
+        if (btn) btn.disabled = disable;
+    });
+}
+
+// ========== تحسين عرض النتائج ==========
+
+function showExcelImportResult(result) {
+    alertWithHTML('نتائج الاستيراد', `
+        <div style="text-align: center; padding: 20px;">
+            <h4>${result.success ? '✅ تم الاستيراد بنجاح' : '❌ فشل في الاستيراد'}</h4>
+            <div style="margin: 20px 0;">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <div class="stat-item">
+                        <span class="status-label">تم استيراده</span>
+                        <span class="status-value" style="color: #27ae60;">${result.importedCount}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="status-label">تم تحديثه</span>
+                        <span class="status-value" style="color: #3498db;">${result.updatedCount}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="status-label">فشل</span>
+                        <span class="status-value" style="color: #e74c3c;">${result.errorCount}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="status-label">الإجمالي</span>
+                        <span class="status-value" style="color: #9b59b6;">${result.importedCount + result.updatedCount}</span>
+                    </div>
+                </div>
+            </div>
+            ${result.errors.length > 0 ? `
+                <details style="text-align: right; margin-top: 15px;">
+                    <summary style="cursor: pointer; color: #e74c3c;">عرض التفاصيل (${result.errors.length} خطأ)</summary>
+                    <div style="max-height: 150px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 12px;">
+                        ${result.errors.map(err => `<div style="padding: 3px 0; border-bottom: 1px solid #dee2e6;">${err}</div>`).join('')}
+                    </div>
+                </details>
+            ` : ''}
+            <button class="btn btn-success" onclick="closeModal('excelImportModal')" style="margin-top: 20px; width: 100%;">
+                تم
+            </button>
+        </div>
+    `);
+}
+
+// ========== تحسين معالجة الملفات الكبيرة ==========
+
+function handleLargeExcelFile(file, callback) {
+    if (file.size > 10 * 1024 * 1024) { // أكثر من 10 ميجابايت
+        if (!confirm('الملف كبير الحجم. قد يستغرق التحميل بعض الوقت. هل تريد المتابعة؟')) {
+            return;
+        }
+    }
+    
+    showLoading(true, '📥 جاري تحميل ومعالجة ملف Excel...');
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            
+            // تحميل كل ورقة على حدة لمنع تجميد المتصفح
+            setTimeout(() => {
+                showLoading(false);
+                callback(workbook);
+            }, 100);
+            
+        } catch (error) {
+            showLoading(false);
+            alert('❌ ملف Excel تالف أو غير صالح');
+        }
+    };
+    
+    reader.onerror = function() {
+        showLoading(false);
+        alert('❌ خطأ في قراءة الملف');
+    };
+    
+    reader.readAsArrayBuffer(file);
+}
+
+// ========== تحديث حدث تحميل الملف ليدعم الملفات الكبيرة ==========
+
+document.getElementById('excelFileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // التحقق من نوع الملف
+    if (!file.name.match(/\.(xlsx|xls)$/i)) {
+        alert('الرجاء اختيار ملف Excel صالح (امتداد .xlsx أو .xls)');
+        return;
+    }
+    
+    handleLargeExcelFile(file, function(workbook) {
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+        
+        if (jsonData.length === 0) {
+            alert('الملف فارغ أو لا يحتوي على بيانات');
+            return;
+        }
+        
+        displayImportPreview(jsonData);
+    });
+});
+
+// ========== نظام حفظ القوالب ==========
+
+function saveExcelTemplate(type) {
+    const template = createExcelTemplate(type);
+    const templateKey = `excel_template_${type}_${currentTeacherId}`;
+    
+    localStorage.setItem(templateKey, JSON.stringify({
+        template: template,
+        timestamp: new Date().toISOString(),
+        type: type
+    }));
+    
+    showSuccess(`تم حفظ قالب ${type} بنجاح`);
+}
+
+function loadExcelTemplate(type) {
+    const templateKey = `excel_template_${type}_${currentTeacherId}`;
+    const saved = localStorage.getItem(templateKey);
+    
+    if (saved) {
+        return JSON.parse(saved).template;
+    }
+    
+    return null;
+}
+
+function createExcelTemplate(type) {
+    switch(type) {
+        case 'import':
+            return [
+                ['ID', 'اسم الطالب', 'الشعبة', 'الباركود', 'مواظبة 1', 'شفهي 1', 'واجبات 1', 'تحريري 1', 'مواظبة 2', 'شفهي 2', 'واجبات 2', 'تحريري 2', 'مواظبة 3', 'واجبات 3', 'شفهي 3', 'تحريري 3']
+            ];
+        case 'export':
+            return [
+                ['ID', 'اسم الطالب', 'الشعبة', 'الباركود', 'المجموع', 'المحصلة', 'التقييم']
+            ];
+        default:
+            return [];
+    }
+}
+
+function downloadTemplate(type) {
+    const template = createExcelTemplate(type);
+    const worksheet = XLSX.utils.aoa_to_sheet(template);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'قالب');
+    
+    const fileName = `قالب_${type}_${currentTeacherId}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+    
+    showSuccess(`تم تنزيل القالب: ${fileName}`);
+}
+
+// ========== إضافة زر تحميل القالب ==========
+
+function addTemplateDownloadButton() {
+    const importModal = document.getElementById('excelImportModal');
+    if (importModal) {
+        const existingButton = importModal.querySelector('.template-download-btn');
+        if (!existingButton) {
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'btn btn-warning template-download-btn';
+            downloadBtn.innerHTML = '📋 تحميل قالب فارغ';
+            downloadBtn.style.margin = '10px 0';
+            downloadBtn.style.width = '100%';
+            downloadBtn.onclick = function() {
+                downloadTemplate('import');
+            };
+            
+            const container = importModal.querySelector('.modal-content');
+            if (container) {
+                container.insertBefore(downloadBtn, container.querySelector('input[type="file"]'));
+            }
+        }
+    }
+}
+
+// ========== استدعاء التهيئة عند تحميل الصفحة ==========
+
+document.addEventListener('DOMContentLoaded', function() {
+    // إضافة زر تحميل القالب
+    setTimeout(addTemplateDownloadButton, 1000);
+    
+    // ربط أحداث جديدة
+    bindExcelEvents();
+});
+
+function bindExcelEvents() {
+    // إغلاق النوافذ عند الضغط على ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (document.getElementById('excelExportModal').style.display === 'block') {
+                closeModal('excelExportModal');
+            }
+            if (document.getElementById('excelImportModal').style.display === 'block') {
+                closeModal('excelImportModal');
+            }
+        }
+    });
+    
+    // منع إغلاق النوافذ عند النقر خارجها (اختياري)
+    const modals = ['excelExportModal', 'excelImportModal'];
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    // يمكنك إلغاء التعليق إذا أردت السماح بالإغلاق بالنقر خارج النافذة
+                    // this.style.display = 'none';
+                }
+            });
+        }
+    });
+}
     </script>
     <!-- نافذة النسخ الاحتياطي -->
 <div id="backupModal" class="modal">
