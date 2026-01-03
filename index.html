@@ -2284,117 +2284,133 @@
             </div>
         </div>
 
-        <!-- نافذة الإحصائيات -->
-        <div id="statsModal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal" onclick="closeModal('statsModal')">&times;</span>
-                <h3>📊 إحصائيات الطلاب المفلترين (المعلم: <span id="statsTeacherId"></span>)</h3>
-                
-                <!-- تبويبات للإحصائيات -->
-                <div class="stats-tabs">
-                    <button class="stats-tab active" onclick="openStatsTab('overall')">المعدل العام</button>
-                    <button class="stats-tab" onclick="openStatsTab('month1')">الشهر الأول</button>
-                    <button class="stats-tab" onclick="openStatsTab('month2')">الشهر الثاني</button>
-                    <button class="stats-tab" onclick="openStatsTab('month3')">الشهر الثالث</button>
+       <!-- نافذة الإحصائيات -->
+<div id="statsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('statsModal')">&times;</span>
+        <h3>📊 إحصائيات الطلاب المفلترين (المعلم: <span id="statsTeacherId"></span>)</h3>
+        
+        <!-- تبويبات للإحصائيات -->
+        <div class="stats-tabs">
+            <button class="stats-tab active" onclick="openStatsTab('overall')">المعدل العام</button>
+            <button class="stats-tab" onclick="openStatsTab('month1')">الشهر الأول</button>
+            <button class="stats-tab" onclick="openStatsTab('month2')">الشهر الثاني</button>
+            <button class="stats-tab" onclick="openStatsTab('month3')">الشهر الثالث</button>
+        </div>
+        
+        <!-- المعدل العام -->
+        <div id="overallStats" class="stats-tab-content active">
+            <h4>المعدل العام لجميع الأشهر</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>العدد الكلي</h4>
+                    <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="totalStudentsCount">0</p>
                 </div>
-                
-                <!-- المعدل العام -->
-                <div id="overallStats" class="stats-tab-content active">
-                    <h4>المعدل العام لجميع الأشهر</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>العدد الكلي</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="totalStudentsCount">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsOverallLess5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsOverall5to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsOverall11to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsOverall16to20">0</p>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <h4>ضعيف (أقل من 50%)</h4>
+                    <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsOverallWeak">0</p>
                 </div>
-                
-                <!-- الشهر الأول -->
-                <div id="month1Stats" class="stats-tab-content">
-                    <h4>إحصائيات الشهر الأول</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth1Less5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth15to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth111to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth116to20">0</p>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <h4>مقبول (50% - 64%)</h4>
+                    <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsOverallAcceptable">0</p>
                 </div>
-                
-                <!-- الشهر الثاني -->
-                <div id="month2Stats" class="stats-tab-content">
-                    <h4>إحصائيات الشهر الثاني</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth2Less5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth25to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth211to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth216to20">0</p>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <h4>جيد (65% - 79%)</h4>
+                    <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsOverallGood">0</p>
                 </div>
-                
-                <!-- الشهر الثالث -->
-                <div id="month3Stats" class="stats-tab-content">
-                    <h4>إحصائيات الشهر الثالث</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth3Less5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth35to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth311to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth316to20">0</p>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <h4>جيد جداً (80% - 89%)</h4>
+                    <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsOverallVeryGood">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>ممتاز (90% - 100%)</h4>
+                    <p style="font-size: 24px; color: #9b59b6; font-weight: bold;" id="statsOverallExcellent">0</p>
                 </div>
             </div>
         </div>
+        
+        <!-- الشهر الأول -->
+        <div id="month1Stats" class="stats-tab-content">
+            <h4>إحصائيات الشهر الأول</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>ضعيف (أقل من 50%)</h4>
+                    <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth1Weak">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>مقبول (50% - 64%)</h4>
+                    <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth1Acceptable">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>جيد (65% - 79%)</h4>
+                    <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth1Good">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>جيد جداً (80% - 89%)</h4>
+                    <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth1VeryGood">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>ممتاز (90% - 100%)</h4>
+                    <p style="font-size: 24px; color: #9b59b6; font-weight: bold;" id="statsMonth1Excellent">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الشهر الثاني -->
+        <div id="month2Stats" class="stats-tab-content">
+            <h4>إحصائيات الشهر الثاني</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>ضعيف (أقل من 50%)</h4>
+                    <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth2Weak">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>مقبول (50% - 64%)</h4>
+                    <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth2Acceptable">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>جيد (65% - 79%)</h4>
+                    <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth2Good">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>جيد جداً (80% - 89%)</h4>
+                    <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth2VeryGood">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>ممتاز (90% - 100%)</h4>
+                    <p style="font-size: 24px; color: #9b59b6; font-weight: bold;" id="statsMonth2Excellent">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الشهر الثالث -->
+        <div id="month3Stats" class="stats-tab-content">
+            <h4>إحصائيات الشهر الثالث</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>ضعيف (أقل من 50%)</h4>
+                    <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth3Weak">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>مقبول (50% - 64%)</h4>
+                    <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth3Acceptable">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>جيد (65% - 79%)</h4>
+                    <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth3Good">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>جيد جداً (80% - 89%)</h4>
+                    <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth3VeryGood">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>ممتاز (90% - 100%)</h4>
+                    <p style="font-size: 24px; color: #9b59b6; font-weight: bold;" id="statsMonth3Excellent">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
         <!-- نافذة التعديل المخصصة للشهر -->
         <div id="editModal" class="modal">
@@ -4488,98 +4504,128 @@
         }
     }
 
-    // ========== دوال الإحصائيات ==========
-    function showStatistics(month) {
-        console.log(`عرض إحصائيات الشهر: ${month}`);
-        
-        const statsTeacherId = document.getElementById('statsTeacherId');
-        if (statsTeacherId) statsTeacherId.textContent = currentTeacherId;
-        
-        calculateAllStatistics();
-        
-        const modal = document.getElementById('statsModal');
-        if (modal) modal.style.display = 'block';
-    }
+   // ========== دوال الإحصائيات المعدلة ==========
+function showStatistics(month) {
+    console.log(`عرض إحصائيات الشهر: ${month}`);
+    
+    const statsTeacherId = document.getElementById('statsTeacherId');
+    if (statsTeacherId) statsTeacherId.textContent = currentTeacherId;
+    
+    calculateAllStatistics();
+    
+    const modal = document.getElementById('statsModal');
+    if (modal) modal.style.display = 'block';
+}
 
-    function calculateAllStatistics() {
-        const searchTerm = document.getElementById(`searchNameInput${currentMonth}`)?.value.trim().toLowerCase() || '';
-        const selectedClass = document.getElementById(`classNameFilter${currentMonth}`)?.value || '';
+function calculateAllStatistics() {
+    const searchTerm = document.getElementById(`searchNameInput${currentMonth}`)?.value.trim().toLowerCase() || '';
+    const selectedClass = document.getElementById(`classNameFilter${currentMonth}`)?.value || '';
 
-        const filteredStudents = allStudents.filter(student => {
-            const studentName = student.studentName ? student.studentName.toLowerCase() : '';
-            const matchesName = searchTerm === '' || studentName.includes(searchTerm);
-            const matchesClass = selectedClass === '' || student.className === selectedClass;
-            return matchesName && matchesClass;
-        });
+    const filteredStudents = allStudents.filter(student => {
+        const studentName = student.studentName ? student.studentName.toLowerCase() : '';
+        const matchesName = searchTerm === '' || studentName.includes(searchTerm);
+        const matchesClass = selectedClass === '' || student.className === selectedClass;
+        return matchesName && matchesClass;
+    });
 
-        const totalStudentsCount = document.getElementById('totalStudentsCount');
-        if (totalStudentsCount) totalStudentsCount.textContent = filteredStudents.length;
-        
-        calculateMonthStatistics(filteredStudents, 1);
-        calculateMonthStatistics(filteredStudents, 2);
-        calculateMonthStatistics(filteredStudents, 3);
-        calculateOverallStatistics(filteredStudents);
-    }
+    const totalStudentsCount = document.getElementById('totalStudentsCount');
+    if (totalStudentsCount) totalStudentsCount.textContent = filteredStudents.length;
+    
+    calculateMonthStatistics(filteredStudents, 1);
+    calculateMonthStatistics(filteredStudents, 2);
+    calculateMonthStatistics(filteredStudents, 3);
+    calculateOverallStatistics(filteredStudents);
+}
 
-    function calculateMonthStatistics(students, month) {
-        const ranges = {
-            less5: 0,
-            from5to10: 0,
-            from11to15: 0,
-            from16to20: 0
-        };
+function calculateMonthStatistics(students, month) {
+    // احسب النسبة المئوية بدلاً من الدرجة الخام
+    const ranges = {
+        weak: 0,        // أقل من 50%
+        acceptable: 0,  // من 50 إلى 64%
+        good: 0,        // من 65 إلى 79%
+        veryGood: 0,    // من 80 إلى 89%
+        excellent: 0    // من 90 إلى 100%
+    };
+    
+    students.forEach(student => {
+        const total = parseFloat(student[`total${month}`]) || 0;
         
-        students.forEach(student => {
-            const total = parseFloat(student[`total${month}`]) || 0;
-            
-            if (total < 5) ranges.less5++;
-            else if (total >= 5 && total <= 10) ranges.from5to10++;
-            else if (total >= 11 && total <= 15) ranges.from11to15++;
-            else if (total >= 16 && total <= 20) ranges.from16to20++;
-        });
+        // تحويل الدرجة من 20 إلى نسبة مئوية
+        const percentage = (total / 20) * 100;
         
-        const less5Element = document.getElementById(`statsMonth${month}Less5`);
-        const from5to10Element = document.getElementById(`statsMonth${month}5to10`);
-        const from11to15Element = document.getElementById(`statsMonth${month}11to15`);
-        const from16to20Element = document.getElementById(`statsMonth${month}16to20`);
-        
-        if (less5Element) less5Element.textContent = ranges.less5;
-        if (from5to10Element) from5to10Element.textContent = ranges.from5to10;
-        if (from11to15Element) from11to15Element.textContent = ranges.from11to15;
-        if (from16to20Element) from16to20Element.textContent = ranges.from16to20;
-    }
+        if (percentage < 50) {
+            ranges.weak++;
+        } else if (percentage >= 50 && percentage <= 64) {
+            ranges.acceptable++;
+        } else if (percentage >= 65 && percentage <= 79) {
+            ranges.good++;
+        } else if (percentage >= 80 && percentage <= 89) {
+            ranges.veryGood++;
+        } else if (percentage >= 90 && percentage <= 100) {
+            ranges.excellent++;
+        }
+    });
+    
+    // تحديث عناصر HTML للشهر المحدد
+    const weakElement = document.getElementById(`statsMonth${month}Weak`);
+    const acceptableElement = document.getElementById(`statsMonth${month}Acceptable`);
+    const goodElement = document.getElementById(`statsMonth${month}Good`);
+    const veryGoodElement = document.getElementById(`statsMonth${month}VeryGood`);
+    const excellentElement = document.getElementById(`statsMonth${month}Excellent`);
+    
+    if (weakElement) weakElement.textContent = ranges.weak;
+    if (acceptableElement) acceptableElement.textContent = ranges.acceptable;
+    if (goodElement) goodElement.textContent = ranges.good;
+    if (veryGoodElement) veryGoodElement.textContent = ranges.veryGood;
+    if (excellentElement) excellentElement.textContent = ranges.excellent;
+}
 
-    function calculateOverallStatistics(students) {
-        const ranges = {
-            less5: 0,
-            from5to10: 0, 
-            from11to15: 0,
-            from16to20: 0
-        };
+function calculateOverallStatistics(students) {
+    const ranges = {
+        weak: 0,        // أقل من 50%
+        acceptable: 0,  // من 50 إلى 64%
+        good: 0,        // من 65 إلى 79%
+        veryGood: 0,    // من 80 إلى 89%
+        excellent: 0    // من 90 إلى 100%
+    };
+    
+    students.forEach(student => {
+        const total1 = parseFloat(student.total1) || 0;
+        const total2 = parseFloat(student.total2) || 0;
+        const total3 = parseFloat(student.total3) || 0;
         
-        students.forEach(student => {
-            const total1 = parseFloat(student.total1) || 0;
-            const total2 = parseFloat(student.total2) || 0;
-            const total3 = parseFloat(student.total3) || 0;
-            
-            const overallAverage = (total1 + total2 + total3) / 3;
-            
-            if (overallAverage < 5) ranges.less5++;
-            else if (overallAverage >= 5 && overallAverage <= 10) ranges.from5to10++;
-            else if (overallAverage >= 11 && overallAverage <= 15) ranges.from11to15++;
-            else if (overallAverage >= 16 && overallAverage <= 20) ranges.from16to20++;
-        });
+        // حساب المعدل العام للثلاث أشهر
+        const overallTotal = (total1 + total2 + total3) / 3;
         
-        const less5Element = document.getElementById('statsOverallLess5');
-        const from5to10Element = document.getElementById('statsOverall5to10');
-        const from11to15Element = document.getElementById('statsOverall11to15');
-        const from16to20Element = document.getElementById('statsOverall16to20');
+        // تحويل المعدل من 20 إلى نسبة مئوية
+        const overallPercentage = (overallTotal / 20) * 100;
         
-        if (less5Element) less5Element.textContent = ranges.less5;
-        if (from5to10Element) from5to10Element.textContent = ranges.from5to10;
-        if (from11to15Element) from11to15Element.textContent = ranges.from11to15;
-        if (from16to20Element) from16to20Element.textContent = ranges.from16to20;
-    }
+        if (overallPercentage < 50) {
+            ranges.weak++;
+        } else if (overallPercentage >= 50 && overallPercentage <= 64) {
+            ranges.acceptable++;
+        } else if (overallPercentage >= 65 && overallPercentage <= 79) {
+            ranges.good++;
+        } else if (overallPercentage >= 80 && overallPercentage <= 89) {
+            ranges.veryGood++;
+        } else if (overallPercentage >= 90 && overallPercentage <= 100) {
+            ranges.excellent++;
+        }
+    });
+    
+    // تحديث عناصر HTML
+    const weakElement = document.getElementById('statsOverallWeak');
+    const acceptableElement = document.getElementById('statsOverallAcceptable');
+    const goodElement = document.getElementById('statsOverallGood');
+    const veryGoodElement = document.getElementById('statsOverallVeryGood');
+    const excellentElement = document.getElementById('statsOverallExcellent');
+    
+    if (weakElement) weakElement.textContent = ranges.weak;
+    if (acceptableElement) acceptableElement.textContent = ranges.acceptable;
+    if (goodElement) goodElement.textContent = ranges.good;
+    if (veryGoodElement) veryGoodElement.textContent = ranges.veryGood;
+    if (excellentElement) excellentElement.textContent = ranges.excellent;
+}
 
     function openStatsTab(tabName) {
         document.querySelectorAll('.stats-tab-content').forEach(content => {
