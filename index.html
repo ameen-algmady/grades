@@ -1613,6 +1613,37 @@
     </style>
 </head>
 <body>
+<!-- نافذة النسخ الاحتياطي -->
+<div id="backupModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('backupModal')">&times;</span>
+        <h3>💾 إدارة النسخ الاحتياطية</h3>
+        
+        <div id="backupStatus" style="margin: 15px 0; padding: 10px; border-radius: 8px;"></div>
+        
+        <button class="btn btn-success" onclick="createManualBackup()" style="width: 100%; margin-bottom: 15px;">
+            📥 إنشاء نسخة احتياطية جديدة
+        </button>
+        
+        <div class="backup-list" id="backupList">
+            <p style="text-align: center; color: #666;">جاري تحميل النسخ الاحتياطية...</p>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn btn-warning" onclick="restoreLatestBackup()" style="flex: 1;">
+                ↩️ استعادة آخر نسخة
+            </button>
+            <button class="btn" onclick="showBackupInfo()" style="flex: 1; background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                ℹ️ معلومات النسخ
+            </button>
+        </div>
+        
+        <div id="backupInfo" style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; display: none;">
+            <h4>📊 معلومات النسخ الاحتياطية:</h4>
+            <div id="backupStats"></div>
+        </div>
+    </div>
+</div>
     <div class="container">
         <div class="header">
             <button class="install-btn" id="installBtn">📲 تثبيت التطبيق</button>
@@ -3590,59 +3621,67 @@ function completeLogin() {
             }
         });
     }
+// ========== دوال المساعدة ==========
 
-    // ========== دوال المساعدة ==========
-    function startSyncMonitoring() {
-        setInterval(() => {
-            if (navigator.onLine && pendingUpdates.length > 0 && !isSyncing) {
-                attemptAutoSync();
-            }
-        }, 30000);
-    }
-
-    function attemptAutoSync() {
+// بدء مراقبة المزامنة كل 30 ثانية
+function startSyncMonitoring() {
+    setInterval(() => {
         if (navigator.onLine && pendingUpdates.length > 0 && !isSyncing) {
-            console.log('المزامنة التلقائية: محاولة مزامنة التعديلات...');
-            syncPendingUpdates(true);
+            attemptAutoSync();
         }
+        updateAutoSyncStatus();
+    }, 30000);
+}
+
+// محاولة المزامنة التلقائية
+async function attemptAutoSync() {
+    if (!navigator.onLine || pendingUpdates.length === 0 || isSyncing) return;
+
+    console.log(`🔄 المزامنة التلقائية: محاولة مزامنة ${pendingUpdates.length} تعديل...`);
+    await syncPendingUpdates(true);
+    updateAutoSyncStatus();
+}
+
+// إعادة محاولة مزامنة تعديل فشل سابقًا
+async function retryFailedUpdate(index) {
+    const update = failedUpdates[index];
+    if (!update) return;
+
+    // إزالة من قائمة الفشل
+    failedUpdates.splice(index, 1);
+    saveFailedUpdates();
+
+    // إرجاعه إلى قائمة المعلّقات
+    pendingUpdates.push(update);
+    savePendingUpdates();
+
+    // محاولة مزامنة مباشرة
+    await syncPendingUpdates(true);
+    updateSyncManagementUI();
+    updateAutoSyncStatus();
+}
+
+// تحديث حالة المزامنة التلقائية في الواجهة
+function updateAutoSyncStatus() {
+    const hasPending = pendingUpdates.length > 0;
+    const isOnline = navigator.onLine;
+
+    let statusText = 'المزامنة التلقائية: متوقفة';
+    let statusColor = '#666';
+
+    if (hasPending && isOnline) {
+        statusText = `المزامنة التلقائية: قيد التشغيل (تعديلات: ${pendingUpdates.length})`;
+        statusColor = '#27ae60';
+    } else if (hasPending && !isOnline) {
+        statusText = 'المزامنة التلقائية: متوقفة (لا يوجد إنترنت)';
+        statusColor = '#f39c12';
     }
 
-    async function retryFailedUpdate(index) {
-        const update = failedUpdates[index];
-        if (!update) return;
-        
-        failedUpdates.splice(index, 1);
-        saveFailedUpdates();
-        
-        pendingUpdates.push(update);
-        savePendingUpdates();
-        
-        await syncPendingUpdates(true);
-        updateSyncManagementUI();
-    }
-
-    function updateAutoSyncStatus() {
-        const hasPending = pendingUpdates.length > 0;
-        const isOnline = navigator.onLine;
-
-        let statusText = 'المزامنة التلقائية: متوقفة';
-        let statusColor = '#666';
-
-        if (hasPending && isOnline) {
-            statusText = `المزامنة التلقائية: قيد التشغيل (تعديلات: ${pendingUpdates.length})`;
-            statusColor = '#27ae60';
-        } else if (hasPending && !isOnline) {
-            statusText = `المزامنة التلقائية: متوقفة (لا يوجد إنترنت)`;
-            statusColor = '#f39c12';
-        }
-
-        document.querySelectorAll('[id^="syncStatus"]').forEach(status => {
-            if (status) {
-                status.textContent = statusText;
-                status.style.color = statusColor;
-            }
-        });
-    }
+    document.querySelectorAll('[id^="syncStatus"]').forEach(status => {
+        status.textContent = statusText;
+        status.style.color = statusColor;
+    });
+}
 
     // ========== تهيئة التطبيق الرئيسية ==========
     document.addEventListener('DOMContentLoaded', () => {
@@ -4768,98 +4807,246 @@ function alertWithHTML(title, htmlContent) {
     document.body.appendChild(modal);
 }
 
+// ========== دالة تسجيل الخروج المحدثة ==========
 function handleLogout() {
+    console.log('🚪 بدء تسجيل الخروج...');
+    
+    // حفظ البيانات إذا كانت هناك تعديلات معلقة
     if (pendingUpdates.length > 0) {
+        console.log(`💾 حفظ ${pendingUpdates.length} تعديل معلق قبل تسجيل الخروج...`);
         savePendingUpdates();
         saveDataToLocalStorage();
+        
+        // محاولة مزامنة نهائية قبل الخروج
+        if (navigator.onLine && !isSyncing) {
+            console.log('🔄 محاولة مزامنة نهائية قبل الخروج...');
+            syncPendingUpdates(false).then(success => {
+                if (!success) {
+                    alert('⚠️ لم يتم مزامنة بعض التعديلات. سيتم حفظها محلياً.');
+                }
+                completeLogout();
+            }).catch(error => {
+                console.error('❌ خطأ في المزامنة النهائية:', error);
+                completeLogout();
+            });
+        } else {
+            completeLogout();
+        }
+    } else {
+        completeLogout();
     }
+}
+
+// ========== دالة إكمال تسجيل الخروج ==========
+function completeLogout() {
+    console.log('✅ إكمال عملية تسجيل الخروج...');
     
-    clearTeacherSession();
+    // حفظ جلسة الخروج
+    saveLogoutSession();
     
-    if (loginSection) loginSection.classList.remove('hidden');
-    if (monthSelectionSection) monthSelectionSection.classList.add('hidden');
-    
-    document.querySelectorAll('.month-workspace').forEach(workspace => {
-        workspace.classList.remove('active');
-    });
-    
+    // تنظيف المتغيرات
     allStudents = [];
-    
-    if (teacherIdInput) teacherIdInput.value = '';
+    pendingUpdates = [];
+    currentTeacherId = '';
     
     // إخفاء زر النسخ الاحتياطي
     const backupBtn = document.getElementById('manualBackupBtn');
     if (backupBtn) backupBtn.style.display = 'none';
     
-    showSuccess('تم تسجيل الخروج بنجاح.');
-}
-
-// ========== دوال إضافية للمزامنة ==========
-function addToSyncHistory(type, status, count, details = '') {
-    const record = {
-        timestamp: new Date().toISOString(),
-        type,
-        status,
-        count,
-        details,
-        teacherId: currentTeacherId
-    };
+    // إخفاء جميع أقسام الشهور
+    document.querySelectorAll('.month-workspace').forEach(workspace => {
+        workspace.classList.remove('active');
+    });
     
-    syncHistory.unshift(record);
+    // إخفاء قسم اختيار الشهر
+    const monthSelectionSection = document.getElementById('monthSelectionSection');
+    if (monthSelectionSection) monthSelectionSection.classList.add('hidden');
     
-    if (syncHistory.length > 100) {
-        syncHistory = syncHistory.slice(0, 100);
-    }
-    
-    saveSyncHistory();
-}
-
-function showSyncHistory() {
-    updateSyncHistoryUI();
-    const modal = document.getElementById('syncHistoryModal');
-    if (modal) modal.style.display = 'block';
-}
-
-function updateSyncHistoryUI() {
-    const tbody = document.getElementById('syncHistoryBody');
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
-    
-    if (syncHistory.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" style="text-align: center; color: #666; padding: 20px;">
-                    لا توجد سجلات مزامنة
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    syncHistory.slice(0, 50).forEach(record => {
-        const row = document.createElement('tr');
+    // إظهار قسم تسجيل الدخول
+    const loginSection = document.getElementById('loginSection');
+    if (loginSection) {
+        loginSection.classList.remove('hidden');
         
-        let statusBadge = '';
-        if (record.status === 'success') {
-            statusBadge = '<span class="badge badge-success">✅ ناجح</span>';
-        } else if (record.status === 'partial') {
-            statusBadge = '<span class="badge badge-warning">⚠️ جزئي</span>';
-        } else {
-            statusBadge = '<span class="badge badge-danger">❌ فشل</span>';
+        // تفريغ حقل معرف المعلم
+        const teacherIdInput = document.getElementById('teacherId');
+        if (teacherIdInput) teacherIdInput.value = '';
+        
+        // إعادة تعيين حالة الاتصال
+        const connectionStatus = document.getElementById('connectionStatus');
+        if (connectionStatus) {
+            connectionStatus.innerHTML = '⏳ جاري الاتصال بـ Google Sheets...';
+            connectionStatus.style.background = '#fff3cd';
+            connectionStatus.style.border = '1px solid #ffeaa7';
         }
         
-        row.innerHTML = `
-            <td>${new Date(record.timestamp).toLocaleString('ar-SA')}</td>
-            <td>${record.type || 'مزامنة'}</td>
-            <td>${record.count || 0}</td>
-            <td>${statusBadge}</td>
-            <td>${record.details || ''}</td>
-        `;
-        tbody.appendChild(row);
+        // إعادة تعيين زر الدخول
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) loginBtn.disabled = true;
+    }
+    
+    // إغلاق أي نوافذ مفتوحة
+    const modals = ['qrModal', 'statsModal', 'editModal', 'syncManagementModal', 
+                   'syncHistoryModal', 'excelExportModal', 'excelImportModal', 'backupModal'];
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.style.display = 'none';
     });
+    
+    // إيقاف أي ماسح QR
+    stopQRScanner();
+    
+    // إعادة تعيين إحصائيات العداد
+    document.querySelectorAll('#studentsCount1, #studentsCount2, #studentsCount3, #studentsCountAll').forEach(span => {
+        if (span) span.textContent = '0';
+    });
+    
+    // إعادة تعيين اسم المعلم
+    document.querySelectorAll('#currentTeacher1, #currentTeacher2, #currentTeacher3, #currentTeacherAll, #welcomeTeacherName').forEach(span => {
+        if (span) span.textContent = '';
+    });
+    
+    // إعادة تعيين الفلاتر
+    for (let i = 1; i <= 3; i++) {
+        const filter = document.getElementById(`classNameFilter${i}`);
+        if (filter) filter.innerHTML = '<option value="">جميع الشعب</option>';
+        
+        const searchInput = document.getElementById(`searchNameInput${i}`);
+        if (searchInput) searchInput.value = '';
+    }
+    
+    const allFilter = document.getElementById('classNameFilterAll');
+    if (allFilter) allFilter.innerHTML = '<option value="">جميع الشعب</option>';
+    
+    const allSearchInput = document.getElementById('searchNameInputAll');
+    if (allSearchInput) allSearchInput.value = '';
+    
+    // إفراغ الجداول
+    document.querySelectorAll('#month1TableBody, #month2TableBody, #month3TableBody, #studentsTableBody').forEach(tbody => {
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
+                        ⏳ جاري تحميل البيانات...
+                    </td>
+                </tr>
+            `;
+        }
+    });
+    
+    // تحديث العداد المعلق
+    updatePendingCount();
+    
+    // عرض رسالة النجاح
+    showSuccess('✅ تم تسجيل الخروج بنجاح.');
+    
+    console.log('✅ تم تسجيل الخروج بنجاح.');
 }
 
+// ========== دالة حفظ جلسة الخروج ==========
+function saveLogoutSession() {
+    try {
+        localStorage.removeItem(TEACHER_SESSION_KEY);
+        console.log('🗑️ تم مسح جلسة المعلم من التخزين المحلي');
+        
+        // حفظ سجل تسجيل الخروج
+        const logoutHistory = JSON.parse(localStorage.getItem('logout_history') || '[]');
+        logoutHistory.unshift({
+            timestamp: new Date().toISOString(),
+            teacherId: currentTeacherId,
+            studentCount: allStudents.length,
+            pendingUpdates: pendingUpdates.length
+        });
+        
+        if (logoutHistory.length > 10) {
+            logoutHistory.pop();
+        }
+        
+        localStorage.setItem('logout_history', JSON.stringify(logoutHistory));
+        
+    } catch (error) {
+        console.error('❌ خطأ في حفظ جلسة الخروج:', error);
+    }
+}
+
+// ========== ربط أحداث أزرار تسجيل الخروج بشكل صحيح ==========
+function setupLogoutButtons() {
+    console.log('🔗 ربط أحداث أزرار تسجيل الخروج...');
+    
+    // ربط أزرار تسجيل الخروج لكل شهر
+    for (let i = 1; i <= 3; i++) {
+        const logoutBtn = document.getElementById(`logoutBtn${i}`);
+        if (logoutBtn) {
+            logoutBtn.removeEventListener('click', handleLogout); // إزالة أي أحداث سابقة
+            logoutBtn.addEventListener('click', handleLogout);
+            console.log(`✅ تم ربط زر تسجيل الخروج ${i}`);
+        }
+    }
+    
+    // ربط زر تسجيل الخروج لجميع الشهور
+    const logoutBtnAll = document.getElementById('logoutBtnAll');
+    if (logoutBtnAll) {
+        logoutBtnAll.removeEventListener('click', handleLogout); // إزالة أي أحداث سابقة
+        logoutBtnAll.addEventListener('click', handleLogout);
+        console.log('✅ تم ربط زر تسجيل الخروج لجميع الشهور');
+    }
+}
+
+// ========== تحديث دالة تهيئة التطبيق ==========
+// أضف استدعاء setupLogoutButtons في دالة initializeApp أو في مكان مناسب
+
+// في دالة initializeApp() أضف:
+function initializeApp() {
+    console.log('🚀 بدء تشغيل التطبيق...');
+    
+    // إنشاء زر النسخ الاحتياطي أولاً
+    createBackupButton();
+    
+    // تهيئة أنظمة الأساسية
+    try {
+        localStorage.setItem('storage_test', 'test');
+        localStorage.removeItem('storage_test');
+        console.log('✅ التخزين المحلي يعمل بشكل صحيح');
+    } catch (e) {
+        console.error('❌ مشكلة في التخزين المحلي:', e);
+        showError('⚠️ التخزين المحلي غير متوفر. قد لا يتم حفظ البيانات.');
+    }
+    
+    // محاولة استعادة الجلسة والبيانات
+    const sessionRestored = initializeSession();
+    
+    // تهيئة PWA
+    initializePWA();
+    
+    // تهيئة نظام النسخ الاحتياطي
+    initializeBackupSystem();
+    
+    // ربط أزرار تسجيل الخروج
+    setupLogoutButtons(); // <-- أضف هذا السطر
+    
+    // تهيئة باقي الأنظمة
+    initializeMonthSystem();
+    initializeQRScanner();
+    initializeStatistics();
+    initializeSyncManagement();
+    
+    // ربط الأحداث العامة
+    setupGlobalEvents();
+    
+    // تحميل البيانات الأولية
+    loadInitialData();
+    
+    // إعداد النسخ الاحتياطي التلقائي
+    setupAutoBackup();
+    
+    console.log('✅ تم تهيئة التطبيق بنجاح');
+    updateDebugInfo('✅ التطبيق جاهز للاستخدام');
+    
+    // تحديث حالة زر النسخ الاحتياطي بعد 3 ثوانٍ
+    setTimeout(() => {
+        updateBackupButtonState();
+        updateBackupList();
+    }, 3000);
+}
 function clearSyncHistory() {
     if (confirm('هل تريد مسح سجل المزامنات بالكامل؟')) {
         syncHistory = [];
@@ -6651,36 +6838,6 @@ function bindExcelEvents() {
     });
 }
     </script>
-    <!-- نافذة النسخ الاحتياطي -->
-<div id="backupModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('backupModal')">&times;</span>
-        <h3>💾 إدارة النسخ الاحتياطية</h3>
-        
-        <div id="backupStatus" style="margin: 15px 0; padding: 10px; border-radius: 8px;"></div>
-        
-        <button class="btn btn-success" onclick="createManualBackup()" style="width: 100%; margin-bottom: 15px;">
-            📥 إنشاء نسخة احتياطية جديدة
-        </button>
-        
-        <div class="backup-list" id="backupList">
-            <p style="text-align: center; color: #666;">جاري تحميل النسخ الاحتياطية...</p>
-        </div>
-        
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button class="btn btn-warning" onclick="restoreLatestBackup()" style="flex: 1;">
-                ↩️ استعادة آخر نسخة
-            </button>
-            <button class="btn" onclick="showBackupInfo()" style="flex: 1; background: linear-gradient(135deg, #9b59b6, #8e44ad);">
-                ℹ️ معلومات النسخ
-            </button>
-        </div>
-        
-        <div id="backupInfo" style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; display: none;">
-            <h4>📊 معلومات النسخ الاحتياطية:</h4>
-            <div id="backupStats"></div>
-        </div>
-    </div>
-</div>
+    
 </body>
 </html>
