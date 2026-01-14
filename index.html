@@ -2540,7 +2540,7 @@
     const SYNC_HISTORY_KEY = 'syncHistory';
     const FAILED_UPDATES_KEY = 'failedUpdates';
     const SYNC_VERIFICATION_KEY = 'syncVerification';
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwcaLokiABRJmf9LzZOAskFoKhdLvOeoFHXt9-a5zAb5eTSMwqyNCzgB_HDOsWF9-hO/exec'; 
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzztkm8mjfg2EmVn32PlYGpdgzgHelJTPVTrBfsrYdyPhU7XuFDEQZtKMlGAxU27Q7o/exec'; 
     
     const STUDENT_PROPERTIES = {
         'ID': 'id',
@@ -2755,6 +2755,7 @@ function initializeSession() {
         if (tryRestoreLocalData()) {
             // ✅ الدخول مباشرة حتى بدون إنترنت
             completeLogin();
+            startSyncMonitoring(); // ← أضف هذا
             return true;
         }
 
@@ -2767,9 +2768,33 @@ function initializeSession() {
                 // حتى لو فشل السيرفر، لا نمنع الدخول
                 completeLogin();
             }
+            startSyncMonitoring(); // ← وأضف هذا هنا أيضاً
         }, 1000);
     }
     return false;
+}
+
+// دالة منفصلة لمراقبة المزامنة
+function startSyncMonitoring() {
+    // تنظيف أي interval قديم أولاً
+    if (window.syncInterval) {
+        clearInterval(window.syncInterval);
+    }
+    
+    // إنشاء interval جديد
+    window.syncInterval = setInterval(() => {
+        if (currentTeacherId) {
+            updateAutoSyncStatus();
+            
+            // المزامنة التلقائية إذا كان هناك إنترنت وتعديلات معلقة
+            if (navigator.onLine && pendingUpdates.length > 0 && !isSyncing) {
+                console.log('المزامنة التلقائية: محاولة مزامنة التعديلات...');
+                syncPendingUpdates(true);
+            }
+        }
+    }, 5000); // كل 5 ثوانٍ
+    
+    console.log('✅ تم بدء مراقبة المزامنة التلقائية');
 }
 
 function tryRestoreLocalData() {
@@ -3263,141 +3288,119 @@ function completeLogin() {
         });
     }
 
-    async function syncPendingUpdates(isAuto = false) {
-        if (pendingUpdates.length === 0 || isSyncing) {
-            if (!isAuto && pendingUpdates.length === 0) {
-                showSuccess('لا توجد تعديلات معلقة للمزامنة.');
-            }
-            return false;
+  async function syncPendingUpdates(isAuto = false) {
+    if (pendingUpdates.length === 0 || isSyncing) {
+        if (!isAuto && pendingUpdates.length === 0) {
+            showSuccess('لا توجد تعديلات معلقة للمزامنة.');
         }
+        return false;
+    }
 
-        isSyncing = true;
-        const updatesToSync = [...pendingUpdates];
-        const totalCount = updatesToSync.length;
+    isSyncing = true;
+    const updatesToSync = [...pendingUpdates];
+    const totalCount = updatesToSync.length;
 
-        showLoading(true, `☁️ جاري مزامنة ${totalCount} تعديل مع Google Sheets...`);
-        
-        // تحديث حالة المزامنة
-        document.querySelectorAll('[id^="syncStatus"]').forEach(status => {
-            if (status) status.textContent = `المزامنة التلقائية: جاري المزامنة (${totalCount})...`;
+    showLoading(true, `☁️ جاري مزامنة ${totalCount} تعديل مع Google Sheets...`);
+    
+    // تحديث حالة المزامنة
+    document.querySelectorAll('[id^="syncStatus"]').forEach(status => {
+        if (status) status.textContent = `المزامنة: جاري المزامنة (${totalCount})...`;
+    });
+    
+    // تعطيل أزرار المزامنة
+    document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
+        if (btn) btn.disabled = true;
+    });
+
+    try {
+        // إرسال البيانات كما كان في السابق (text/plain)
+        const response = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8', // ← مهم: إرجاع إلى text/plain
+            },
+            body: JSON.stringify({ 
+                updates: updatesToSync,
+                teacherId: currentTeacherId,
+                timestamp: new Date().toISOString()
+            })
         });
         
-        // تعطيل أزرار المزامنة
+        const data = await response.json();
+        
+        showLoading(false);
+        
+        // تمكين أزرار المزامنة
         document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
-            if (btn) btn.disabled = true;
+            if (btn) btn.disabled = false;
         });
-
-        try {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'cors',
-                headers: {
-                    'Content-Type': 'text/plain;charset=utf-8',
-                },
-                body: JSON.stringify({ 
-                    updates: updatesToSync,
-                    teacherId: currentTeacherId,
-                    timestamp: new Date().toISOString()
-                })
-            });
+        
+        if (data.status === 'success') {
+            const successCount = data.updatedCount || totalCount;
             
-            const data = await response.json();
+            // حذف التعديلات التي تمت مزامنتها
+            pendingUpdates = pendingUpdates.filter(update => 
+                !updatesToSync.some(synced => 
+                    synced.id === update.id
+                )
+            );
             
-            showLoading(false);
+            savePendingUpdates();
             
-            // تمكين أزرار المزامنة
-            document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
-                if (btn) btn.disabled = false;
-            });
+            // إضافة للسجل
+            addToSyncHistory(
+                isAuto ? 'مزامنة تلقائية' : 'مزامنة يدوية',
+                'success',
+                successCount,
+                `تمت مزامنة ${successCount} تعديل`
+            );
             
-            if (data.status === 'success') {
-                const successCount = data.updatedCount || totalCount;
-                
-                // إزالت التعديلات التي تمت مزامنتها
-                pendingUpdates = pendingUpdates.filter(update => 
-                    !updatesToSync.some(synced => synced.id === update.id)
-                );
-                
-                savePendingUpdates();
-                
-                // إضافة للسجل
-                addToSyncHistory(
-                    isAuto ? 'مزامنة تلقائية' : 'مزامنة يدوية',
-                    'success',
-                    successCount,
-                    `تمت مزامنة ${successCount} من ${totalCount} تعديل`
-                );
-                
-                showSuccess(`✅ تم مزامنة ${successCount} خلية بنجاح!`);
-                
-                // التحقق من المزامنة إذا كان الخيار مفعلاً
-                const verifyAfterSync = document.getElementById('verifyAfterSync');
-                if (verifyAfterSync && verifyAfterSync.checked) {
-                    setTimeout(() => {
-                        verifySyncStatus();
-                    }, 2000);
-                } else {
-                    // تحديث البيانات من السيرفر
-                    await fetchDataFromSheet(currentTeacherId, false);
-                }
-                
-                return true;
-                
-            } else {
-                // نقل التعديلات الفاشلة
-                updatesToSync.forEach(update => {
-                    update.error = data.error || 'خطأ غير معروف';
-                    update.retryCount = (update.retryCount || 0) + 1;
-                    failedUpdates.push(update);
-                });
-                
-                saveFailedUpdates();
-                
-                // إضافة للسجل
-                addToSyncHistory(
-                    isAuto ? 'مزامنة تلقائية' : 'مزامنة يدوية',
-                    'failed',
-                    0,
-                    data.error || 'فشل المزامنة'
-                );
-                
-                showError(`❌ فشلت المزامنة: ${data.error || 'خطأ غير معروف.'}`);
-                return false;
-            }
+            showSuccess(`✅ تم مزامنة ${successCount} خلية بنجاح!`);
             
-        } catch (error) {
-            showLoading(false);
+            // تحديث عرض البيانات
+            updateDisplayedStudents();
             
-            document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
-                if (btn) btn.disabled = false;
-            });
+            return true;
             
-            // نقل التعديلات الفاشلة
-            updatesToSync.forEach(update => {
-                update.error = error.message;
-                update.retryCount = (update.retryCount || 0) + 1;
-                failedUpdates.push(update);
-            });
-            
-            saveFailedUpdates();
-            
+        } else {
             // إضافة للسجل
             addToSyncHistory(
                 isAuto ? 'مزامنة تلقائية' : 'مزامنة يدوية',
                 'failed',
                 0,
-                error.message
+                data.error || 'فشل المزامنة'
             );
             
-            showError('❌ خطأ في الاتصال أثناء المزامنة: ' + error.message);
+            showError(`❌ فشلت المزامنة: ${data.error || 'خطأ غير معروف.'}`);
             return false;
-            
-        } finally {
-            isSyncing = false;
-            updateAutoSyncStatus();
-            updateSyncManagementUI();
         }
+        
+    } catch (error) {
+        showLoading(false);
+        
+        document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
+            if (btn) btn.disabled = false;
+        });
+        
+        // إضافة للسجل
+        addToSyncHistory(
+            isAuto ? 'مزامنة تلقائية' : 'مزامنة يدوية',
+            'failed',
+            0,
+            error.message
+        );
+        
+        showError('❌ خطأ في الاتصال أثناء المزامنة: ' + error.message);
+        return false;
+        
+    } finally {
+        isSyncing = false;
+        updatePendingCount();
+        updateAutoSyncStatus();
+        updateSyncManagementUI();
     }
+}
 
     // ========== دوال إدارة المزامنة ==========
     async function forceReSync() {
@@ -3773,7 +3776,99 @@ function completeLogin() {
             }
         });
     }
+// ========== دوال التحقق والمزامنة المتقدمة ==========
 
+async function verifySyncWithServer() {
+    try {
+        const response = await fetch(WEB_APP_URL + '?action=verify&teacherId=' + currentTeacherId);
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.data) {
+            const serverData = mapData(data.data);
+            const serverStudents = serverData.filter(s => s.teacherId === currentTeacherId);
+            
+            let mismatches = 0;
+            
+            serverStudents.forEach(serverStudent => {
+                const localStudent = allStudents.find(s => s.id === serverStudent.id);
+                if (localStudent) {
+                    // التحقق من درجات الشهر الأول
+                    if (serverStudent.attendance1 !== localStudent.attendance1 ||
+                        serverStudent.oral1 !== localStudent.oral1 ||
+                        serverStudent.homework1 !== localStudent.homework1 ||
+                        serverStudent.written1 !== localStudent.written1 ||
+                        serverStudent.attendance2 !== localStudent.attendance2 ||
+                        serverStudent.oral2 !== localStudent.oral2 ||
+                        serverStudent.homework2 !== localStudent.homework2 ||
+                        serverStudent.written2 !== localStudent.written2 ||
+                        serverStudent.attendance3 !== localStudent.attendance3 ||
+                        serverStudent.homework3 !== localStudent.homework3 ||
+                        serverStudent.oral3 !== localStudent.oral3 ||
+                        serverStudent.written3 !== localStudent.written3) {
+                        mismatches++;
+                    }
+                }
+            });
+            
+            if (mismatches > 0) {
+                console.warn(`⚠️ يوجد ${mismatches} عدم تطابق بين البيانات المحلية والسيرفر`);
+                return false;
+            } else {
+                console.log('✅ جميع البيانات متطابقة مع السيرفر');
+                return true;
+            }
+        }
+        return false;
+    } catch (error) {
+        console.error('❌ فشل في التحقق من المزامنة:', error);
+        return false;
+    }
+}
+
+async function autoLogin() {
+    try {
+        const teacherId = teacherIdInput.value.trim();
+        if (!teacherId) return false;
+        
+        const success = await fetchDataFromSheet(teacherId, true);
+        if (success) {
+            saveTeacherSession(teacherId);
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('❌ فشل في التسجيل التلقائي:', error);
+        return false;
+    }
+}
+
+// ========== دالة إعادة محاولة المزامنات الفاشلة ==========
+
+async function retryAllFailedUpdates() {
+    if (failedUpdates.length === 0) {
+        showSuccess('لا توجد مزامنات فاشلة');
+        return;
+    }
+    
+    if (!confirm(`هل تريد إعادة محاولة ${failedUpdates.length} مزامنة فاشلة؟`)) {
+        return;
+    }
+    
+    // نقل الفاشلة إلى المعلقة
+    pendingUpdates = [...pendingUpdates, ...failedUpdates];
+    failedUpdates = [];
+    
+    savePendingUpdates();
+    saveFailedUpdates();
+    
+    updatePendingCount();
+    updateSyncManagementUI();
+    
+    showSuccess(`تم نقل ${pendingUpdates.length} مزامنة للمحاولة مرة أخرى`);
+    
+    // بدء المزامنة
+    await syncPendingUpdates(false);
+}
     // ========== تهيئة التطبيق الرئيسية ==========
     document.addEventListener('DOMContentLoaded', () => {
         console.log('🚀 بدء تشغيل التطبيق على GitHub Pages...');
@@ -4899,31 +4994,50 @@ function alertWithHTML(title, htmlContent) {
 }
 
 function handleLogout() {
-    if (pendingUpdates.length > 0) {
-        savePendingUpdates();
-        saveDataToLocalStorage();
+    // عرض تنبيه تأكيد
+    if (!confirm('هل تريد حقاً تسجيل الخروج؟')) {
+        return;
     }
     
-    clearTeacherSession();
+    // محاولة مزامنة التعديلات المتبقية قبل الخروج
+    if (pendingUpdates.length > 0 && navigator.onLine) {
+        if (confirm('يوجد تعديلات غير مزامنة. هل تريد محاولة المزامنة قبل الخروج؟')) {
+            syncPendingUpdates(false).then(() => {
+                completeLogout();
+            }).catch(() => {
+                completeLogout();
+            });
+            return;
+        }
+    }
     
-    if (loginSection) loginSection.classList.remove('hidden');
-    if (monthSelectionSection) monthSelectionSection.classList.add('hidden');
-    
+    completeLogout();
+}
+// ========== دوال تسجيل الخروج ==========
+function completeLogout() {
+    // إخفاء جميع أقسام الشهور
     document.querySelectorAll('.month-workspace').forEach(workspace => {
         workspace.classList.remove('active');
     });
     
-    allStudents = [];
+    // إخفاء قسم اختيار الشهر
+    if (monthSelectionSection) monthSelectionSection.classList.add('hidden');
     
+    // إظهار قسم تسجيل الدخول
+    if (loginSection) loginSection.classList.remove('hidden');
+    
+    // إعادة تعيين حقل معرف المعلم
     if (teacherIdInput) teacherIdInput.value = '';
     
     // إخفاء زر النسخ الاحتياطي
     const backupBtn = document.getElementById('manualBackupBtn');
     if (backupBtn) backupBtn.style.display = 'none';
     
+    // إعادة تعيين المتغيرات (وليس حذف البيانات المحلية)
+    currentTeacherId = '';
+    
     showSuccess('تم تسجيل الخروج بنجاح.');
 }
-
 // ========== دوال إضافية للمزامنة ==========
 function addToSyncHistory(type, status, count, details = '') {
     const record = {
