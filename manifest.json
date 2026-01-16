@@ -8,6 +8,7 @@
   "background_color": "#667eea",
   "theme_color": "#667eea",
   "orientation": "portrait",
+  "id": "/grades/",
   "icons": [
     {
       "src": "icon-192x192.png",

@@ -3187,7 +3187,9 @@ function completeLogin() {
         }
     }
 
-  // ========== نظام المزامنة المتقدم (مُصلح) ==========
+// ========== نظام المزامنة المتقدم (مُصلح) ==========
+
+// تهيئة نظام إدارة المزامنة
 function initializeSyncManagement() {
     console.log('تهيئة نظام إدارة المزامنة...');
 
@@ -3234,32 +3236,26 @@ function initializeSyncManagement() {
     startSyncMonitoring();
 }
 
+// عرض واجهة إدارة المزامنة
 function showSyncManagement() {
     updateSyncManagementUI();
     const modal = document.getElementById('syncManagementModal');
     if (modal) {
         modal.style.display = 'block';
 
-        // تأكد من تحميل الخيارات
         const autoRetryCheckbox = document.getElementById('autoRetryFailed');
-        if (autoRetryCheckbox) {
-            autoRetryCheckbox.checked = true;
-        }
+        if (autoRetryCheckbox) autoRetryCheckbox.checked = true;
 
         const verifyAfterSync = document.getElementById('verifyAfterSync');
-        if (verifyAfterSync) {
-            verifyAfterSync.checked = true;
-        }
+        if (verifyAfterSync) verifyAfterSync.checked = true;
 
         const retryIntervalSelect = document.getElementById('retryInterval');
-        if (retryIntervalSelect) {
-            retryIntervalSelect.value = '10';
-        }
+        if (retryIntervalSelect) retryIntervalSelect.value = '10';
     }
 }
 
+// تحديث واجهة إدارة المزامنة
 function updateSyncManagementUI() {
-    // تحديث الإحصائيات
     const syncPendingCount = document.getElementById('syncPendingCount');
     const syncFailedCount = document.getElementById('syncFailedCount');
     const syncCompletedCount = document.getElementById('syncCompletedCount');
@@ -3268,24 +3264,22 @@ function updateSyncManagementUI() {
     if (syncPendingCount) syncPendingCount.textContent = pendingUpdates.length;
     if (syncFailedCount) syncFailedCount.textContent = failedUpdates.length;
 
-    // حساب التعديلات المكتملة
-    const completedCount = syncHistory.filter(h => h.status === 'success').reduce((sum, h) => sum + (h.count || 0), 0);
+    const completedCount = syncHistory.filter(h => h.status === 'success')
+        .reduce((sum, h) => sum + (h.count || 0), 0);
     if (syncCompletedCount) syncCompletedCount.textContent = completedCount;
 
-    // تحديث وقت آخر مزامنة
-    const lastSuccess = syncHistory.filter(h => h.status === 'success').sort((a, b) =>
-        new Date(b.timestamp) - new Date(a.timestamp)
-    )[0];
+    const lastSuccess = syncHistory.filter(h => h.status === 'success')
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
 
     if (lastSyncTime) {
         lastSyncTime.textContent = lastSuccess ?
             new Date(lastSuccess.timestamp).toLocaleString('ar-SA') : 'لم تتم';
     }
 
-    // تحديث تفاصيل التعديلات المعلقة
     updateSyncDetailsList();
 }
 
+// تفاصيل التعديلات المعلقة والفاشلة
 function updateSyncDetailsList() {
     const container = document.getElementById('syncDetailsList');
     if (!container) return;
@@ -3297,7 +3291,7 @@ function updateSyncDetailsList() {
         return;
     }
 
-    // عرض التعديلات المعلقة
+    // التعديلات المعلقة
     pendingUpdates.forEach((update, index) => {
         const student = allStudents.find(s => s.id === update.id);
         const detailItem = document.createElement('div');
@@ -3306,7 +3300,7 @@ function updateSyncDetailsList() {
             <div class="sync-detail-info">
                 <strong>${student ? student.studentName : 'طالب غير معروف'}</strong>
                 <div style="font-size: 12px; color: #666;">
-                    ${Object.keys(update).filter(k => !['row', 'id', 'error', 'retryCount'].includes(k)).join(', ')}
+                    ${Object.keys(update).filter(k => !['row','id','error','retryCount'].includes(k)).join(', ')}
                 </div>
             </div>
             <span class="sync-detail-status status-pending">⏳ معلق</span>
@@ -3314,7 +3308,7 @@ function updateSyncDetailsList() {
         container.appendChild(detailItem);
     });
 
-    // عرض التعديلات الفاشلة
+    // التعديلات الفاشلة
     failedUpdates.forEach((update, index) => {
         const student = allStudents.find(s => s.id === update.id);
         const detailItem = document.createElement('div');
@@ -3336,7 +3330,7 @@ function updateSyncDetailsList() {
     });
 }
 
-// ========== المزامنة بدفعات 10-10 مع fallback إلى واحد واحد ==========
+// ========== المزامنة بدفعات 20 → 10 → 1 ==========
 async function syncPendingUpdates(isAuto = false) {
     if (pendingUpdates.length === 0 || isSyncing) {
         if (!isAuto && pendingUpdates.length === 0) {
@@ -3352,30 +3346,20 @@ async function syncPendingUpdates(isAuto = false) {
     showLoading(true, `☁️ جاري مزامنة ${totalCount} تعديل مع Google Sheets...`);
     updateProgressBar(0, totalCount);
 
-    // تعطيل أزرار المزامنة أثناء العملية
     document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
         if (btn) btn.disabled = true;
     });
 
-    const batchSize = 10;
-    let batchMode = true; // يبدأ على شكل دفعات
+    let batchSize = 20;
 
     while (pendingUpdates.length > 0) {
-        let updatesToSend;
-
-        if (batchMode) {
-            updatesToSend = pendingUpdates.slice(0, batchSize);
-        } else {
-            updatesToSend = [pendingUpdates[0]];
-        }
+        let updatesToSend = pendingUpdates.slice(0, batchSize);
 
         try {
             const response = await fetch(WEB_APP_URL, {
                 method: 'POST',
                 mode: 'cors',
-                headers: {
-                    'Content-Type': 'text/plain;charset=utf-8',
-                },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
                     updates: updatesToSend,
                     teacherId: currentTeacherId,
@@ -3395,9 +3379,12 @@ async function syncPendingUpdates(isAuto = false) {
             }
 
         } catch (error) {
-            if (batchMode) {
-                showError(`⚠️ فشلت المزامنة المجمعة: ${error.message}. سيتم التحول إلى مزامنة فردية...`);
-                batchMode = false;
+            if (batchSize === 20) {
+                showError(`⚠️ فشلت دفعة 20: ${error.message}. سيتم التحول إلى دفعات 10...`);
+                batchSize = 10;
+            } else if (batchSize === 10) {
+                showError(`⚠️ فشلت دفعة 10: ${error.message}. سيتم التحول إلى مزامنة فردية...`);
+                batchSize = 1;
             } else {
                 addToSyncHistory(
                     isAuto ? 'مزامنة تلقائية' : 'مزامنة يدوية',
@@ -3413,7 +3400,6 @@ async function syncPendingUpdates(isAuto = false) {
 
     showLoading(false);
 
-    // إعادة تمكين الأزرار
     document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
         if (btn) btn.disabled = false;
     });
@@ -3436,7 +3422,20 @@ async function syncPendingUpdates(isAuto = false) {
     return successCount > 0;
 }
 
-// 🔹 دالة شريط التقدم
+// حدث المزامنة في الخلفية
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-updates') {
+    console.log('🔄 تشغيل مزامنة الخلفية...');
+    event.waitUntil(syncPendingUpdatesInBackground());
+  }
+});
+navigator.serviceWorker.ready.then(registration => {
+  if ('sync' in registration) {
+    registration.sync.register('sync-updates')
+      .then(() => console.log('📡 تم تسجيل مزامنة الخلفية'))
+      .catch(err => console.error('❌ خطأ في تسجيل مزامنة الخلفية:', err));
+  }
+});
 // 🔹 دالة شريط التقدم
 function updateProgressBar(done, total) {
     const bar = document.getElementById('syncProgressBar');
