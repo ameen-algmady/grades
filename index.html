@@ -5,22 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام إدارة نتائج الطلاب - Google Sheets Update</title>
     
-    <!-- Meta Tags for PWA - محدث -->
+    <!-- Meta Tags for PWA -->
     <meta name="theme-color" content="#667eea"/>
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="نتائج الطلاب">
     
-    <!-- الأيقونات -->
-    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/yourusername/your-repo/main/icon-192x192.png">
-    <link rel="shortcut icon" href="https://raw.githubusercontent.com/yourusername/your-repo/main/icon-192x192.png">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/yourusername/your-repo/main/icon-192x192.png">
-    
-    <!-- Manifest -->
-    <link rel="manifest" href="https://raw.githubusercontent.com/yourusername/your-repo/main/manifest.json">
     <!-- مكتبة SheetJS لإنشاء ملفات Excel -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <style>
         /* CSS الأصلي (محدث) */
@@ -83,11 +76,6 @@
             font-size: 12px;
             display: none;
             transition: all 0.3s ease;
-        }
-
-        .install-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .section {
@@ -204,11 +192,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .loading p {
-            margin: 0;
-            padding: 10px;
-        }
-
         .loading.success {
             color: #27ae60;
             background: rgba(39, 174, 96, 0.1);
@@ -255,34 +238,6 @@
             border-color: rgba(231, 76, 60, 0.3);
         }
 
-        .install-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            display: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-
-        .install-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(135deg, #8e44ad, #732d91);
-        }
-
-        .install-btn:active {
-            transform: translateY(0);
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -326,16 +281,6 @@
             align-items: center;
             flex-wrap: wrap;
             margin: 15px 0;
-        }
-
-        .search-container input,
-        .search-container select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            flex: 1;
-            min-width: 200px;
-            font-size: 14px;
         }
 
         .modal {
@@ -747,23 +692,6 @@
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* تخصيص ألوان التبويبات */
-        .month-tab[data-month="1"] { border-right: 3px solid #3498db; }
-        .month-tab[data-month="2"] { border-right: 3px solid #27ae60; }
-        .month-tab[data-month="3"] { border-right: 3px solid #f39c12; }
-        .month-tab[data-month="all"] { border-right: 3px solid #9b59b6; }
-
-        .month-tab.active[data-month="1"] { background: linear-gradient(135deg, #3498db, #2980b9); }
-        .month-tab.active[data-month="2"] { background: linear-gradient(135deg, #27ae60, #229954); }
-        .month-tab.active[data-month="3"] { background: linear-gradient(135deg, #f39c12, #e67e22); }
-        .month-tab.active[data-month="all"] { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
-
-        /* تحسين عرض الجدول في التبويبات المختلفة */
         .month-table th {
             position: sticky;
             top: 0;
@@ -1209,35 +1137,6 @@
             transition: width 0.3s ease;
         }
 
-        /* زر النسخ الاحتياطي */
-        #manualBackupBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 1000;
-            display: none;
-            transition: all 0.3s ease;
-        }
-
-        #manualBackupBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
-            background: linear-gradient(135deg, #2980b9, #1c6ea4);
-        }
-
-        #manualBackupBtn:active {
-            transform: translateY(0);
-        }
-
         /* نافذة تأكيد النسخ الاحتياطي */
         #backupModal .modal-content {
             max-width: 400px;
@@ -1285,49 +1184,198 @@
             gap: 4px;
         }
 
-        /* تصميم شريط الأدوات العلوي - تم التحديث */
+        /* ================ تحسينات الشريط العلوي ================ */
+        /* تصميم جديد للشريط العلوي - صف واحد فقط */
         .toolbar-top {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 15px;
-            padding: 10px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
             background: white;
             border-radius: 10px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* صف الأزرار الرئيسية */
+        .toolbar-main-row {
+            display: flex;
             justify-content: space-between;
+            align-items: center;
+            width: 100%;
         }
 
-        .toolbar-left {
+        /* زر العودة */
+        .back-to-selection-btn {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
             display: flex;
-            gap: 8px;
             align-items: center;
-            flex-wrap: wrap;
+            gap: 5px;
+            min-width: 80px;
+        }
+
+        /* معلومات المعلم */
+        .teacher-info-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #2c3e50;
+            font-weight: bold;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             flex: 1;
+            justify-content: center;
+            margin: 0 10px;
         }
 
-        .toolbar-right {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: flex-end;
+        .teacher-info-display span {
+            color: #3498db;
+            font-weight: bold;
         }
 
-        .toolbar-main {
+        /* زر الخروج */
+        .logout-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
             display: flex;
-            gap: 8px;
             align-items: center;
-            flex-wrap: wrap;
-            flex: 2;
+            gap: 6px;
+            min-width: 80px;
             justify-content: center;
         }
 
-        /* تحسين تصميم حاوية البحث */
+        /* صف الأزرار الوظيفية (4 أزرار) */
+        .toolbar-buttons-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* أزرار الأيقونات الصغيرة */
+        .btn-icon-small {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            min-height: 60px;
+        }
+
+        .btn-icon-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-icon-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-icon-emoji {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .btn-icon-text {
+            font-size: 10px;
+            line-height: 1.2;
+        }
+
+        /* ألوان الأزرار */
+        .btn-icon-small.export-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .btn-icon-small.import-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .btn-icon-small.sync-btn {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+        }
+
+        .btn-icon-small.stats-btn {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        /* الشريط السفلي المبسط */
+        .toolbar-bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .sync-btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sync-progress-container {
+            width: 100%;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .sync-progress-bar {
+            width: 0%;
+            height: 20px;
+            background: #27ae60;
+            text-align: center;
+            color: #fff;
+            font-size: 12px;
+            line-height: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .sync-status-text {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            margin-top: 3px;
+        }
+
+        /* أدوات البحث والتصفية (معدلة) */
         .search-tools-container {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr; /* صندوقين فقط بعد حذف الباركود */
             gap: 10px;
             margin: 15px 0;
             padding: 12px;
@@ -1365,7 +1413,7 @@
             box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
         }
 
-        /* تحسين التصميم للهواتف */
+        /* ================ تحسينات للهواتف ================ */
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -1376,27 +1424,64 @@
                 font-size: 1.6em;
             }
 
+            /* تحسين الشريط العلوي للهواتف */
             .toolbar-top {
                 flex-direction: column;
+                padding: 10px;
                 gap: 10px;
             }
 
-            .toolbar-left, .toolbar-main, .toolbar-right {
-                width: 100%;
-                justify-content: center;
+            .toolbar-main-row {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
             }
 
-            .btn {
-                padding: 10px 15px;
-                font-size: 13px;
-                margin: 1px;
+            .teacher-info-display {
+                order: 2;
+                margin: 5px 0;
+                padding: 6px 10px;
+                font-size: 12px;
             }
 
+            .back-to-selection-btn {
+                order: 1;
+                align-self: flex-start;
+            }
+
+            .logout-btn {
+                order: 3;
+                align-self: flex-end;
+                margin-top: -40px;
+            }
+
+            /* صف الأزرار الوظيفية */
+            .toolbar-buttons-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+                margin-top: 15px;
+            }
+
+            .btn-icon-small {
+                min-height: 55px;
+                padding: 6px 3px;
+            }
+
+            .btn-icon-emoji {
+                font-size: 16px;
+            }
+
+            .btn-icon-text {
+                font-size: 9px;
+            }
+
+            /* تحسين شريط البحث */
             .search-tools-container {
                 grid-template-columns: 1fr;
                 gap: 12px;
             }
 
+            /* تحسين الجداول */
             table {
                 font-size: 12px;
             }
@@ -1405,10 +1490,7 @@
                 padding: 6px 4px;
             }
 
-            .student-form {
-                grid-template-columns: 1fr;
-            }
-
+            /* تحسين النوافذ المنبثقة */
             .modal-content {
                 margin: 5% auto;
                 padding: 15px;
@@ -1416,6 +1498,7 @@
                 font-size: 14px;
             }
 
+            /* تحسين ماسح QR */
             #qrScanner {
                 height: 200px;
             }
@@ -1425,64 +1508,19 @@
                 height: 150px;
             }
 
-            .scores-grid {
+            /* تحسين الشريط السفلي */
+            .toolbar-bottom {
                 grid-template-columns: 1fr;
+                gap: 8px;
             }
 
-            .top-save-btn {
-                width: 90%;
-                top: 60px;
-                padding: 8px 16px;
-                font-size: 13px;
-            }
-
-            .stats-tabs,
-            .months-tabs {
-                flex-direction: column;
-            }
-
-            .stats-tab,
-            .month-tab {
-                text-align: center;
-                border-bottom: none;
-                border-right: 3px solid transparent;
-                margin-bottom: 4px;
-            }
-
-            .stats-tab.active,
-            .month-tab.active {
-                border-right-color: inherit;
-                border-bottom: none;
-            }
-
-            .month-tab {
-                margin: 2px 0;
-            }
-
+            /* تحسين أزرار الشهر */
             .month-cards {
                 grid-template-columns: 1fr;
             }
 
             .month-card {
                 padding: 15px 12px;
-            }
-            
-            .status-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .sync-actions-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .sync-history-table {
-                font-size: 11px;
-            }
-
-            /* تصغير الأزرار في الشريط العلوي للهواتف */
-            .toolbar-main .btn {
-                padding: 8px 12px;
-                font-size: 12px;
             }
         }
 
@@ -1491,17 +1529,12 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .toolbar-top {
-                flex-wrap: wrap;
-            }
-            
-            .toolbar-main .btn {
-                padding: 10px 15px;
-                font-size: 13px;
+            .toolbar-buttons-row {
+                grid-template-columns: repeat(4, 1fr);
             }
         }
 
-        /* تحسين تصميم رأس الشهر */
+        /* تصميم رأس الشهر */
         .current-month-header {
             background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
@@ -1541,96 +1574,28 @@
             background: linear-gradient(135deg, #9b59b6, #8e44ad);
         }
 
-        /* 🔹 شريط التقدم المخصص لكل قسم */
-        .sync-progress-container {
-            width: 100%;
-            background: #eee;
-            margin-top: 5px;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        
-        .sync-progress-bar {
-            width: 0%;
-            height: 20px;
-            background: #27ae60;
-            text-align: center;
-            color: #fff;
-            font-size: 12px;
-            line-height: 20px;
-            transition: width 0.3s ease;
-        }
-
-        /* الشريط السفلي - تم التبسيط */
-        .toolbar-bottom {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-            padding: 12px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
-        .sync-btn-container {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .teacher-info-display {
-            color: #2c3e50;
-            font-weight: bold;
-            font-size: 13px;
-            background: white;
-            padding: 6px 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .teacher-info-display span {
-            color: #3498db;
-            font-weight: bold;
-        }
-
-        /* أزرار صغيرة للشريط العلوي */
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 12px;
-            border-radius: 8px;
-            margin: 1px;
-        }
-
-        .btn-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 8px 12px;
-            border-radius: 8px;
+        /* زر النسخ الاحتياطي اليدوي */
+        #manualBackupBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
             border: none;
-            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 12px;
-            margin: 1px;
-        }
-
-        .btn-icon:hover {
-            transform: translateY(-2px);
+            font-size: 13px;
+            font-weight: bold;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            transition: all 0.3s ease;
         }
 
-        .sync-status-text {
-            font-size: 11px;
-            color: #666;
-            text-align: center;
-            margin-top: 3px;
+        #manualBackupBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -1811,530 +1776,529 @@
             </div>
         </div>
 
-       <!-- نافذة العمل للشهر الأول -->
-<div id="month1Workspace" class="month-workspace">
-    <!-- شريط الأدوات العلوي المحدث -->
-    <div class="toolbar-top">
-        <div class="toolbar-left">
-            <button class="btn back-to-selection" onclick="backToMonthSelection()">
-                <span style="margin-left: 5px;">⬅ العودة</span>
-            </button>
-            <div class="teacher-info-display">
-                <span id="currentTeacher1"></span> | الطلاب: <span id="studentsCount1">0</span>
+        <!-- نافذة العمل للشهر الأول -->
+        <div id="month1Workspace" class="month-workspace">
+            <!-- شريط الأدوات العلوي الجديد - صف واحد فقط -->
+            <div class="toolbar-top">
+                <!-- الصف الواحد: زر العودة + معلومات المعلم + زر الخروج -->
+                <div class="toolbar-main-row">
+                    <button class="back-to-selection-btn" onclick="backToMonthSelection()">
+                        <span>⬅</span>
+                        <span>العودة</span>
+                    </button>
+                    
+                    <div class="teacher-info-display">
+                        <span id="currentTeacher1"></span>
+                        <span>|</span>
+                        <span>الطلاب: <span id="studentsCount1">0</span></span>
+                    </div>
+                    
+                    <button class="logout-btn" id="logoutBtn1">
+                        <span>🚪</span>
+                        <span>خروج</span>
+                    </button>
+                </div>
+                
+                <!-- صف الأزرار الوظيفية (4 أزرار) -->
+                <div class="toolbar-buttons-row">
+                    <button class="btn-icon-small export-btn" onclick="showExcelExportModal()">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📊</span>
+                            <span class="btn-icon-text">تصدير Excel</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small import-btn" onclick="showExcelImportModal()">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📥</span>
+                            <span class="btn-icon-text">استيراد Excel</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small sync-btn" id="manageSyncBtn1">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">⚙️</span>
+                            <span class="btn-icon-text">إدارة المزامنة</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small stats-btn" id="showStatsBtn1">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📈</span>
+                            <span class="btn-icon-text">الإحصائيات</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- عنوان الشهر -->
+            <div class="current-month-header month-1">
+                <h2>📘 الشهر الأول - إدارة الدرجات</h2>
+                <p>يمكنك هنا إدارة وتعديل درجات الشهر الأول للطلاب</p>
+            </div>
+
+            <!-- شريط الأدوات السفلي -->
+            <div class="toolbar-bottom">
+                <div class="sync-btn-container">
+                    <button class="btn" id="qrScanBtn1" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                        <span>📷</span>
+                        <span>مسح QR Code</span>
+                    </button>
+                    <div class="sync-status-text" id="syncStatus1">المزامنة: متوقفة</div>
+                </div>
+                
+                <div class="sync-btn-container">
+                    <button class="btn" id="syncSheetsBtn1" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                        <span>☁️</span>
+                        <span>مزامنة التعديلات</span>
+                        <span id="pendingCount1" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
+                    </button>
+                    
+                    <div class="sync-progress-container">
+                        <div id="syncProgressBar1" class="sync-progress-bar">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أدوات البحث والتصفية (معدلة - بدون بحث بالباركود) -->
+            <div class="search-tools-container">
+                <div class="search-group">
+                    <label for="classNameFilter1">🔍 التصفية حسب الشعبة</label>
+                    <select id="classNameFilter1">
+                        <option value="">جميع الشعب</option>
+                    </select>
+                </div>
+                
+                <div class="search-group">
+                    <label for="searchNameInput1">🔎 البحث بالاسم</label>
+                    <input type="text" id="searchNameInput1" placeholder="أدخل جزء من اسم الطالب...">
+                </div>
+            </div>
+
+            <!-- الجدول -->
+            <div style="overflow-x: auto;">
+                <table class="month-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Barcode</th>
+                            <th>اسم الطالب</th>
+                            <th>الشعبة</th>
+                            <th>مواظبة 1</th>
+                            <th>شفهي 1</th>
+                            <th>واجبات 1</th>
+                            <th>تحريري 1</th>
+                            <th>المجموع 1</th>
+                            <th>محصلة 1</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="month1TableBody">
+                        <tr>
+                            <td colspan="11" style="text-align: center; color: #666; padding: 30px;">
+                                ⏳ جاري تحميل البيانات...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-        
-        <div class="toolbar-main">
-            <!-- أزرار صغيرة موحدة -->
-            <button class="btn btn-small" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
-                <span>📊</span>
-                <span>تصدير</span>
-            </button>
-            
-            <button class="btn btn-small" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9);">
-                <span>📥</span>
-                <span>استيراد</span>
-            </button>
-            
-            <button class="btn btn-small" id="manageSyncBtn1" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-                <span>⚙️</span>
-                <span>مزامنة</span>
-            </button>
-            
-            <button class="btn btn-small" id="showStatsBtn1" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                <span>📈</span>
-                <span>إحصائيات</span>
-            </button>
-        </div>
-        
-        <div class="toolbar-right">
-            <button class="btn btn-small btn-logout" id="logoutBtn1">
-                <span style="margin-left: 5px;">خروج</span>
-            </button>
-        </div>
-    </div>
 
-    <!-- عنوان الشهر -->
-    <div class="current-month-header month-1">
-        <h2>📘 الشهر الأول - إدارة الدرجات</h2>
-        <p>يمكنك هنا إدارة وتعديل درجات الشهر الأول للطلاب</p>
-    </div>
+        <!-- نافذة العمل للشهر الثاني -->
+        <div id="month2Workspace" class="month-workspace">
+            <!-- شريط الأدوات العلوي الجديد - صف واحد فقط -->
+            <div class="toolbar-top">
+                <!-- الصف الواحد: زر العودة + معلومات المعلم + زر الخروج -->
+                <div class="toolbar-main-row">
+                    <button class="back-to-selection-btn" onclick="backToMonthSelection()">
+                        <span>⬅</span>
+                        <span>العودة</span>
+                    </button>
+                    
+                    <div class="teacher-info-display">
+                        <span id="currentTeacher2"></span>
+                        <span>|</span>
+                        <span>الطلاب: <span id="studentsCount2">0</span></span>
+                    </div>
+                    
+                    <button class="logout-btn" id="logoutBtn2">
+                        <span>🚪</span>
+                        <span>خروج</span>
+                    </button>
+                </div>
+                
+                <!-- صف الأزرار الوظيفية (4 أزرار) -->
+                <div class="toolbar-buttons-row">
+                    <button class="btn-icon-small export-btn" onclick="showExcelExportModal()">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📊</span>
+                            <span class="btn-icon-text">تصدير Excel</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small import-btn" onclick="showExcelImportModal()">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📥</span>
+                            <span class="btn-icon-text">استيراد Excel</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small sync-btn" id="manageSyncBtn2">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">⚙️</span>
+                            <span class="btn-icon-text">إدارة المزامنة</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small stats-btn" id="showStatsBtn2">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📈</span>
+                            <span class="btn-icon-text">الإحصائيات</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
 
-    <!-- شريط الأدوات السفلي المبسط -->
-    <div class="toolbar-bottom">
-        <div class="sync-btn-container">
-            <button class="btn" id="qrScanBtn1" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-            <div class="sync-status-text" id="syncStatus1">المزامنة: متوقفة</div>
-        </div>
-        
-        <div class="sync-btn-container">
-            <button class="btn" id="syncSheetsBtn1" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
-                <span>☁️</span>
-                <span>مزامنة التعديلات</span>
-                <span id="pendingCount1" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
-            </button>
-            
-            <!-- 🔹 شريط التقدم -->
-            <div class="sync-progress-container">
-                <div id="syncProgressBar1" class="sync-progress-bar">0%</div>
+            <!-- عنوان الشهر -->
+            <div class="current-month-header month-2">
+                <h2>📗 الشهر الثاني - إدارة الدرجات</h2>
+                <p>يمكنك هنا إدارة وتعديل درجات الشهر الثاني للطلاب</p>
+            </div>
+
+            <!-- شريط الأدوات السفلي -->
+            <div class="toolbar-bottom">
+                <div class="sync-btn-container">
+                    <button class="btn" id="qrScanBtn2" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                        <span>📷</span>
+                        <span>مسح QR Code</span>
+                    </button>
+                    <div class="sync-status-text" id="syncStatus2">المزامنة: متوقفة</div>
+                </div>
+                
+                <div class="sync-btn-container">
+                    <button class="btn" id="syncSheetsBtn2" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                        <span>☁️</span>
+                        <span>مزامنة التعديلات</span>
+                        <span id="pendingCount2" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
+                    </button>
+                    
+                    <div class="sync-progress-container">
+                        <div id="syncProgressBar2" class="sync-progress-bar">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أدوات البحث والتصفية (معدلة - بدون بحث بالباركود) -->
+            <div class="search-tools-container">
+                <div class="search-group">
+                    <label for="classNameFilter2">🔍 التصفية حسب الشعبة</label>
+                    <select id="classNameFilter2">
+                        <option value="">جميع الشعب</option>
+                    </select>
+                </div>
+                
+                <div class="search-group">
+                    <label for="searchNameInput2">🔎 البحث بالاسم</label>
+                    <input type="text" id="searchNameInput2" placeholder="أدخل جزء من اسم الطالب...">
+                </div>
+            </div>
+
+            <!-- الجدول -->
+            <div style="overflow-x: auto;">
+                <table class="month-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Barcode</th>
+                            <th>اسم الطالب</th>
+                            <th>الشعبة</th>
+                            <th>مواظبة 2</th>
+                            <th>شفهي 2</th>
+                            <th>واجبات 2</th>
+                            <th>تحريري 2</th>
+                            <th>المجموع 2</th>
+                            <th>محصلة 2</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="month2TableBody">
+                        <tr>
+                            <td colspan="11" style="text-align: center; color: #666; padding: 30px;">
+                                ⏳ جاري تحميل البيانات...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
 
-    <!-- أدوات البحث والتصفية -->
-    <div class="search-tools-container">
-        <!-- التصفية حسب الشعبة -->
-        <div class="search-group">
-            <label for="classNameFilter1">🔍 التصفية حسب الشعبة</label>
-            <select id="classNameFilter1">
-                <option value="">جميع الشعب</option>
-            </select>
-        </div>
-        
-        <!-- البحث بالاسم -->
-        <div class="search-group">
-            <label for="searchNameInput1">🔎 البحث بالاسم</label>
-            <input type="text" id="searchNameInput1" placeholder="أدخل جزء من اسم الطالب...">
-        </div>
-        
-        <!-- مسح QR Code -->
-        <div class="search-group">
-            <label for="qrScanBtn1">📷 مسح الباركود</label>
-            <button class="btn" id="qrScanBtn1" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-        </div>
-    </div>
+        <!-- نافذة العمل للشهر الثالث -->
+        <div id="month3Workspace" class="month-workspace">
+            <!-- شريط الأدوات العلوي الجديد - صف واحد فقط -->
+            <div class="toolbar-top">
+                <!-- الصف الواحد: زر العودة + معلومات المعلم + زر الخروج -->
+                <div class="toolbar-main-row">
+                    <button class="back-to-selection-btn" onclick="backToMonthSelection()">
+                        <span>⬅</span>
+                        <span>العودة</span>
+                    </button>
+                    
+                    <div class="teacher-info-display">
+                        <span id="currentTeacher3"></span>
+                        <span>|</span>
+                        <span>الطلاب: <span id="studentsCount3">0</span></span>
+                    </div>
+                    
+                    <button class="logout-btn" id="logoutBtn3">
+                        <span>🚪</span>
+                        <span>خروج</span>
+                    </button>
+                </div>
+                
+                <!-- صف الأزرار الوظيفية (4 أزرار) -->
+                <div class="toolbar-buttons-row">
+                    <button class="btn-icon-small export-btn" onclick="showExcelExportModal()">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📊</span>
+                            <span class="btn-icon-text">تصدير Excel</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small import-btn" onclick="showExcelImportModal()">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📥</span>
+                            <span class="btn-icon-text">استيراد Excel</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small sync-btn" id="manageSyncBtn3">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">⚙️</span>
+                            <span class="btn-icon-text">إدارة المزامنة</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small stats-btn" id="showStatsBtn3">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📈</span>
+                            <span class="btn-icon-text">الإحصائيات</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
 
-    <!-- الجدول -->
-    <div style="overflow-x: auto;">
-        <table class="month-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Barcode</th>
-                    <th>اسم الطالب</th>
-                    <th>الشعبة</th>
-                    <th>مواظبة 1</th>
-                    <th>شفهي 1</th>
-                    <th>واجبات 1</th>
-                    <th>تحريري 1</th>
-                    <th>المجموع 1</th>
-                    <th>محصلة 1</th>
-                    <th>الإجراءات</th>
-                </tr>
-            </thead>
-            <tbody id="month1TableBody">
-                <tr>
-                    <td colspan="11" style="text-align: center; color: #666; padding: 30px;">
-                        ⏳ جاري تحميل البيانات...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+            <!-- عنوان الشهر -->
+            <div class="current-month-header month-3">
+                <h2>📙 الشهر الثالث - إدارة الدرجات</h2>
+                <p>يمكنك هنا إدارة وتعديل درجات الشهر الثالث للطلاب</p>
+            </div>
 
-<!-- نافذة العمل للشهر الثاني -->
-<div id="month2Workspace" class="month-workspace">
-    <!-- شريط الأدوات العلوي المحدث -->
-    <div class="toolbar-top">
-        <div class="toolbar-left">
-            <button class="btn back-to-selection" onclick="backToMonthSelection()">
-                <span style="margin-left: 5px;">⬅ العودة</span>
-            </button>
-            <div class="teacher-info-display">
-                <span id="currentTeacher2"></span> | الطلاب: <span id="studentsCount2">0</span>
+            <!-- شريط الأدوات السفلي -->
+            <div class="toolbar-bottom">
+                <div class="sync-btn-container">
+                    <button class="btn" id="qrScanBtn3" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                        <span>📷</span>
+                        <span>مسح QR Code</span>
+                    </button>
+                    <div class="sync-status-text" id="syncStatus3">المزامنة: متوقفة</div>
+                </div>
+                
+                <div class="sync-btn-container">
+                    <button class="btn" id="syncSheetsBtn3" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                        <span>☁️</span>
+                        <span>مزامنة التعديلات</span>
+                        <span id="pendingCount3" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
+                    </button>
+                    
+                    <div class="sync-progress-container">
+                        <div id="syncProgressBar3" class="sync-progress-bar">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أدوات البحث والتصفية (معدلة - بدون بحث بالباركود) -->
+            <div class="search-tools-container">
+                <div class="search-group">
+                    <label for="classNameFilter3">🔍 التصفية حسب الشعبة</label>
+                    <select id="classNameFilter3">
+                        <option value="">جميع الشعب</option>
+                    </select>
+                </div>
+                
+                <div class="search-group">
+                    <label for="searchNameInput3">🔎 البحث بالاسم</label>
+                    <input type="text" id="searchNameInput3" placeholder="أدخل جزء من اسم الطالب...">
+                </div>
+            </div>
+
+            <!-- الجدول -->
+            <div style="overflow-x: auto;">
+                <table class="month-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Barcode</th>
+                            <th>اسم الطالب</th>
+                            <th>الشعبة</th>
+                            <th>مواظبة 3</th>
+                            <th>واجبات 3</th>
+                            <th>شفهي 3</th>
+                            <th>تحريري 3</th>
+                            <th>المجموع 3</th>
+                            <th>محصلة 3</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="month3TableBody">
+                        <tr>
+                            <td colspan="11" style="text-align: center; color: #666; padding: 30px;">
+                                ⏳ جاري تحميل البيانات...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-        
-        <div class="toolbar-main">
-            <!-- أزرار صغيرة موحدة -->
-            <button class="btn btn-small" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
-                <span>📊</span>
-                <span>تصدير</span>
-            </button>
-            
-            <button class="btn btn-small" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9);">
-                <span>📥</span>
-                <span>استيراد</span>
-            </button>
-            
-            <button class="btn btn-small" id="manageSyncBtn2" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-                <span>⚙️</span>
-                <span>مزامنة</span>
-            </button>
-            
-            <button class="btn btn-small" id="showStatsBtn2" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                <span>📈</span>
-                <span>إحصائيات</span>
-            </button>
-        </div>
-        
-        <div class="toolbar-right">
-            <button class="btn btn-small btn-logout" id="logoutBtn2">
-                <span style="margin-left: 5px;">خروج</span>
-            </button>
-        </div>
-    </div>
 
-    <!-- عنوان الشهر -->
-    <div class="current-month-header month-2">
-        <h2>📗 الشهر الثاني - إدارة الدرجات</h2>
-        <p>يمكنك هنا إدارة وتعديل درجات الشهر الثاني للطلاب</p>
-    </div>
+        <!-- نافذة العمل لجميع الشهور -->
+        <div id="allMonthsWorkspace" class="month-workspace">
+            <!-- شريط الأدوات العلوي الجديد - صف واحد فقط -->
+            <div class="toolbar-top">
+                <!-- الصف الواحد: زر العودة + معلومات المعلم + زر الخروج -->
+                <div class="toolbar-main-row">
+                    <button class="back-to-selection-btn" onclick="backToMonthSelection()">
+                        <span>⬅</span>
+                        <span>العودة</span>
+                    </button>
+                    
+                    <div class="teacher-info-display">
+                        <span id="currentTeacherAll"></span>
+                        <span>|</span>
+                        <span>الطلاب: <span id="studentsCountAll">0</span></span>
+                    </div>
+                    
+                    <button class="logout-btn" id="logoutBtnAll">
+                        <span>🚪</span>
+                        <span>خروج</span>
+                    </button>
+                </div>
+                
+                <!-- صف الأزرار الوظيفية (4 أزرار) -->
+                <div class="toolbar-buttons-row">
+                    <button class="btn-icon-small export-btn" onclick="showExcelExportModal()">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📊</span>
+                            <span class="btn-icon-text">تصدير Excel</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small import-btn" onclick="showExcelImportModal()">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📥</span>
+                            <span class="btn-icon-text">استيراد Excel</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small sync-btn" id="manageSyncBtnAll">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">⚙️</span>
+                            <span class="btn-icon-text">إدارة المزامنة</span>
+                        </div>
+                    </button>
+                    
+                    <button class="btn-icon-small stats-btn" id="showStatsBtnAll">
+                        <div class="btn-icon-content">
+                            <span class="btn-icon-emoji">📈</span>
+                            <span class="btn-icon-text">الإحصائيات</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
 
-    <!-- شريط الأدوات السفلي المبسط -->
-    <div class="toolbar-bottom">
-        <div class="sync-btn-container">
-            <button class="btn" id="qrScanBtn2" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-            <div class="sync-status-text" id="syncStatus2">المزامنة: متوقفة</div>
-        </div>
-        
-        <div class="sync-btn-container">
-            <button class="btn" id="syncSheetsBtn2" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
-                <span>☁️</span>
-                <span>مزامنة التعديلات</span>
-                <span id="pendingCount2" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
-            </button>
-            
-            <!-- 🔹 شريط التقدم -->
-            <div class="sync-progress-container">
-                <div id="syncProgressBar2" class="sync-progress-bar">0%</div>
+            <!-- عنوان الشهر -->
+            <div class="current-month-header all-months">
+                <h2>📚 جميع الشهور - عرض شامل</h2>
+                <p>عرض شامل لجميع درجات الطلاب في الأشهر الثلاثة</p>
+            </div>
+
+            <!-- شريط الأدوات السفلي -->
+            <div class="toolbar-bottom">
+                <div class="sync-btn-container">
+                    <button class="btn" id="qrScanBtnAll" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                        <span>📷</span>
+                        <span>مسح QR Code</span>
+                    </button>
+                    <div class="sync-status-text" id="syncStatusAll">المزامنة: متوقفة</div>
+                </div>
+                
+                <div class="sync-btn-container">
+                    <button class="btn" id="syncSheetsBtnAll" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                        <span>☁️</span>
+                        <span>مزامنة التعديلات</span>
+                        <span id="pendingCountAll" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
+                    </button>
+                    
+                    <div class="sync-progress-container">
+                        <div id="syncProgressBarAll" class="sync-progress-bar">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أدوات البحث والتصفية (معدلة - بدون بحث بالباركود) -->
+            <div class="search-tools-container">
+                <div class="search-group">
+                    <label for="classNameFilterAll">🔍 التصفية حسب الشعبة</label>
+                    <select id="classNameFilterAll">
+                        <option value="">جميع الشعب</option>
+                    </select>
+                </div>
+                
+                <div class="search-group">
+                    <label for="searchNameInputAll">🔎 البحث بالاسم</label>
+                    <input type="text" id="searchNameInputAll" placeholder="أدخل جزء من اسم الطالب...">
+                </div>
+            </div>
+
+            <!-- الجدول -->
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Barcode</th>
+                            <th>اسم الطالب</th>
+                            <th>الشعبة</th>
+                            <th>مواظبة 1</th>
+                            <th>شفهي 1</th>
+                            <th>واجبات 1</th>
+                            <th>تحريري 1</th>
+                            <th>المجموع 1</th>
+                            <th>محصلة 1</th>
+                            <th>مواظبة 2</th>
+                            <th>شفهي 2</th>
+                            <th>واجبات 2</th>
+                            <th>تحريري 2</th>
+                            <th>المجموع 2</th>
+                            <th>محصلة 2</th>
+                            <th>مواظبة 3</th>
+                            <th>واجبات 3</th>
+                            <th>شفهي 3</th>
+                            <th>تحريري 3</th>
+                            <th>المجموع 3</th>
+                            <th>محصلة 3</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <tr>
+                            <td colspan="23" style="text-align: center; color: #666; padding: 30px;">
+                                ⏳ جاري تحميل البيانات...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
-
-    <!-- أدوات البحث والتصفية -->
-    <div class="search-tools-container">
-        <!-- التصفية حسب الشعبة -->
-        <div class="search-group">
-            <label for="classNameFilter2">🔍 التصفية حسب الشعبة</label>
-            <select id="classNameFilter2">
-                <option value="">جميع الشعب</option>
-            </select>
-        </div>
-        
-        <!-- البحث بالاسم -->
-        <div class="search-group">
-            <label for="searchNameInput2">🔎 البحث بالاسم</label>
-            <input type="text" id="searchNameInput2" placeholder="أدخل جزء من اسم الطالب...">
-        </div>
-        
-        <!-- مسح QR Code -->
-        <div class="search-group">
-            <label for="qrScanBtn2">📷 مسح الباركود</label>
-            <button class="btn" id="qrScanBtn2" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- الجدول -->
-    <div style="overflow-x: auto;">
-        <table class="month-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Barcode</th>
-                    <th>اسم الطالب</th>
-                    <th>الشعبة</th>
-                    <th>مواظبة 2</th>
-                    <th>شفهي 2</th>
-                    <th>واجبات 2</th>
-                    <th>تحريري 2</th>
-                    <th>المجموع 2</th>
-                    <th>محصلة 2</th>
-                    <th>الإجراءات</th>
-                </tr>
-            </thead>
-            <tbody id="month2TableBody">
-                <tr>
-                    <td colspan="11" style="text-align: center; color: #666; padding: 30px;">
-                        ⏳ جاري تحميل البيانات...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- نافذة العمل للشهر الثالث -->
-<div id="month3Workspace" class="month-workspace">
-    <!-- شريط الأدوات العلوي المحدث -->
-    <div class="toolbar-top">
-        <div class="toolbar-left">
-            <button class="btn back-to-selection" onclick="backToMonthSelection()">
-                <span style="margin-left: 5px;">⬅ العودة</span>
-            </button>
-            <div class="teacher-info-display">
-                <span id="currentTeacher3"></span> | الطلاب: <span id="studentsCount3">0</span>
-            </div>
-        </div>
-        
-        <div class="toolbar-main">
-            <!-- أزرار صغيرة موحدة -->
-            <button class="btn btn-small" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
-                <span>📊</span>
-                <span>تصدير</span>
-            </button>
-            
-            <button class="btn btn-small" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9);">
-                <span>📥</span>
-                <span>استيراد</span>
-            </button>
-            
-            <button class="btn btn-small" id="manageSyncBtn3" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-                <span>⚙️</span>
-                <span>مزامنة</span>
-            </button>
-            
-            <button class="btn btn-small" id="showStatsBtn3" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                <span>📈</span>
-                <span>إحصائيات</span>
-            </button>
-        </div>
-        
-        <div class="toolbar-right">
-            <button class="btn btn-small btn-logout" id="logoutBtn3">
-                <span style="margin-left: 5px;">خروج</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- عنوان الشهر -->
-    <div class="current-month-header month-3">
-        <h2>📙 الشهر الثالث - إدارة الدرجات</h2>
-        <p>يمكنك هنا إدارة وتعديل درجات الشهر الثالث للطلاب</p>
-    </div>
-
-    <!-- شريط الأدوات السفلي المبسط -->
-    <div class="toolbar-bottom">
-        <div class="sync-btn-container">
-            <button class="btn" id="qrScanBtn3" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-            <div class="sync-status-text" id="syncStatus3">المزامنة: متوقفة</div>
-        </div>
-        
-        <div class="sync-btn-container">
-            <button class="btn" id="syncSheetsBtn3" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
-                <span>☁️</span>
-                <span>مزامنة التعديلات</span>
-                <span id="pendingCount3" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
-            </button>
-            
-            <!-- 🔹 شريط التقدم -->
-            <div class="sync-progress-container">
-                <div id="syncProgressBar3" class="sync-progress-bar">0%</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- أدوات البحث والتصفية -->
-    <div class="search-tools-container">
-        <!-- التصفية حسب الشعبة -->
-        <div class="search-group">
-            <label for="classNameFilter3">🔍 التصفية حسب الشعبة</label>
-            <select id="classNameFilter3">
-                <option value="">جميع الشعب</option>
-            </select>
-        </div>
-        
-        <!-- البحث بالاسم -->
-        <div class="search-group">
-            <label for="searchNameInput3">🔎 البحث بالاسم</label>
-            <input type="text" id="searchNameInput3" placeholder="أدخل جزء من اسم الطالب...">
-        </div>
-        
-        <!-- مسح QR Code -->
-        <div class="search-group">
-            <label for="qrScanBtn3">📷 مسح الباركود</label>
-            <button class="btn" id="qrScanBtn3" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- الجدول -->
-    <div style="overflow-x: auto;">
-        <table class="month-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Barcode</th>
-                    <th>اسم الطالب</th>
-                    <th>الشعبة</th>
-                    <th>مواظبة 3</th>
-                    <th>واجبات 3</th>
-                    <th>شفهي 3</th>
-                    <th>تحريري 3</th>
-                    <th>المجموع 3</th>
-                    <th>محصلة 3</th>
-                    <th>الإجراءات</th>
-                </tr>
-            </thead>
-            <tbody id="month3TableBody">
-                <tr>
-                    <td colspan="11" style="text-align: center; color: #666; padding: 30px;">
-                        ⏳ جاري تحميل البيانات...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- نافذة العمل لجميع الشهور -->
-<div id="allMonthsWorkspace" class="month-workspace">
-    <!-- شريط الأدوات العلوي المحدث -->
-    <div class="toolbar-top">
-        <div class="toolbar-left">
-            <button class="btn back-to-selection" onclick="backToMonthSelection()">
-                <span style="margin-left: 5px;">⬅ العودة</span>
-            </button>
-            <div class="teacher-info-display">
-                <span id="currentTeacherAll"></span> | الطلاب: <span id="studentsCountAll">0</span>
-            </div>
-        </div>
-        
-        <div class="toolbar-main">
-            <!-- أزرار صغيرة موحدة -->
-            <button class="btn btn-small" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
-                <span>📊</span>
-                <span>تصدير</span>
-            </button>
-            
-            <button class="btn btn-small" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9);">
-                <span>📥</span>
-                <span>استيراد</span>
-            </button>
-            
-            <button class="btn btn-small" id="manageSyncBtnAll" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-                <span>⚙️</span>
-                <span>مزامنة</span>
-            </button>
-            
-            <button class="btn btn-small" id="showStatsBtnAll" style="background: linear-gradient(135deg, #27ae60, #229954);">
-                <span>📈</span>
-                <span>إحصائيات</span>
-            </button>
-        </div>
-        
-        <div class="toolbar-right">
-            <button class="btn btn-small btn-logout" id="logoutBtnAll">
-                <span style="margin-left: 5px;">خروج</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- عنوان الشهر -->
-    <div class="current-month-header all-months">
-        <h2>📚 جميع الشهور - عرض شامل</h2>
-        <p>عرض شامل لجميع درجات الطلاب في الأشهر الثلاثة</p>
-    </div>
-
-    <!-- شريط الأدوات السفلي المبسط -->
-    <div class="toolbar-bottom">
-        <div class="sync-btn-container">
-            <button class="btn" id="qrScanBtnAll" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-            <div class="sync-status-text" id="syncStatusAll">المزامنة: متوقفة</div>
-        </div>
-        
-        <div class="sync-btn-container">
-            <button class="btn" id="syncSheetsBtnAll" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
-                <span>☁️</span>
-                <span>مزامنة التعديلات</span>
-                <span id="pendingCountAll" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
-            </button>
-            
-            <!-- 🔹 شريط التقدم -->
-            <div class="sync-progress-container">
-                <div id="syncProgressBarAll" class="sync-progress-bar">0%</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- أدوات البحث والتصفية -->
-    <div class="search-tools-container">
-        <!-- التصفية حسب الشعبة -->
-        <div class="search-group">
-            <label for="classNameFilterAll">🔍 التصفية حسب الشعبة</label>
-            <select id="classNameFilterAll">
-                <option value="">جميع الشعب</option>
-            </select>
-        </div>
-        
-        <!-- البحث بالاسم -->
-        <div class="search-group">
-            <label for="searchNameInputAll">🔎 البحث بالاسم</label>
-            <input type="text" id="searchNameInputAll" placeholder="أدخل جزء من اسم الطالب...">
-        </div>
-        
-        <!-- مسح QR Code -->
-        <div class="search-group">
-            <label for="qrScanBtnAll">📷 مسح الباركود</label>
-            <button class="btn" id="qrScanBtnAll" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- الجدول -->
-    <div style="overflow-x: auto;">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Barcode</th>
-                    <th>اسم الطالب</th>
-                    <th>الشعبة</th>
-                    <th>مواظبة 1</th>
-                    <th>شفهي 1</th>
-                    <th>واجبات 1</th>
-                    <th>تحريري 1</th>
-                    <th>المجموع 1</th>
-                    <th>محصلة 1</th>
-                    <th>مواظبة 2</th>
-                    <th>شفهي 2</th>
-                    <th>واجبات 2</th>
-                    <th>تحريري 2</th>
-                    <th>المجموع 2</th>
-                    <th>محصلة 2</th>
-                    <th>مواظبة 3</th>
-                    <th>واجبات 3</th>
-                    <th>شفهي 3</th>
-                    <th>تحريري 3</th>
-                    <th>المجموع 3</th>
-                    <th>محصلة 3</th>
-                    <th>الإجراءات</th>
-                </tr>
-            </thead>
-            <tbody id="studentsTableBody">
-                <tr>
-                    <td colspan="23" style="text-align: center; color: #666; padding: 30px;">
-                        ⏳ جاري تحميل البيانات...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
 
         <div id="loading" class="loading hidden">
             ⏳ جاري تحميل البيانات...
@@ -2601,8 +2565,7 @@
     <!-- إضافة مكتبة jsQR لمسح QR Code -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
-    <!-- JavaScript code remains the same -->
-    
+
     <script>
     // ========== إصلاحات خاصة بـ GitHub Pages ==========
 
