@@ -1597,6 +1597,111 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 18px rgba(0,0,0,0.3);
         }
+        /* ================ الحل المدمج ================ */
+
+/* إضافة CSS جديد في نهاية الملف */
+
+/* تقليل المساحات الجانبية عند عرض الشهر */
+.month-workspace.active {
+    padding: 0;
+}
+
+.month-workspace .section {
+    padding: 15px 8px; /* تقليل المساحات الجانبية */
+}
+
+.month-workspace .table-container {
+    margin: 0 -8px; /* تعويض تقليل padding */
+    width: calc(100% + 16px);
+    border-radius: 8px 8px 0 0;
+}
+
+/* تحسين عرض الجدول */
+.month-workspace table {
+    width: 100%;
+    min-width: 100%;
+    table-layout: fixed; /* توزيع ثابت للأعمدة */
+}
+
+/* تخصيص عرض الأعمدة */
+.month-workspace th:nth-child(1), /* ID */
+.month-workspace td:nth-child(1) {
+    width: 50px;
+    min-width: 50px;
+    max-width: 50px;
+}
+
+.month-workspace th:nth-child(2), /* Barcode */
+.month-workspace td:nth-child(2) {
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
+}
+
+.month-workspace th:nth-child(3), /* اسم الطالب */
+.month-workspace td:nth-child(3) {
+    width: 150px;
+    min-width: 150px;
+    max-width: 150px;
+}
+
+.month-workspace th:nth-child(4), /* الشعبة */
+.month-workspace td:nth-child(4) {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+}
+
+/* تخصيص عرض أعمدة الدرجات */
+.month-workspace th:nth-child(n+5):nth-child(-n+12),
+.month-workspace td:nth-child(n+5):nth-child(-n+12) {
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
+    text-align: center;
+}
+
+/* تخصيص عرض عمود الإجراءات */
+.month-workspace th:last-child,
+.month-workspace td:last-child {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    text-align: center;
+}
+
+/* للهواتف - إبقاء التصميم متجاوباً */
+@media (max-width: 768px) {
+    .month-workspace .section {
+        padding: 12px 5px;
+    }
+    
+    .month-workspace .table-container {
+        margin: 0 -5px;
+        width: calc(100% + 10px);
+        font-size: 10px;
+    }
+    
+    .month-workspace th,
+    .month-workspace td {
+        padding: 4px 3px;
+        font-size: 10px;
+    }
+    
+    .month-workspace th:nth-child(1),
+    .month-workspace td:nth-child(1) {
+        width: 40px;
+        min-width: 40px;
+        max-width: 40px;
+    }
+    
+    .month-workspace th:nth-child(3),
+    .month-workspace td:nth-child(3) {
+        width: 100px;
+        min-width: 100px;
+        max-width: 100px;
+    }
+}
     </style>
 </head>
 <body>
