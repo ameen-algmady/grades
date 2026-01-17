@@ -128,13 +128,13 @@
             background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 12px 20px;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             transition: all 0.3s ease;
-            margin: 5px;
+            margin: 2px;
         }
 
         .btn:hover {
@@ -156,19 +156,11 @@
 
         .teacher-info {
             background: #ecf0f1;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-right: 5px solid #3498db;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
+            font-size: 14px;
         }
 
         table {
@@ -184,17 +176,17 @@
         th {
             background: linear-gradient(135deg, #34495e, #2c3e50);
             color: white;
-            padding: 15px 10px;
+            padding: 12px 8px;
             text-align: right;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         td {
-            padding: 12px 10px;
+            padding: 10px 8px;
             border-bottom: 1px solid #ecf0f1;
             text-align: right;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         tr:hover {
@@ -232,8 +224,8 @@
         .result-cell {
             font-weight: bold;
             text-align: center;
-            font-size: 13px;
-            padding: 8px 5px;
+            font-size: 12px;
+            padding: 6px 4px;
             border-radius: 5px;
             transition: all 0.3s ease;
             border: 1px solid transparent;
@@ -270,10 +262,10 @@
             background: linear-gradient(135deg, #9b59b6, #8e44ad);
             color: white;
             border: none;
-            padding: 12px 18px;
+            padding: 10px 15px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             display: none;
             transition: all 0.3s ease;
@@ -301,9 +293,10 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
-            padding: 5px;
+            padding: 4px;
             border-radius: 3px;
             display: inline-block;
+            font-size: 13px;
         }
 
         .student-name:hover {
@@ -316,10 +309,10 @@
             background-color: #f39c12;
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             transition: background-color 0.3s ease;
         }
 
@@ -342,6 +335,7 @@
             border-radius: 5px;
             flex: 1;
             min-width: 200px;
+            font-size: 14px;
         }
 
         .modal {
@@ -359,7 +353,7 @@
         .modal-content {
             background: white;
             margin: 2% auto;
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
             width: 95%;
             max-width: 800px;
@@ -414,18 +408,19 @@
             margin-bottom: 8px;
             font-weight: bold;
             color: var(--dark-color);
+            font-size: 14px;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
             margin-top: 15px;
         }
 
         .stat-item {
             background: #f0f8ff;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -444,7 +439,7 @@
             background: #e74c3c;
             color: white;
             border-radius: 50%;
-            padding: 3px 8px;
+            padding: 2px 6px;
             font-size: 10px;
             font-weight: bold;
             line-height: 1;
@@ -452,21 +447,23 @@
 
         .debug-panel {
             background: #f8f9fa;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             margin: 15px 0;
             border: 1px solid #dee2e6;
+            font-size: 13px;
         }
 
         .debug-panel h4 {
             color: #6c757d;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
 
         #syncStatus {
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
-            margin-top: 5px;
+            margin-top: 4px;
             text-align: center;
         }
 
@@ -481,7 +478,7 @@
 
         #qrScanner {
             width: 100%;
-            height: 300px;
+            height: 250px;
             border: 2px dashed #3498db;
             border-radius: 10px;
             margin-bottom: 15px;
@@ -513,8 +510,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
+            width: 180px;
+            height: 180px;
             border: 2px solid #3498db;
             border-radius: 10px;
             box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.3);
@@ -526,6 +523,7 @@
             background: #f8f9fa;
             border-radius: 5px;
             border: 1px solid #dee2e6;
+            font-size: 14px;
         }
 
         .qr-result.success {
@@ -545,7 +543,7 @@
             position: sticky;
             top: 0;
             background: white;
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 2px solid #ecf0f1;
             z-index: 10;
             margin-bottom: 15px;
@@ -554,29 +552,29 @@
         .edit-form-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 15px;
+            gap: 12px;
         }
 
         .month-section {
             background: #f8f9fa;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             border: 1px solid #dee2e6;
         }
 
         .month-title {
             color: #2c3e50;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-align: center;
-            font-size: 1.2em;
+            font-size: 1.1em;
             border-bottom: 2px solid #3498db;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
 
         .scores-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
         }
 
         .score-group {
@@ -585,26 +583,27 @@
         }
 
         .score-group label {
-            font-size: 0.9em;
-            margin-bottom: 5px;
+            font-size: 0.85em;
+            margin-bottom: 4px;
             color: #555;
         }
 
         .score-group input {
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .total-display {
             grid-column: 1 / -1;
             background: #e8f4fd;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 8px;
             border: 1px solid #3498db;
+            font-size: 14px;
         }
 
         .total-display .label {
@@ -613,7 +612,7 @@
         }
 
         .total-display .value {
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: bold;
             color: #3498db;
         }
@@ -621,11 +620,12 @@
         .result-display {
             grid-column: 1 / -1;
             background: #e8f6f3;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
             text-align: center;
             margin-top: 5px;
             border: 1px solid #27ae60;
+            font-size: 14px;
         }
 
         .result-display .label {
@@ -634,7 +634,7 @@
         }
 
         .result-display .value {
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: bold;
             color: #27ae60;
         }
@@ -642,20 +642,20 @@
         /* زر الحفظ في الأعلى */
         .top-save-btn {
             position: sticky;
-            top: 80px;
+            top: 70px;
             background: linear-gradient(135deg, #27ae60, #229954);
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 10px 20px;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             z-index: 20;
-            margin: 10px auto;
+            margin: 8px auto;
             display: block;
-            width: 220px;
+            width: 200px;
             text-align: center;
             transition: all 0.3s ease;
         }
@@ -668,19 +668,21 @@
         /* تبويبات الإحصائيات */
         .stats-tabs {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #ecf0f1;
+            flex-wrap: wrap;
         }
 
         .stats-tab {
             background: none;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 15px;
             cursor: pointer;
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
             font-weight: bold;
             color: #7f8c8d;
+            font-size: 13px;
         }
 
         .stats-tab.active {
@@ -703,7 +705,7 @@
         /* تبويبات الشهور الجديدة */
         .months-tabs {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #ecf0f1;
             background: #f8f9fa;
             border-radius: 10px;
@@ -713,7 +715,7 @@
         .month-tab {
             background: none;
             border: none;
-            padding: 12px 20px;
+            padding: 10px 15px;
             cursor: pointer;
             border-radius: 8px;
             transition: all 0.3s ease;
@@ -722,6 +724,7 @@
             flex: 1;
             text-align: center;
             margin: 0 2px;
+            font-size: 13px;
         }
 
         .month-tab.active {
@@ -770,143 +773,145 @@
         .current-month-indicator {
             background: linear-gradient(135deg, #ffeaa7, #fab1a0);
             color: #2d3436;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
             margin-left: 10px;
             display: inline-block;
         }
+
         /* أزرار Excel */
-.btn-excel {
-    background: linear-gradient(135deg, #27ae60, #229954) !important;
-    color: white !important;
-    border: none !important;
-}
+        .btn-excel {
+            background: linear-gradient(135deg, #27ae60, #229954) !important;
+            color: white !important;
+            border: none !important;
+        }
 
-.btn-excel-export {
-    background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
-    color: white !important;
-    border: none !important;
-}
+        .btn-excel-export {
+            background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+            color: white !important;
+            border: none !important;
+        }
 
-.btn-excel-import {
-    background: linear-gradient(135deg, #3498db, #2980b9) !important;
-    color: white !important;
-    border: none !important;
-}
+        .btn-excel-import {
+            background: linear-gradient(135deg, #3498db, #2980b9) !important;
+            color: white !important;
+            border: none !important;
+        }
 
-.excel-icon {
-    font-size: 16px;
-    margin-left: 5px;
-}
+        .excel-icon {
+            font-size: 14px;
+            margin-left: 5px;
+        }
 
-/* تحسين تصميم نافذة Excel */
-.excel-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin: 20px 0;
-}
+        /* تحسين تصميم نافذة Excel */
+        .excel-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
 
-.excel-option-card {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid #e0e0e0;
-}
+        .excel-option-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e0e0e0;
+        }
 
-.excel-option-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    border-color: #27ae60;
-}
+        .excel-option-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-color: #27ae60;
+        }
 
-.excel-option-card.selected {
-    border-color: #27ae60;
-    background: #f0fff4;
-}
+        .excel-option-card.selected {
+            border-color: #27ae60;
+            background: #f0fff4;
+        }
 
-.excel-option-icon {
-    font-size: 2.5em;
-    margin-bottom: 10px;
-    color: #27ae60;
-}
+        .excel-option-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+            color: #27ae60;
+        }
 
-.excel-option-title {
-    font-weight: bold;
-    color: #2c3e50;
-    margin-bottom: 5px;
-}
+        .excel-option-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
 
-.excel-option-desc {
-    font-size: 12px;
-    color: #7f8c8d;
-}
+        .excel-option-desc {
+            font-size: 11px;
+            color: #7f8c8d;
+        }
 
-/* تحسين تصميم جداول Excel */
-.excel-preview {
-    max-height: 300px;
-    overflow-y: auto;
-    margin: 15px 0;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-}
+        /* تحسين تصميم جداول Excel */
+        .excel-preview {
+            max-height: 250px;
+            overflow-y: auto;
+            margin: 12px 0;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
 
-.excel-preview table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-}
+        .excel-preview table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
 
-.excel-preview th {
-    background: #27ae60;
-    color: white;
-    padding: 8px;
-    position: sticky;
-    top: 0;
-    font-weight: bold;
-}
+        .excel-preview th {
+            background: #27ae60;
+            color: white;
+            padding: 6px;
+            position: sticky;
+            top: 0;
+            font-weight: bold;
+        }
 
-.excel-preview td {
-    padding: 6px 8px;
-    border-bottom: 1px solid #eee;
-}
+        .excel-preview td {
+            padding: 5px 6px;
+            border-bottom: 1px solid #eee;
+        }
 
-.excel-preview tr:hover {
-    background: #f8f9fa;
-}
+        .excel-preview tr:hover {
+            background: #f8f9fa;
+        }
 
         /* أنماط جديدة لاختيار الشهر */
         .month-selection {
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 15px;
         }
 
         .month-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
         }
 
         .month-card {
             background: white;
-            border-radius: 15px;
-            padding: 30px 20px;
+            border-radius: 12px;
+            padding: 20px 15px;
             text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             cursor: pointer;
             transition: all 0.3s ease;
             border: 3px solid transparent;
         }
 
         .month-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
         .month-card.month-1 {
@@ -930,19 +935,19 @@
         }
 
         .month-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
+            font-size: 2.5em;
+            margin-bottom: 12px;
         }
 
         .month-card h3 {
             color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 1.4em;
+            margin-bottom: 8px;
+            font-size: 1.2em;
         }
 
         .month-card p {
             color: #7f8c8d;
-            font-size: 0.9em;
+            font-size: 0.85em;
             line-height: 1.5;
         }
 
@@ -957,7 +962,9 @@
 
         .back-to-selection {
             background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            font-size: 13px;
         }
 
         .current-month-header {
@@ -965,7 +972,7 @@
             color: white;
             padding: 15px;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
         }
 
@@ -985,13 +992,13 @@
         .sync-controls-panel {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 15px;
         }
 
         .sync-status-card {
             background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             border: 1px solid #dee2e6;
         }
@@ -999,13 +1006,13 @@
         .status-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 15px;
+            gap: 12px;
+            margin-top: 12px;
         }
 
         .status-item {
             background: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -1015,11 +1022,12 @@
             display: block;
             font-weight: bold;
             color: #2c3e50;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            font-size: 13px;
         }
 
         .status-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #3498db;
         }
@@ -1039,28 +1047,29 @@
         .sync-actions-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
 
         .sync-details-section {
             background: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             border: 1px solid #dee2e6;
         }
 
         .sync-details-list {
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .sync-detail-item {
-            padding: 10px;
+            padding: 8px;
             border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 13px;
         }
 
         .sync-detail-item:last-child {
@@ -1072,9 +1081,9 @@
         }
 
         .sync-detail-status {
-            padding: 3px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
 
@@ -1095,16 +1104,17 @@
 
         .sync-options {
             background: #f8f9fa;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             border: 1px solid #dee2e6;
         }
 
         .option-item {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 13px;
         }
 
         .option-item:last-child {
@@ -1116,33 +1126,36 @@
         }
 
         .option-item select {
-            width: 100px;
-            padding: 5px;
+            width: 80px;
+            padding: 4px;
+            font-size: 13px;
         }
 
         .sync-history-container {
-            max-height: 400px;
+            max-height: 350px;
             overflow-y: auto;
-            margin-top: 15px;
+            margin-top: 12px;
         }
 
         .sync-history-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .sync-history-table th {
             background: #34495e;
             color: white;
-            padding: 10px;
+            padding: 8px;
             position: sticky;
             top: 0;
+            font-size: 12px;
         }
 
         .sync-history-table td {
-            padding: 8px 10px;
+            padding: 6px 8px;
             border-bottom: 1px solid #eee;
+            font-size: 12px;
         }
 
         .sync-history-table tr:hover {
@@ -1150,9 +1163,9 @@
         }
 
         .badge {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
             font-weight: bold;
         }
 
@@ -1176,438 +1189,6 @@
             color: #0c5460;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 10px;
-            }
-
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .search-container {
-                flex-direction: column;
-            }
-
-            .search-container input,
-            .search-container select {
-                min-width: 100%;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 8px 5px;
-            }
-
-            .student-form {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                margin: 5% auto;
-                padding: 15px;
-                width: 98%;
-            }
-
-            #qrScanner {
-                height: 250px;
-            }
-
-            .scanner-frame {
-                width: 180px;
-                height: 180px;
-            }
-
-            .scores-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .top-save-btn {
-                width: 90%;
-                top: 60px;
-                padding: 10px 20px;
-                font-size: 14px;
-            }
-
-            .stats-tabs,
-            .months-tabs {
-                flex-direction: column;
-            }
-
-            .stats-tab,
-            .month-tab {
-                text-align: center;
-                border-bottom: none;
-                border-right: 3px solid transparent;
-                margin-bottom: 5px;
-            }
-
-            .stats-tab.active,
-            .month-tab.active {
-                border-right-color: inherit;
-                border-bottom: none;
-            }
-
-            .month-tab {
-                margin: 2px 0;
-            }
-
-            .month-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .month-card {
-                padding: 20px 15px;
-            }
-            
-            .status-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .sync-actions-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .sync-history-table {
-                font-size: 12px;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .edit-form-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
-            }
-            
-            .month-section {
-                margin-bottom: 0;
-            }
-        }
-        /* زر النسخ الاحتياطي */
-#manualBackupBtn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    z-index: 1000;
-    display: none;
-    transition: all 0.3s ease;
-}
-
-#manualBackupBtn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
-    background: linear-gradient(135deg, #2980b9, #1c6ea4);
-}
-
-#manualBackupBtn:active {
-    transform: translateY(0);
-}
-
-/* نافذة تأكيد النسخ الاحتياطي */
-#backupModal .modal-content {
-    max-width: 400px;
-}
-
-.backup-success {
-    background: #d4edda;
-    color: #155724;
-    padding: 15px;
-    border-radius: 8px;
-    margin: 15px 0;
-    border: 1px solid #c3e6cb;
-}
-
-.backup-list {
-    max-height: 200px;
-    overflow-y: auto;
-    margin: 15px 0;
-    padding: 10px;
-    background: #f8f9fa;
-    border-radius: 5px;
-    border: 1px solid #dee2e6;
-}
-
-.backup-item {
-    padding: 10px;
-    border-bottom: 1px solid #dee2e6;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.backup-item:last-child {
-    border-bottom: none;
-}
-
-.backup-info {
-    flex: 1;
-}
-
-.backup-actions {
-    display: flex;
-    gap: 5px;
-}
-/* تحسين تصميم عناصر التحكم */
-.controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 15px;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    border-radius: 10px;
-    border: 1px solid #dee2e6;
-}
-
-.teacher-info-display {
-    color: #2c3e50;
-    font-weight: bold;
-    font-size: 14px;
-    background: white;
-    padding: 8px 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.teacher-info-display span {
-    color: #3498db;
-    font-weight: bold;
-}
-
-/* تصميم شريط الأدوات العلوي */
-.toolbar-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 12px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-.toolbar-left {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.toolbar-right {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-/* تصميم شريط الأدوات السفلي */
-.toolbar-bottom {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 10px;
-    margin: 15px 0;
-    padding: 15px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-.toolbar-bottom.full-width {
-    grid-template-columns: 1fr 1fr 1fr;
-}
-
-/* تحسين تصميم حاوية البحث */
-.search-tools-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    margin: 15px 0;
-    padding: 15px;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    border-radius: 10px;
-    border: 1px solid #dee2e6;
-}
-
-.search-tools-container .search-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.search-tools-container label {
-    font-size: 12px;
-    font-weight: bold;
-    color: #2c3e50;
-    margin-bottom: 3px;
-}
-
-.search-tools-container input,
-.search-tools-container select {
-    width: 100%;
-    padding: 10px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.search-tools-container input:focus,
-.search-tools-container select:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
-}
-
-/* أزرار إضافية */
-.btn-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 15px;
-    border-radius: 8px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-}
-
-.btn-icon:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.btn-icon.small {
-    padding: 8px 12px;
-    font-size: 12px;
-}
-
-/* تحسين تصميم زر المزامنة */
-.sync-btn-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-.sync-status-text {
-    font-size: 11px;
-    color: #666;
-    text-align: center;
-    margin-top: 3px;
-}
-
-/* تحسين التصميم للهواتف */
-@media (max-width: 768px) {
-    .toolbar-top {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .toolbar-left, .toolbar-right {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .toolbar-bottom {
-        grid-template-columns: 1fr;
-    }
-    
-    .search-tools-container {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .btn-icon {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .teacher-info-display {
-        text-align: center;
-        font-size: 13px;
-    }
-    
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: center;
-    }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    .toolbar-bottom {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .search-tools-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* تحسين تصميم رأس الشهر */
-.current-month-header {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    padding: 20px;
-    border-radius: 12px;
-    margin: 20px 0;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
-}
-
-.current-month-header h2 {
-    margin: 0 0 10px 0;
-    font-size: 1.8em;
-    font-weight: 300;
-}
-
-.current-month-header p {
-    margin: 0;
-    opacity: 0.9;
-    font-size: 0.95em;
-}
-
-/* ألوان مختلفة لكل شهر */
-.current-month-header.month-1 {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-}
-
-.current-month-header.month-2 {
-    background: linear-gradient(135deg, #27ae60, #229954);
-}
-
-.current-month-header.month-3 {
-    background: linear-gradient(135deg, #f39c12, #e67e22);
-}
-
-.current-month-header.all-months {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
-}
-
         /* 🔹 شريط التقدم */
         #syncProgressContainer {
             width: 100%;
@@ -1626,6 +1207,430 @@
             font-size: 12px;
             line-height: 20px;
             transition: width 0.3s ease;
+        }
+
+        /* زر النسخ الاحتياطي */
+        #manualBackupBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        #manualBackupBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #2980b9, #1c6ea4);
+        }
+
+        #manualBackupBtn:active {
+            transform: translateY(0);
+        }
+
+        /* نافذة تأكيد النسخ الاحتياطي */
+        #backupModal .modal-content {
+            max-width: 400px;
+        }
+
+        .backup-success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            border: 1px solid #c3e6cb;
+            font-size: 14px;
+        }
+
+        .backup-list {
+            max-height: 180px;
+            overflow-y: auto;
+            margin: 12px 0;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+
+        .backup-item {
+            padding: 8px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .backup-item:last-child {
+            border-bottom: none;
+        }
+
+        .backup-info {
+            flex: 1;
+        }
+
+        .backup-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        /* تصميم شريط الأدوات العلوي - تم التحديث */
+        .toolbar-top {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .toolbar-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .toolbar-main {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            flex: 2;
+            justify-content: center;
+        }
+
+        /* تحسين تصميم حاوية البحث */
+        .search-tools-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 12px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .search-tools-container .search-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .search-tools-container label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 3px;
+        }
+
+        .search-tools-container input,
+        .search-tools-container select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .search-tools-container input:focus,
+        .search-tools-container select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
+        }
+
+        /* تحسين التصميم للهواتف */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .toolbar-top {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .toolbar-left, .toolbar-main, .toolbar-right {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 13px;
+                margin: 1px;
+            }
+
+            .search-tools-container {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 6px 4px;
+            }
+
+            .student-form {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 5% auto;
+                padding: 15px;
+                width: 98%;
+                font-size: 14px;
+            }
+
+            #qrScanner {
+                height: 200px;
+            }
+
+            .scanner-frame {
+                width: 150px;
+                height: 150px;
+            }
+
+            .scores-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .top-save-btn {
+                width: 90%;
+                top: 60px;
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .stats-tabs,
+            .months-tabs {
+                flex-direction: column;
+            }
+
+            .stats-tab,
+            .month-tab {
+                text-align: center;
+                border-bottom: none;
+                border-right: 3px solid transparent;
+                margin-bottom: 4px;
+            }
+
+            .stats-tab.active,
+            .month-tab.active {
+                border-right-color: inherit;
+                border-bottom: none;
+            }
+
+            .month-tab {
+                margin: 2px 0;
+            }
+
+            .month-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .month-card {
+                padding: 15px 12px;
+            }
+            
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sync-actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sync-history-table {
+                font-size: 11px;
+            }
+
+            /* تصغير الأزرار في الشريط العلوي للهواتف */
+            .toolbar-main .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .search-tools-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .toolbar-top {
+                flex-wrap: wrap;
+            }
+            
+            .toolbar-main .btn {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+        }
+
+        /* تحسين تصميم رأس الشهر */
+        .current-month-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .current-month-header h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.6em;
+            font-weight: 300;
+        }
+
+        .current-month-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        /* ألوان مختلفة لكل شهر */
+        .current-month-header.month-1 {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .current-month-header.month-2 {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .current-month-header.month-3 {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .current-month-header.all-months {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+
+        /* 🔹 شريط التقدم المخصص لكل قسم */
+        .sync-progress-container {
+            width: 100%;
+            background: #eee;
+            margin-top: 5px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .sync-progress-bar {
+            width: 0%;
+            height: 20px;
+            background: #27ae60;
+            text-align: center;
+            color: #fff;
+            font-size: 12px;
+            line-height: 20px;
+            transition: width 0.3s ease;
+        }
+
+        /* الشريط السفلي - تم التبسيط */
+        .toolbar-bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .sync-btn-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .teacher-info-display {
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 13px;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .teacher-info-display span {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        /* أزرار صغيرة للشريط العلوي */
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+            border-radius: 8px;
+            margin: 1px;
+        }
+
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            margin: 1px;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .sync-status-text {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            margin-top: 3px;
         }
     </style>
 </head>
@@ -1696,118 +1701,119 @@
                 </div>
             </div>
         </div>
+
         <!-- نافذة تصدير Excel -->
-<div id="excelExportModal" class="modal">
-    <div class="modal-content" style="max-width: 800px;">
-        <span class="close-modal" onclick="closeModal('excelExportModal')">&times;</span>
-        <h3>📊 تصدير إلى Excel</h3>
-        
-        <div class="excel-options">
-            <div class="excel-option-card" onclick="selectExcelOption('currentMonth')">
-                <div class="excel-option-icon">📅</div>
-                <div class="excel-option-title">الشهر الحالي</div>
-                <div class="excel-option-desc">تصدير بيانات الشهر الحالي فقط</div>
-            </div>
-            
-            <div class="excel-option-card" onclick="selectExcelOption('allMonths')">
-                <div class="excel-option-icon">📚</div>
-                <div class="excel-option-title">جميع الشهور</div>
-                <div class="excel-option-desc">تصدير جميع البيانات في ملف واحد</div>
-            </div>
-            
-            <div class="excel-option-card" onclick="selectExcelOption('backupData')">
-                <div class="excel-option-icon">💾</div>
-                <div class="excel-option-title">النسخ الاحتياطية</div>
-                <div class="excel-option-desc">تصدير جميع النسخ الاحتياطية</div>
-            </div>
-        </div>
-        
-        <!-- خيارات التصدير -->
-        <div id="excelOptions" style="display: none;">
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <h4 id="excelOptionTitle"></h4>
-                <div id="excelOptionDetails"></div>
-            </div>
-            
-            <!-- معاينة البيانات -->
-            <div id="excelPreview" class="excel-preview" style="display: none;">
-                <p style="text-align: center; color: #666; padding: 20px;">جاري تحميل المعاينة...</p>
-            </div>
-            
-            <!-- خيارات التنسيق -->
-            <div style="margin: 15px 0;">
-                <h4>خيارات التنسيق:</h4>
-                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <label style="display: flex; align-items: center; gap: 5px;">
-                        <input type="checkbox" id="includeTotals" checked>
-                        تضمين المجاميع والمحصلات
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 5px;">
-                        <input type="checkbox" id="includeBarcode" checked>
-                        تضمين الباركود
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 5px;">
-                        <input type="checkbox" id="formatArabic" checked>
-                        تنسيق عربي
-                    </label>
+        <div id="excelExportModal" class="modal">
+            <div class="modal-content" style="max-width: 800px;">
+                <span class="close-modal" onclick="closeModal('excelExportModal')">&times;</span>
+                <h3>📊 تصدير إلى Excel</h3>
+                
+                <div class="excel-options">
+                    <div class="excel-option-card" onclick="selectExcelOption('currentMonth')">
+                        <div class="excel-option-icon">📅</div>
+                        <div class="excel-option-title">الشهر الحالي</div>
+                        <div class="excel-option-desc">تصدير بيانات الشهر الحالي فقط</div>
+                    </div>
+                    
+                    <div class="excel-option-card" onclick="selectExcelOption('allMonths')">
+                        <div class="excel-option-icon">📚</div>
+                        <div class="excel-option-title">جميع الشهور</div>
+                        <div class="excel-option-desc">تصدير جميع البيانات في ملف واحد</div>
+                    </div>
+                    
+                    <div class="excel-option-card" onclick="selectExcelOption('backupData')">
+                        <div class="excel-option-icon">💾</div>
+                        <div class="excel-option-title">النسخ الاحتياطية</div>
+                        <div class="excel-option-desc">تصدير جميع النسخ الاحتياطية</div>
+                    </div>
+                </div>
+                
+                <!-- خيارات التصدير -->
+                <div id="excelOptions" style="display: none;">
+                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                        <h4 id="excelOptionTitle"></h4>
+                        <div id="excelOptionDetails"></div>
+                    </div>
+                    
+                    <!-- معاينة البيانات -->
+                    <div id="excelPreview" class="excel-preview" style="display: none;">
+                        <p style="text-align: center; color: #666; padding: 15px;">جاري تحميل المعاينة...</p>
+                    </div>
+                    
+                    <!-- خيارات التنسيق -->
+                    <div style="margin: 12px 0;">
+                        <h4>خيارات التنسيق:</h4>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 4px; font-size: 13px;">
+                                <input type="checkbox" id="includeTotals" checked>
+                                تضمين المجاميع والمحصلات
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 4px; font-size: 13px;">
+                                <input type="checkbox" id="includeBarcode" checked>
+                                تضمين الباركود
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 4px; font-size: 13px;">
+                                <input type="checkbox" id="formatArabic" checked>
+                                تنسيق عربي
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- أزرار التنفيذ -->
+                    <div style="display: flex; gap: 8px; margin-top: 15px;">
+                        <button class="btn btn-excel-export" onclick="generateExcelFile()" style="flex: 1;">
+                            📥 تنزيل ملف Excel
+                        </button>
+                        <button class="btn" onclick="previewExcelData()" style="flex: 1; background: linear-gradient(135deg, #f39c12, #e67e22);">
+                            👁️ معاينة البيانات
+                        </button>
+                    </div>
                 </div>
             </div>
-            
-            <!-- أزرار التنفيذ -->
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn btn-excel-export" onclick="generateExcelFile()" style="flex: 1;">
-                    📥 تنزيل ملف Excel
-                </button>
-                <button class="btn" onclick="previewExcelData()" style="flex: 1; background: linear-gradient(135deg, #f39c12, #e67e22);">
-                    👁️ معاينة البيانات
-                </button>
-            </div>
         </div>
-    </div>
-</div>
 
-<!-- نافذة استيراد Excel -->
-<div id="excelImportModal" class="modal">
-    <div class="modal-content" style="max-width: 600px;">
-        <span class="close-modal" onclick="closeModal('excelImportModal')">&times;</span>
-        <h3>📥 استيراد من Excel</h3>
-        
-        <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid #3498db;">
-            <h4>تعليمات الاستيراد:</h4>
-            <ol style="margin: 10px 0 0 20px; font-size: 14px;">
-                <li>يجب أن يحتوي الملف على عمود <strong>ID</strong> لتحديد الطلاب</li>
-                <li>يمكن استيراد ملفات <strong>.xlsx</strong> أو <strong>.xls</strong></li>
-                <li>يجب أن تكون الأسماء في أول ورقة في الملف</li>
-                <li>الدرجات يجب أن تكون أرقاماً</li>
-            </ol>
-        </div>
-        
-        <input type="file" id="excelFileInput" accept=".xlsx,.xls" 
-               style="margin: 15px 0; padding: 15px; width: 100%; border: 2px dashed #3498db; border-radius: 8px; cursor: pointer;">
-        
-        <div id="excelImportPreview" style="display: none;">
-            <h4>معاينة البيانات المستوردة:</h4>
-            <div class="excel-preview" id="importPreviewTable"></div>
-            
-            <div style="margin: 15px 0;">
-                <label style="display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" id="confirmImport" onchange="toggleImportButton()">
-                    أتأكد من صحة البيانات وأوافق على الاستيراد
-                </label>
+        <!-- نافذة استيراد Excel -->
+        <div id="excelImportModal" class="modal">
+            <div class="modal-content" style="max-width: 600px;">
+                <span class="close-modal" onclick="closeModal('excelImportModal')">&times;</span>
+                <h3>📥 استيراد من Excel</h3>
+                
+                <div style="background: #e8f4fd; padding: 12px; border-radius: 8px; margin: 12px 0; border: 1px solid #3498db;">
+                    <h4>تعليمات الاستيراد:</h4>
+                    <ol style="margin: 8px 0 0 20px; font-size: 13px;">
+                        <li>يجب أن يحتوي الملف على عمود <strong>ID</strong> لتحديد الطلاب</li>
+                        <li>يمكن استيراد ملفات <strong>.xlsx</strong> أو <strong>.xls</strong></li>
+                        <li>يجب أن تكون الأسماء في أول ورقة في الملف</li>
+                        <li>الدرجات يجب أن تكون أرقاماً</li>
+                    </ol>
+                </div>
+                
+                <input type="file" id="excelFileInput" accept=".xlsx,.xls" 
+                       style="margin: 12px 0; padding: 12px; width: 100%; border: 2px dashed #3498db; border-radius: 8px; cursor: pointer;">
+                
+                <div id="excelImportPreview" style="display: none;">
+                    <h4>معاينة البيانات المستوردة:</h4>
+                    <div class="excel-preview" id="importPreviewTable"></div>
+                    
+                    <div style="margin: 12px 0;">
+                        <label style="display: flex; align-items: center; gap: 4px; font-size: 13px;">
+                            <input type="checkbox" id="confirmImport" onchange="toggleImportButton()">
+                            أتأكد من صحة البيانات وأوافق على الاستيراد
+                        </label>
+                    </div>
+                    
+                    <button class="btn btn-excel-import" id="importExcelBtn" disabled onclick="processExcelImport()" style="width: 100%;">
+                        ⬆️ استيراد البيانات
+                    </button>
+                </div>
+                
+                <div id="importResult" style="margin-top: 12px;"></div>
             </div>
-            
-            <button class="btn btn-excel-import" id="importExcelBtn" disabled onclick="processExcelImport()" style="width: 100%;">
-                ⬆️ استيراد البيانات
-            </button>
         </div>
-        
-        <div id="importResult" style="margin-top: 15px;"></div>
-    </div>
-</div>
 
        <!-- نافذة العمل للشهر الأول -->
 <div id="month1Workspace" class="month-workspace">
-    <!-- شريط الأدوات العلوي -->
+    <!-- شريط الأدوات العلوي المحدث -->
     <div class="toolbar-top">
         <div class="toolbar-left">
             <button class="btn back-to-selection" onclick="backToMonthSelection()">
@@ -1818,24 +1824,35 @@
             </div>
         </div>
         
+        <div class="toolbar-main">
+            <!-- أزرار صغيرة موحدة -->
+            <button class="btn btn-small" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                <span>📊</span>
+                <span>تصدير</span>
+            </button>
+            
+            <button class="btn btn-small" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                <span>📥</span>
+                <span>استيراد</span>
+            </button>
+            
+            <button class="btn btn-small" id="manageSyncBtn1" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+                <span>⚙️</span>
+                <span>مزامنة</span>
+            </button>
+            
+            <button class="btn btn-small" id="showStatsBtn1" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                <span>📈</span>
+                <span>إحصائيات</span>
+            </button>
+        </div>
+        
         <div class="toolbar-right">
-            <button class="btn btn-logout" id="logoutBtn1">
-                <span style="margin-left: 5px;">تسجيل الخروج</span>
+            <button class="btn btn-small btn-logout" id="logoutBtn1">
+                <span style="margin-left: 5px;">خروج</span>
             </button>
         </div>
     </div>
-    <!-- في شريط الأدوات السفلي، أضف: -->
-<div style="display: flex; gap: 5px; flex: 1;">
-    <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
-        <span>📊</span>
-        <span>تصدير Excel</span>
-    </button>
-    
-    <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
-        <span>📥</span>
-        <span>استيراد Excel</span>
-    </button>
-</div>
 
     <!-- عنوان الشهر -->
     <div class="current-month-header month-1">
@@ -1843,32 +1860,26 @@
         <p>يمكنك هنا إدارة وتعديل درجات الشهر الأول للطلاب</p>
     </div>
 
-    <!-- شريط الأدوات السفلي (أيقونتين في الصف) -->
+    <!-- شريط الأدوات السفلي المبسط -->
     <div class="toolbar-bottom">
-        <!-- الصف الأول -->
-        <button class="btn-icon" id="manageSyncBtn1" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-            <span>⚙️</span>
-            <span>إدارة المزامنة</span>
-        </button>
-        
-        <button class="btn-icon" id="showStatsBtn1" style="background: linear-gradient(135deg, #27ae60, #229954);">
-            <span>📈</span>
-            <span>الإحصائيات</span>
-        </button>
-        
         <div class="sync-btn-container">
-            <button class="btn-icon" id="syncSheetsBtn1" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
-                <span>☁️</span>
-                <span>مزامنة التعديلات</span>
-                <span id="pendingCount1" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-right: 5px;">0</span>
+            <button class="btn" id="qrScanBtn1" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
             </button>
             <div class="sync-status-text" id="syncStatus1">المزامنة: متوقفة</div>
+        </div>
+        
+        <div class="sync-btn-container">
+            <button class="btn" id="syncSheetsBtn1" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                <span>☁️</span>
+                <span>مزامنة التعديلات</span>
+                <span id="pendingCount1" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
+            </button>
             
             <!-- 🔹 شريط التقدم -->
-            <div id="syncProgressContainer" style="width:100%; background:#eee; margin-top:5px; border-radius:5px; overflow:hidden;">
-                <div id="syncProgressBar" style="width:0%; height:20px; background:#27ae60; text-align:center; color:#fff; font-size:12px; line-height:20px;">
-                    0%
-                </div>
+            <div class="sync-progress-container">
+                <div id="syncProgressBar1" class="sync-progress-bar">0%</div>
             </div>
         </div>
     </div>
@@ -1883,19 +1894,19 @@
             </select>
         </div>
         
-        <!-- مسح QR Code -->
-        <div class="search-group">
-            <label for="qrScanBtn1">📷 مسح الباركود</label>
-            <button class="btn-icon" id="qrScanBtn1" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-        </div>
-        
         <!-- البحث بالاسم -->
         <div class="search-group">
             <label for="searchNameInput1">🔎 البحث بالاسم</label>
             <input type="text" id="searchNameInput1" placeholder="أدخل جزء من اسم الطالب...">
+        </div>
+        
+        <!-- مسح QR Code -->
+        <div class="search-group">
+            <label for="qrScanBtn1">📷 مسح الباركود</label>
+            <button class="btn" id="qrScanBtn1" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
+            </button>
         </div>
     </div>
 
@@ -1919,7 +1930,7 @@
             </thead>
             <tbody id="month1TableBody">
                 <tr>
-                    <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
+                    <td colspan="11" style="text-align: center; color: #666; padding: 30px;">
                         ⏳ جاري تحميل البيانات...
                     </td>
                 </tr>
@@ -1930,7 +1941,7 @@
 
 <!-- نافذة العمل للشهر الثاني -->
 <div id="month2Workspace" class="month-workspace">
-    <!-- شريط الأدوات العلوي -->
+    <!-- شريط الأدوات العلوي المحدث -->
     <div class="toolbar-top">
         <div class="toolbar-left">
             <button class="btn back-to-selection" onclick="backToMonthSelection()">
@@ -1941,24 +1952,35 @@
             </div>
         </div>
         
+        <div class="toolbar-main">
+            <!-- أزرار صغيرة موحدة -->
+            <button class="btn btn-small" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                <span>📊</span>
+                <span>تصدير</span>
+            </button>
+            
+            <button class="btn btn-small" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                <span>📥</span>
+                <span>استيراد</span>
+            </button>
+            
+            <button class="btn btn-small" id="manageSyncBtn2" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+                <span>⚙️</span>
+                <span>مزامنة</span>
+            </button>
+            
+            <button class="btn btn-small" id="showStatsBtn2" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                <span>📈</span>
+                <span>إحصائيات</span>
+            </button>
+        </div>
+        
         <div class="toolbar-right">
-            <button class="btn btn-logout" id="logoutBtn2">
-                <span style="margin-left: 5px;">تسجيل الخروج</span>
+            <button class="btn btn-small btn-logout" id="logoutBtn2">
+                <span style="margin-left: 5px;">خروج</span>
             </button>
         </div>
     </div>
-    <!-- في شريط الأدوات السفلي، أضف: -->
-<div style="display: flex; gap: 5px; flex: 1;">
-    <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
-        <span>📊</span>
-        <span>تصدير Excel</span>
-    </button>
-    
-    <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
-        <span>📥</span>
-        <span>استيراد Excel</span>
-    </button>
-</div>
 
     <!-- عنوان الشهر -->
     <div class="current-month-header month-2">
@@ -1966,32 +1988,26 @@
         <p>يمكنك هنا إدارة وتعديل درجات الشهر الثاني للطلاب</p>
     </div>
 
-    <!-- شريط الأدوات السفلي (أيقونتين في الصف) -->
+    <!-- شريط الأدوات السفلي المبسط -->
     <div class="toolbar-bottom">
-        <!-- الصف الأول -->
-        <button class="btn-icon" id="manageSyncBtn2" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-            <span>⚙️</span>
-            <span>إدارة المزامنة</span>
-        </button>
-        
-        <button class="btn-icon" id="showStatsBtn2" style="background: linear-gradient(135deg, #27ae60, #229954);">
-            <span>📈</span>
-            <span>الإحصائيات</span>
-        </button>
-        
         <div class="sync-btn-container">
-            <button class="btn-icon" id="syncSheetsBtn2" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
-                <span>☁️</span>
-                <span>مزامنة التعديلات</span>
-                <span id="pendingCount2" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-right: 5px;">0</span>
+            <button class="btn" id="qrScanBtn2" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
             </button>
             <div class="sync-status-text" id="syncStatus2">المزامنة: متوقفة</div>
+        </div>
+        
+        <div class="sync-btn-container">
+            <button class="btn" id="syncSheetsBtn2" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                <span>☁️</span>
+                <span>مزامنة التعديلات</span>
+                <span id="pendingCount2" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
+            </button>
             
             <!-- 🔹 شريط التقدم -->
-            <div id="syncProgressContainer2" style="width:100%; background:#eee; margin-top:5px; border-radius:5px; overflow:hidden;">
-                <div id="syncProgressBar2" style="width:0%; height:20px; background:#27ae60; text-align:center; color:#fff; font-size:12px; line-height:20px;">
-                    0%
-                </div>
+            <div class="sync-progress-container">
+                <div id="syncProgressBar2" class="sync-progress-bar">0%</div>
             </div>
         </div>
     </div>
@@ -2006,19 +2022,19 @@
             </select>
         </div>
         
-        <!-- مسح QR Code -->
-        <div class="search-group">
-            <label for="qrScanBtn2">📷 مسح الباركود</label>
-            <button class="btn-icon" id="qrScanBtn2" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-        </div>
-        
         <!-- البحث بالاسم -->
         <div class="search-group">
             <label for="searchNameInput2">🔎 البحث بالاسم</label>
             <input type="text" id="searchNameInput2" placeholder="أدخل جزء من اسم الطالب...">
+        </div>
+        
+        <!-- مسح QR Code -->
+        <div class="search-group">
+            <label for="qrScanBtn2">📷 مسح الباركود</label>
+            <button class="btn" id="qrScanBtn2" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
+            </button>
         </div>
     </div>
 
@@ -2042,7 +2058,7 @@
             </thead>
             <tbody id="month2TableBody">
                 <tr>
-                    <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
+                    <td colspan="11" style="text-align: center; color: #666; padding: 30px;">
                         ⏳ جاري تحميل البيانات...
                     </td>
                 </tr>
@@ -2053,7 +2069,7 @@
 
 <!-- نافذة العمل للشهر الثالث -->
 <div id="month3Workspace" class="month-workspace">
-    <!-- شريط الأدوات العلوي -->
+    <!-- شريط الأدوات العلوي المحدث -->
     <div class="toolbar-top">
         <div class="toolbar-left">
             <button class="btn back-to-selection" onclick="backToMonthSelection()">
@@ -2064,56 +2080,62 @@
             </div>
         </div>
         
+        <div class="toolbar-main">
+            <!-- أزرار صغيرة موحدة -->
+            <button class="btn btn-small" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                <span>📊</span>
+                <span>تصدير</span>
+            </button>
+            
+            <button class="btn btn-small" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                <span>📥</span>
+                <span>استيراد</span>
+            </button>
+            
+            <button class="btn btn-small" id="manageSyncBtn3" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+                <span>⚙️</span>
+                <span>مزامنة</span>
+            </button>
+            
+            <button class="btn btn-small" id="showStatsBtn3" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                <span>📈</span>
+                <span>إحصائيات</span>
+            </button>
+        </div>
+        
         <div class="toolbar-right">
-            <button class="btn btn-logout" id="logoutBtn3">
-                <span style="margin-left: 5px;">تسجيل الخروج</span>
+            <button class="btn btn-small btn-logout" id="logoutBtn3">
+                <span style="margin-left: 5px;">خروج</span>
             </button>
         </div>
     </div>
-         <!-- في شريط الأدوات السفلي، أضف: -->
-<div style="display: flex; gap: 5px; flex: 1;">
-    <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
-        <span>📊</span>
-        <span>تصدير Excel</span>
-    </button>
-    
-    <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
-        <span>📥</span>
-        <span>استيراد Excel</span>
-    </button>
-</div>
+
     <!-- عنوان الشهر -->
     <div class="current-month-header month-3">
         <h2>📙 الشهر الثالث - إدارة الدرجات</h2>
         <p>يمكنك هنا إدارة وتعديل درجات الشهر الثالث للطلاب</p>
     </div>
 
-    <!-- شريط الأدوات السفلي (أيقونتين في الصف) -->
+    <!-- شريط الأدوات السفلي المبسط -->
     <div class="toolbar-bottom">
-        <!-- الصف الأول -->
-        <button class="btn-icon" id="manageSyncBtn3" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-            <span>⚙️</span>
-            <span>إدارة المزامنة</span>
-        </button>
-        
-        <button class="btn-icon" id="showStatsBtn3" style="background: linear-gradient(135deg, #27ae60, #229954);">
-            <span>📈</span>
-            <span>الإحصائيات</span>
-        </button>
-        
         <div class="sync-btn-container">
-            <button class="btn-icon" id="syncSheetsBtn3" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
-                <span>☁️</span>
-                <span>مزامنة التعديلات</span>
-                <span id="pendingCount3" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-right: 5px;">0</span>
+            <button class="btn" id="qrScanBtn3" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
             </button>
             <div class="sync-status-text" id="syncStatus3">المزامنة: متوقفة</div>
+        </div>
+        
+        <div class="sync-btn-container">
+            <button class="btn" id="syncSheetsBtn3" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                <span>☁️</span>
+                <span>مزامنة التعديلات</span>
+                <span id="pendingCount3" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
+            </button>
             
             <!-- 🔹 شريط التقدم -->
-            <div id="syncProgressContainer3" style="width:100%; background:#eee; margin-top:5px; border-radius:5px; overflow:hidden;">
-                <div id="syncProgressBar3" style="width:0%; height:20px; background:#27ae60; text-align:center; color:#fff; font-size:12px; line-height:20px;">
-                    0%
-                </div>
+            <div class="sync-progress-container">
+                <div id="syncProgressBar3" class="sync-progress-bar">0%</div>
             </div>
         </div>
     </div>
@@ -2128,19 +2150,19 @@
             </select>
         </div>
         
-        <!-- مسح QR Code -->
-        <div class="search-group">
-            <label for="qrScanBtn3">📷 مسح الباركود</label>
-            <button class="btn-icon" id="qrScanBtn3" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-        </div>
-        
         <!-- البحث بالاسم -->
         <div class="search-group">
             <label for="searchNameInput3">🔎 البحث بالاسم</label>
             <input type="text" id="searchNameInput3" placeholder="أدخل جزء من اسم الطالب...">
+        </div>
+        
+        <!-- مسح QR Code -->
+        <div class="search-group">
+            <label for="qrScanBtn3">📷 مسح الباركود</label>
+            <button class="btn" id="qrScanBtn3" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
+            </button>
         </div>
     </div>
 
@@ -2164,7 +2186,7 @@
             </thead>
             <tbody id="month3TableBody">
                 <tr>
-                    <td colspan="11" style="text-align: center; color: #666; padding: 40px;">
+                    <td colspan="11" style="text-align: center; color: #666; padding: 30px;">
                         ⏳ جاري تحميل البيانات...
                     </td>
                 </tr>
@@ -2175,7 +2197,7 @@
 
 <!-- نافذة العمل لجميع الشهور -->
 <div id="allMonthsWorkspace" class="month-workspace">
-    <!-- شريط الأدوات العلوي -->
+    <!-- شريط الأدوات العلوي المحدث -->
     <div class="toolbar-top">
         <div class="toolbar-left">
             <button class="btn back-to-selection" onclick="backToMonthSelection()">
@@ -2186,56 +2208,62 @@
             </div>
         </div>
         
+        <div class="toolbar-main">
+            <!-- أزرار صغيرة موحدة -->
+            <button class="btn btn-small" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                <span>📊</span>
+                <span>تصدير</span>
+            </button>
+            
+            <button class="btn btn-small" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                <span>📥</span>
+                <span>استيراد</span>
+            </button>
+            
+            <button class="btn btn-small" id="manageSyncBtnAll" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+                <span>⚙️</span>
+                <span>مزامنة</span>
+            </button>
+            
+            <button class="btn btn-small" id="showStatsBtnAll" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                <span>📈</span>
+                <span>إحصائيات</span>
+            </button>
+        </div>
+        
         <div class="toolbar-right">
-            <button class="btn btn-logout" id="logoutBtnAll">
-                <span style="margin-left: 5px;">تسجيل الخروج</span>
+            <button class="btn btn-small btn-logout" id="logoutBtnAll">
+                <span style="margin-left: 5px;">خروج</span>
             </button>
         </div>
     </div>
-         <!-- في شريط الأدوات السفلي، أضف: -->
-<div style="display: flex; gap: 5px; flex: 1;">
-    <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
-        <span>📊</span>
-        <span>تصدير Excel</span>
-    </button>
-    
-    <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
-        <span>📥</span>
-        <span>استيراد Excel</span>
-    </button>
-</div>
+
     <!-- عنوان الشهر -->
     <div class="current-month-header all-months">
         <h2>📚 جميع الشهور - عرض شامل</h2>
         <p>عرض شامل لجميع درجات الطلاب في الأشهر الثلاثة</p>
     </div>
 
-    <!-- شريط الأدوات السفلي (أيقونتين في الصف) -->
+    <!-- شريط الأدوات السفلي المبسط -->
     <div class="toolbar-bottom">
-        <!-- الصف الأول -->
-        <button class="btn-icon" id="manageSyncBtnAll" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
-            <span>⚙️</span>
-            <span>إدارة المزامنة</span>
-        </button>
-        
-        <button class="btn-icon" id="showStatsBtnAll" style="background: linear-gradient(135deg, #27ae60, #229954);">
-            <span>📈</span>
-            <span>الإحصائيات</span>
-        </button>
-        
         <div class="sync-btn-container">
-            <button class="btn-icon" id="syncSheetsBtnAll" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
-                <span>☁️</span>
-                <span>مزامنة التعديلات</span>
-                <span id="pendingCountAll" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-right: 5px;">0</span>
+            <button class="btn" id="qrScanBtnAll" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
             </button>
             <div class="sync-status-text" id="syncStatusAll">المزامنة: متوقفة</div>
+        </div>
+        
+        <div class="sync-btn-container">
+            <button class="btn" id="syncSheetsBtnAll" style="background: linear-gradient(135deg, #e74c3c, #c0392b); width: 100%;">
+                <span>☁️</span>
+                <span>مزامنة التعديلات</span>
+                <span id="pendingCountAll" class="hidden" style="background: white; color: #e74c3c; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 5px;">0</span>
+            </button>
             
             <!-- 🔹 شريط التقدم -->
-            <div id="syncProgressContainerAll" style="width:100%; background:#eee; margin-top:5px; border-radius:5px; overflow:hidden;">
-                <div id="syncProgressBarAll" style="width:0%; height:20px; background:#27ae60; text-align:center; color:#fff; font-size:12px; line-height:20px;">
-                    0%
-                </div>
+            <div class="sync-progress-container">
+                <div id="syncProgressBarAll" class="sync-progress-bar">0%</div>
             </div>
         </div>
     </div>
@@ -2250,19 +2278,19 @@
             </select>
         </div>
         
-        <!-- مسح QR Code -->
-        <div class="search-group">
-            <label for="qrScanBtnAll">📷 مسح الباركود</label>
-            <button class="btn-icon" id="qrScanBtnAll" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
-                <span>📷</span>
-                <span>مسح QR Code</span>
-            </button>
-        </div>
-        
         <!-- البحث بالاسم -->
         <div class="search-group">
             <label for="searchNameInputAll">🔎 البحث بالاسم</label>
             <input type="text" id="searchNameInputAll" placeholder="أدخل جزء من اسم الطالب...">
+        </div>
+        
+        <!-- مسح QR Code -->
+        <div class="search-group">
+            <label for="qrScanBtnAll">📷 مسح الباركود</label>
+            <button class="btn" id="qrScanBtnAll" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); width: 100%;">
+                <span>📷</span>
+                <span>مسح QR Code</span>
+            </button>
         </div>
     </div>
 
@@ -2298,7 +2326,7 @@
             </thead>
             <tbody id="studentsTableBody">
                 <tr>
-                    <td colspan="23" style="text-align: center; color: #666; padding: 40px;">
+                    <td colspan="23" style="text-align: center; color: #666; padding: 30px;">
                         ⏳ جاري تحميل البيانات...
                     </td>
                 </tr>
@@ -2306,7 +2334,7 @@
         </table>
     </div>
 </div>
-                
+
 
         <div id="loading" class="loading hidden">
             ⏳ جاري تحميل البيانات...
@@ -2352,23 +2380,23 @@
                     <div class="stats-grid">
                         <div class="stat-item">
                             <h4>العدد الكلي</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="totalStudentsCount">0</p>
+                            <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="totalStudentsCount">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsOverallLess5">0</p>
+                            <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsOverallLess5">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsOverall5to10">0</p>
+                            <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsOverall5to10">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsOverall11to15">0</p>
+                            <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsOverall11to15">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsOverall16to20">0</p>
+                            <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsOverall16to20">0</p>
                         </div>
                     </div>
                 </div>
@@ -2379,19 +2407,19 @@
                     <div class="stats-grid">
                         <div class="stat-item">
                             <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth1Less5">0</p>
+                            <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsMonth1Less5">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth15to10">0</p>
+                            <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsMonth15to10">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth111to15">0</p>
+                            <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsMonth111to15">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth116to20">0</p>
+                            <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsMonth116to20">0</p>
                         </div>
                     </div>
                 </div>
@@ -2402,19 +2430,19 @@
                     <div class="stats-grid">
                         <div class="stat-item">
                             <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth2Less5">0</p>
+                            <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsMonth2Less5">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth25to10">0</p>
+                            <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsMonth25to10">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth211to15">0</p>
+                            <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsMonth211to15">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth216to20">0</p>
+                            <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsMonth216to20">0</p>
                         </div>
                     </div>
                 </div>
@@ -2425,19 +2453,19 @@
                     <div class="stats-grid">
                         <div class="stat-item">
                             <h4>أقل من 5</h4>
-                            <p style="font-size: 24px; color: #e74c3c; font-weight: bold;" id="statsMonth3Less5">0</p>
+                            <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsMonth3Less5">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 24px; color: #f39c12; font-weight: bold;" id="statsMonth35to10">0</p>
+                            <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsMonth35to10">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 24px; color: #3498db; font-weight: bold;" id="statsMonth311to15">0</p>
+                            <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsMonth311to15">0</p>
                         </div>
                         <div class="stat-item">
                             <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 24px; color: #27ae60; font-weight: bold;" id="statsMonth316to20">0</p>
+                            <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsMonth316to20">0</p>
                         </div>
                     </div>
                 </div>
@@ -2563,7 +2591,7 @@
                         </tbody>
                     </table>
                 </div>
-                <button class="btn" onclick="clearSyncHistory()" style="margin-top: 15px;">
+                <button class="btn" onclick="clearSyncHistory()" style="margin-top: 12px;">
                     🗑️ مسح السجل
                 </button>
             </div>
@@ -2573,8 +2601,8 @@
     <!-- إضافة مكتبة jsQR لمسح QR Code -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
-   
-
+    <!-- JavaScript code remains the same -->
+    
     <script>
     // ========== إصلاحات خاصة بـ GitHub Pages ==========
 
@@ -6668,56 +6696,6 @@ document.addEventListener('DOMContentLoaded', () => {
     addExcelButtonsToUI();
 });
 
-function addExcelButtonsToUI() {
-    // إضافة أزرار Excel لجميع أقسام الشهور
-    for (let i = 1; i <= 3; i++) {
-        const toolbar = document.querySelector(`#month${i}Workspace .toolbar-bottom`);
-        if (toolbar) {
-            // التحقق من وجود الأزرار مسبقاً
-            const existingButtons = toolbar.querySelectorAll('.btn-excel');
-            if (existingButtons.length === 0) {
-                const excelButtons = document.createElement('div');
-                excelButtons.className = 'excel-buttons';
-                excelButtons.style.cssText = 'display: flex; gap: 5px; flex: 1;';
-                excelButtons.innerHTML = `
-                    <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
-                        <span>📊</span>
-                        <span>تصدير Excel</span>
-                    </button>
-                    
-                    <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
-                        <span>📥</span>
-                        <span>استيراد Excel</span>
-                    </button>
-                `;
-                toolbar.appendChild(excelButtons);
-            }
-        }
-    }
-    
-    // إضافة أزرار لقسم جميع الشهور
-    const allToolbar = document.querySelector('#allMonthsWorkspace .toolbar-bottom');
-    if (allToolbar) {
-        const existingButtons = allToolbar.querySelectorAll('.btn-excel');
-        if (existingButtons.length === 0) {
-            const excelButtons = document.createElement('div');
-            excelButtons.className = 'excel-buttons';
-            excelButtons.style.cssText = 'display: flex; gap: 5px; flex: 1;';
-            excelButtons.innerHTML = `
-                <button class="btn-icon" onclick="showExcelExportModal()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); flex: 1;">
-                    <span>📊</span>
-                    <span>تصدير Excel</span>
-                </button>
-                
-                <button class="btn-icon" onclick="showExcelImportModal()" style="background: linear-gradient(135deg, #3498db, #2980b9); flex: 1;">
-                    <span>📥</span>
-                    <span>استيراد Excel</span>
-                </button>
-            `;
-            allToolbar.appendChild(excelButtons);
-        }
-    }
-}
 
 // ========== تعطيل زر المزامنة أثناء التصدير ==========
 
