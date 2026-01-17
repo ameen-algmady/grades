@@ -2787,7 +2787,21 @@
         
         return true;
     }
+async function saveSessionData() {
+  const db = await openDatabase();
+  const tx = db.transaction('sessions', 'readwrite');
+  const store = tx.objectStore('sessions');
 
+  const sessionData = {
+    pendingUpdates,
+    failedUpdates,
+    syncHistory,
+    timestamp: new Date().toISOString()
+  };
+
+  store.put(sessionData);
+  console.log("💾 تم حفظ الجلسة الأخيرة في IndexedDB");
+}
     // ========== إدارة الجلسة والتسجيل التلقائي ==========
 // ========== إدارة الجلسة والتسجيل التلقائي ==========
 function initializeSession() {
