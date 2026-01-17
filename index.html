@@ -2787,21 +2787,7 @@
         
         return true;
     }
-async function saveSessionData() {
-  const db = await openDatabase();
-  const tx = db.transaction('sessions', 'readwrite');
-  const store = tx.objectStore('sessions');
 
-  const sessionData = {
-    pendingUpdates,
-    failedUpdates,
-    syncHistory,
-    timestamp: new Date().toISOString()
-  };
-
-  store.put(sessionData);
-  console.log("💾 تم حفظ الجلسة الأخيرة في IndexedDB");
-}
     // ========== إدارة الجلسة والتسجيل التلقائي ==========
 // ========== إدارة الجلسة والتسجيل التلقائي ==========
 function initializeSession() {
@@ -2835,6 +2821,21 @@ function initializeSession() {
     }
     return false;
 }
+async function saveSessionData() {
+  const db = await openDatabase();
+  const tx = db.transaction('sessions', 'readwrite');
+  const store = tx.objectStore('sessions');
+
+  const sessionData = {
+    pendingUpdates,
+    failedUpdates,
+    syncHistory,
+    timestamp: new Date().toISOString()
+  };
+
+  store.put(sessionData);
+  console.log("💾 تم حفظ الجلسة الأخيرة في IndexedDB");
+}
 
 // دالة منفصلة لمراقبة المزامنة
 function startSyncMonitoring() {
@@ -2858,6 +2859,7 @@ function startSyncMonitoring() {
     
     console.log('✅ تم بدء مراقبة المزامنة التلقائية');
 }
+
 
 function tryRestoreLocalData() {
     try {
@@ -3345,6 +3347,7 @@ function updateSyncDetailsList() {
 }
 
 // ========== المزامنة بدفعات 20 → 10 → 1 ==========
+// ========== المزامنة بدفعات 20 → 10 → 1 ==========
 async function syncPendingUpdates(isAuto = false) {
     if (pendingUpdates.length === 0 || isSyncing) {
         if (!isAuto && pendingUpdates.length === 0) {
@@ -3360,6 +3363,7 @@ async function syncPendingUpdates(isAuto = false) {
     showLoading(true, `☁️ جاري مزامنة ${totalCount} تعديل مع Google Sheets...`);
     updateProgressBar(0, totalCount);
 
+    // تعطيل أزرار المزامنة أثناء العملية
     document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
         if (btn) btn.disabled = true;
     });
@@ -3367,7 +3371,7 @@ async function syncPendingUpdates(isAuto = false) {
     let batchSize = 20;
 
     while (pendingUpdates.length > 0) {
-        let updatesToSend = pendingUpdates.slice(0, batchSize);
+        const updatesToSend = pendingUpdates.slice(0, batchSize);
 
         try {
             const response = await fetch(WEB_APP_URL, {
@@ -3406,7 +3410,7 @@ async function syncPendingUpdates(isAuto = false) {
                     successCount,
                     `توقف عند الخطأ: ${error.message}`
                 );
-                showError(`❌ فشلت المزامنة عند التعديل رقم ${successCount+1}: ${error.message}`);
+                showError(`❌ فشلت المزامنة عند التعديل رقم ${successCount + 1}: ${error.message}`);
                 break;
             }
         }
@@ -3414,6 +3418,7 @@ async function syncPendingUpdates(isAuto = false) {
 
     showLoading(false);
 
+    // إعادة تمكين الأزرار
     document.querySelectorAll('[id^="syncSheetsBtn"]').forEach(btn => {
         if (btn) btn.disabled = false;
     });
@@ -3427,29 +3432,17 @@ async function syncPendingUpdates(isAuto = false) {
         );
         showSuccess(`✅ تمت مزامنة ${successCount} تعديل بنجاح!`);
         updateDisplayedStudents();
+        await saveSessionData(); // ← حفظ الحالة النهائية بعد النجاح
     }
 
     isSyncing = false;
     updatePendingCount();
     updateSyncManagementUI();
     updateAutoSyncStatus();
+
     return successCount > 0;
 }
 
-// حدث المزامنة في الخلفية
-self.addEventListener('sync', event => {
-  if (event.tag === 'sync-updates') {
-    console.log('🔄 تشغيل مزامنة الخلفية...');
-    event.waitUntil(syncPendingUpdatesInBackground());
-  }
-});
-navigator.serviceWorker.ready.then(registration => {
-  if ('sync' in registration) {
-    registration.sync.register('sync-updates')
-      .then(() => console.log('📡 تم تسجيل مزامنة الخلفية'))
-      .catch(err => console.error('❌ خطأ في تسجيل مزامنة الخلفية:', err));
-  }
-});
 // 🔹 دالة شريط التقدم
 function updateProgressBar(done, total) {
     const bar = document.getElementById('syncProgressBar');
@@ -3459,36 +3452,37 @@ function updateProgressBar(done, total) {
         bar.textContent = percent + '%';
     }
 }
-    // ========== دوال إدارة المزامنة ==========
-    async function forceReSync() {
-        if (!confirm('هل تريد إعادة مزامنة جميع التعديلات المعلقة والفاشلة؟')) return;
-        
-        const allUpdates = [...pendingUpdates, ...failedUpdates];
-        if (allUpdates.length === 0) {
-            showSuccess('لا توجد تعديلات لإعادة المزامنة');
-            return;
-        }
-        
-        showLoading(true, `🔄 جاري إعادة مزامنة ${allUpdates.length} تعديل...`);
-        
-        // تنظيف القوائم
-        pendingUpdates = [];
-        failedUpdates = [];
-        savePendingUpdates();
-        saveFailedUpdates();
-        
-        // إضافة للقائمة المعلقة للمزامنة الجديدة
-        pendingUpdates = allUpdates;
-        savePendingUpdates();
-        
-        // بدء المزامنة
-        const success = await syncPendingUpdates(false);
-        
-        if (success) {
-            showSuccess(`✅ تمت إعادة مزامنة ${allUpdates.length} تعديل بنجاح`);
-            updateSyncManagementUI();
-        }
+
+// ========== إعادة المزامنة اليدوية ==========
+async function forceReSync() {
+    if (!confirm('هل تريد إعادة مزامنة جميع التعديلات المعلقة والفاشلة؟')) return;
+
+    const allUpdates = [...pendingUpdates, ...failedUpdates];
+    if (allUpdates.length === 0) {
+        showSuccess('لا توجد تعديلات لإعادة المزامنة');
+        return;
     }
+
+    showLoading(true, `🔄 جاري إعادة مزامنة ${allUpdates.length} تعديل...`);
+
+    // تنظيف القوائم
+    pendingUpdates = [];
+    failedUpdates = [];
+    savePendingUpdates();
+    saveFailedUpdates();
+
+    // إضافة التعديلات للقائمة المعلقة
+    pendingUpdates = allUpdates;
+    savePendingUpdates();
+
+    // بدء المزامنة
+    const success = await syncPendingUpdates(false);
+
+    if (success) {
+        showSuccess(`✅ تمت إعادة مزامنة ${allUpdates.length} تعديل بنجاح`);
+        updateSyncManagementUI();
+    }
+}
 
     async function syncMissingData() {
         showLoading(true, '🔍 جاري البحث عن بيانات مفقودة...');
