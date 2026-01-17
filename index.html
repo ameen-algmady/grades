@@ -1702,6 +1702,27 @@
         max-width: 100px;
     }
 }
+/* إضافة هذا CSS في نهاية الملف */
+
+/* إزالة الخلفية الزرقاء عندما يكون هناك شهر نشط */
+body.has-active-workspace {
+    background: #f5f7fa; /* لون رمادي فاتح بدلاً من الأزرق */
+    padding: 5px; /* تقليل padding */
+}
+
+/* أو إزالة التدرج تماماً */
+body.month-active {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+    padding: 5px !important;
+}
+
+/* تحسين الحاوية */
+.container {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
     </style>
 </head>
 <body>
