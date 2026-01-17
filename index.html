@@ -1633,23 +1633,23 @@
 
 .month-workspace th:nth-child(2), /* Barcode */
 .month-workspace td:nth-child(2) {
-    width: 70px;
-    min-width: 70px;
-    max-width: 70px;
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
 }
 
 .month-workspace th:nth-child(3), /* اسم الطالب */
 .month-workspace td:nth-child(3) {
-    width: 150px;
-    min-width: 150px;
-    max-width: 150px;
+    width: 180px;
+    min-width: 180px;
+    max-width: 180px;
 }
 
 .month-workspace th:nth-child(4), /* الشعبة */
 .month-workspace td:nth-child(4) {
-    width: 80px;
-    min-width: 80px;
-    max-width: 80px;
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
 }
 
 /* تخصيص عرض أعمدة الدرجات */
@@ -2450,117 +2450,133 @@ body.month-active {
             </div>
         </div>
 
-        <!-- نافذة الإحصائيات -->
-        <div id="statsModal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal" onclick="closeModal('statsModal')">&times;</span>
-                <h3>📊 إحصائيات الطلاب المفلترين (المعلم: <span id="statsTeacherId"></span>)</h3>
-                
-                <!-- تبويبات للإحصائيات -->
-                <div class="stats-tabs">
-                    <button class="stats-tab active" onclick="openStatsTab('overall')">المعدل العام</button>
-                    <button class="stats-tab" onclick="openStatsTab('month1')">الشهر الأول</button>
-                    <button class="stats-tab" onclick="openStatsTab('month2')">الشهر الثاني</button>
-                    <button class="stats-tab" onclick="openStatsTab('month3')">الشهر الثالث</button>
+       <!-- نافذة الإحصائيات -->
+<div id="statsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('statsModal')">&times;</span>
+        <h3>📊 إحصائيات الطلاب المفلترين (المعلم: <span id="statsTeacherId"></span>)</h3>
+        
+        <!-- تبويبات للإحصائيات -->
+        <div class="stats-tabs">
+            <button class="stats-tab active" onclick="openStatsTab('overall')">المعدل العام</button>
+            <button class="stats-tab" onclick="openStatsTab('month1')">الشهر الأول</button>
+            <button class="stats-tab" onclick="openStatsTab('month2')">الشهر الثاني</button>
+            <button class="stats-tab" onclick="openStatsTab('month3')">الشهر الثالث</button>
+        </div>
+        
+        <!-- المعدل العام -->
+        <div id="overallStats" class="stats-tab-content active">
+            <h4>المعدل العام لجميع الأشهر</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>العدد الكلي</h4>
+                    <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="totalStudentsCount">0</p>
                 </div>
-                
-                <!-- المعدل العام -->
-                <div id="overallStats" class="stats-tab-content active">
-                    <h4>المعدل العام لجميع الأشهر</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>العدد الكلي</h4>
-                            <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="totalStudentsCount">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsOverallLess5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsOverall5to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsOverall11to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsOverall16to20">0</p>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <h4>أقل من 50</h4>
+                    <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsOverallLess50">0</p>
                 </div>
-                
-                <!-- الشهر الأول -->
-                <div id="month1Stats" class="stats-tab-content">
-                    <h4>إحصائيات الشهر الأول</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsMonth1Less5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsMonth15to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsMonth111to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsMonth116to20">0</p>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <h4>من 50 إلى 64</h4>
+                    <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsOverall50to64">0</p>
                 </div>
-                
-                <!-- الشهر الثاني -->
-                <div id="month2Stats" class="stats-tab-content">
-                    <h4>إحصائيات الشهر الثاني</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsMonth2Less5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsMonth25to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsMonth211to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsMonth216to20">0</p>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <h4>من 65 إلى 74</h4>
+                    <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsOverall65to74">0</p>
                 </div>
-                
-                <!-- الشهر الثالث -->
-                <div id="month3Stats" class="stats-tab-content">
-                    <h4>إحصائيات الشهر الثالث</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h4>أقل من 5</h4>
-                            <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsMonth3Less5">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 5 إلى 10</h4>
-                            <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsMonth35to10">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 11 إلى 15</h4>
-                            <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsMonth311to15">0</p>
-                        </div>
-                        <div class="stat-item">
-                            <h4>من 16 إلى 20</h4>
-                            <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsMonth316to20">0</p>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <h4>من 75 إلى 89</h4>
+                    <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsOverall75to89">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 90 إلى 100</h4>
+                    <p style="font-size: 22px; color: #2ecc71; font-weight: bold;" id="statsOverall90to100">0</p>
                 </div>
             </div>
         </div>
+        
+        <!-- الشهر الأول -->
+        <div id="month1Stats" class="stats-tab-content">
+            <h4>إحصائيات الشهر الأول</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>أقل من 50</h4>
+                    <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsMonth1Less50">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 50 إلى 64</h4>
+                    <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsMonth150to64">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 65 إلى 74</h4>
+                    <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsMonth165to74">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 75 إلى 89</h4>
+                    <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsMonth175to89">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 90 إلى 100</h4>
+                    <p style="font-size: 22px; color: #2ecc71; font-weight: bold;" id="statsMonth190to100">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الشهر الثاني -->
+        <div id="month2Stats" class="stats-tab-content">
+            <h4>إحصائيات الشهر الثاني</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>أقل من 50</h4>
+                    <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsMonth2Less50">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 50 إلى 64</h4>
+                    <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsMonth250to64">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 65 إلى 74</h4>
+                    <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsMonth265to74">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 75 إلى 89</h4>
+                    <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsMonth275to89">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 90 إلى 100</h4>
+                    <p style="font-size: 22px; color: #2ecc71; font-weight: bold;" id="statsMonth290to100">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الشهر الثالث -->
+        <div id="month3Stats" class="stats-tab-content">
+            <h4>إحصائيات الشهر الثالث</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>أقل من 50</h4>
+                    <p style="font-size: 22px; color: #e74c3c; font-weight: bold;" id="statsMonth3Less50">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 50 إلى 64</h4>
+                    <p style="font-size: 22px; color: #f39c12; font-weight: bold;" id="statsMonth350to64">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 65 إلى 74</h4>
+                    <p style="font-size: 22px; color: #3498db; font-weight: bold;" id="statsMonth365to74">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 75 إلى 89</h4>
+                    <p style="font-size: 22px; color: #27ae60; font-weight: bold;" id="statsMonth375to89">0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>من 90 إلى 100</h4>
+                    <p style="font-size: 22px; color: #2ecc71; font-weight: bold;" id="statsMonth390to100">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
         <!-- نافذة التعديل المخصصة للشهر -->
         <div id="editModal" class="modal">
@@ -5072,38 +5088,44 @@ function calculateAllStatistics() {
 
 function calculateMonthStatistics(students, month) {
     const ranges = {
-        less5: 0,
-        from5to10: 0,
-        from11to15: 0,
-        from16to20: 0
+        less50: 0,
+        from50to64: 0,
+        from65to74: 0,
+        from75to89: 0,
+        from90to100: 0
     };
     
     students.forEach(student => {
         const total = parseFloat(student[`total${month}`]) || 0;
         
-        if (total < 5) ranges.less5++;
-        else if (total >= 5 && total <= 10) ranges.from5to10++;
-        else if (total >= 11 && total <= 15) ranges.from11to15++;
-        else if (total >= 16 && total <= 20) ranges.from16to20++;
+        if (total < 50) ranges.less50++;
+        else if (total >= 50 && total <= 64) ranges.from50to64++;
+        else if (total >= 65 && total <= 74) ranges.from65to74++;
+        else if (total >= 75 && total <= 89) ranges.from75to89++;
+        else if (total >= 90 && total <= 100) ranges.from90to100++;
     });
     
-    const less5Element = document.getElementById(`statsMonth${month}Less5`);
-    const from5to10Element = document.getElementById(`statsMonth${month}5to10`);
-    const from11to15Element = document.getElementById(`statsMonth${month}11to15`);
-    const from16to20Element = document.getElementById(`statsMonth${month}16to20`);
+    // تحديث العناصر في الواجهة
+    const less50Element = document.getElementById(`statsMonth${month}Less50`);
+    const from50to64Element = document.getElementById(`statsMonth${month}50to64`);
+    const from65to74Element = document.getElementById(`statsMonth${month}65to74`);
+    const from75to89Element = document.getElementById(`statsMonth${month}75to89`);
+    const from90to100Element = document.getElementById(`statsMonth${month}90to100`);
     
-    if (less5Element) less5Element.textContent = ranges.less5;
-    if (from5to10Element) from5to10Element.textContent = ranges.from5to10;
-    if (from11to15Element) from11to15Element.textContent = ranges.from11to15;
-    if (from16to20Element) from16to20Element.textContent = ranges.from16to20;
+    if (less50Element) less50Element.textContent = ranges.less50;
+    if (from50to64Element) from50to64Element.textContent = ranges.from50to64;
+    if (from65to74Element) from65to74Element.textContent = ranges.from65to74;
+    if (from75to89Element) from75to89Element.textContent = ranges.from75to89;
+    if (from90to100Element) from90to100Element.textContent = ranges.from90to100;
 }
 
 function calculateOverallStatistics(students) {
     const ranges = {
-        less5: 0,
-        from5to10: 0, 
-        from11to15: 0,
-        from16to20: 0
+        less50: 0,
+        from50to64: 0,
+        from65to74: 0,
+        from75to89: 0,
+        from90to100: 0
     };
     
     students.forEach(student => {
@@ -5111,23 +5133,36 @@ function calculateOverallStatistics(students) {
         const total2 = parseFloat(student.total2) || 0;
         const total3 = parseFloat(student.total3) || 0;
         
-        const overallAverage = (total1 + total2 + total3) / 3;
+        // حساب المعدل العام
+        let sum = 0;
+        let count = 0;
         
-        if (overallAverage < 5) ranges.less5++;
-        else if (overallAverage >= 5 && overallAverage <= 10) ranges.from5to10++;
-        else if (overallAverage >= 11 && overallAverage <= 15) ranges.from11to15++;
-        else if (overallAverage >= 16 && overallAverage <= 20) ranges.from16to20++;
+        if (total1 > 0) { sum += total1; count++; }
+        if (total2 > 0) { sum += total2; count++; }
+        if (total3 > 0) { sum += total3; count++; }
+        
+        const overallAverage = count > 0 ? sum / count : 0;
+        
+        // تصنيف المعدل العام
+        if (overallAverage < 50) ranges.less50++;
+        else if (overallAverage >= 50 && overallAverage <= 64) ranges.from50to64++;
+        else if (overallAverage >= 65 && overallAverage <= 74) ranges.from65to74++;
+        else if (overallAverage >= 75 && overallAverage <= 89) ranges.from75to89++;
+        else if (overallAverage >= 90 && overallAverage <= 100) ranges.from90to100++;
     });
     
-    const less5Element = document.getElementById('statsOverallLess5');
-    const from5to10Element = document.getElementById('statsOverall5to10');
-    const from11to15Element = document.getElementById('statsOverall11to15');
-    const from16to20Element = document.getElementById('statsOverall16to20');
+    // تحديث العناصر في الواجهة
+    const less50Element = document.getElementById('statsOverallLess50');
+    const from50to64Element = document.getElementById('statsOverall50to64');
+    const from65to74Element = document.getElementById('statsOverall65to74');
+    const from75to89Element = document.getElementById('statsOverall75to89');
+    const from90to100Element = document.getElementById('statsOverall90to100');
     
-    if (less5Element) less5Element.textContent = ranges.less5;
-    if (from5to10Element) from5to10Element.textContent = ranges.from5to10;
-    if (from11to15Element) from11to15Element.textContent = ranges.from11to15;
-    if (from16to20Element) from16to20Element.textContent = ranges.from16to20;
+    if (less50Element) less50Element.textContent = ranges.less50;
+    if (from50to64Element) from50to64Element.textContent = ranges.from50to64;
+    if (from65to74Element) from65to74Element.textContent = ranges.from65to74;
+    if (from75to89Element) from75to89Element.textContent = ranges.from75to89;
+    if (from90to100Element) from90to100Element.textContent = ranges.from90to100;
 }
 
 function openStatsTab(tabName) {
