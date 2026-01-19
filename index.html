@@ -1427,13 +1427,13 @@
             /* تحسين الشريط العلوي للهواتف */
             .toolbar-top {
                 flex-direction: column;
-                padding: 10px;
-                gap: 10px;
+                padding: 5px;
+                gap: 5px;
             }
 
             .toolbar-main-row {
                 flex-direction: column;
-                gap: 10px;
+                gap: 5px;
                 text-align: center;
             }
 
@@ -1707,13 +1707,13 @@
 /* إزالة الخلفية الزرقاء عندما يكون هناك شهر نشط */
 body.has-active-workspace {
     background: #f5f7fa; /* لون رمادي فاتح بدلاً من الأزرق */
-    padding: 5px; /* تقليل padding */
+    padding: 2px; /* تقليل padding */
 }
 
 /* أو إزالة التدرج تماماً */
 body.month-active {
     background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
-    padding: 5px !important;
+    padding: 2px !important;
 }
 
 /* تحسين الحاوية */
@@ -2780,7 +2780,1065 @@ body.month-active {
     let deferredPrompt = null;
     let retryAttempts = 0;
     const MAX_RETRY_ATTEMPTS = 3;
+// ========== نظام IndexedDB للتخزين الموثوق ==========
+const DB_NAME = 'GradesDB';
+const DB_VERSION = 2;
 
+// تهيئة قاعدة البيانات
+async function initDatabase() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        
+        request.onerror = (event) => {
+            console.error('❌ فشل فتح قاعدة البيانات:', event.target.error);
+            reject(event.target.error);
+        };
+        
+        request.onsuccess = (event) => {
+            console.log('✅ تم فتح قاعدة البيانات بنجاح');
+            resolve(event.target.result);
+        };
+        
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            
+            // إنشاء مخازن (object stores) إذا لم تكن موجودة
+            if (!db.objectStoreNames.contains('students')) {
+                const store = db.createObjectStore('students', { keyPath: 'id' });
+                store.createIndex('teacherId', 'teacherId', { unique: false });
+                store.createIndex('lastModified', 'lastModified', { unique: false });
+            }
+            
+            if (!db.objectStoreNames.contains('updates')) {
+                const store = db.createObjectStore('updates', { 
+                    keyPath: ['id', 'field', 'timestamp'] 
+                });
+                store.createIndex('status', 'status', { unique: false });
+                store.createIndex('teacherId', 'teacherId', { unique: false });
+            }
+            
+            if (!db.objectStoreNames.contains('sessions')) {
+                db.createObjectStore('sessions', { keyPath: 'teacherId' });
+            }
+            
+            if (!db.objectStoreNames.contains('backups')) {
+                db.createObjectStore('backups', { keyPath: 'timestamp' });
+            }
+            
+            console.log('✅ تم إنشاء/تحديث هياكل قاعدة البيانات');
+        };
+    });
+}
+
+// حفظ جلسة المعلم في IndexedDB
+async function saveTeacherSessionDB(teacherId, sessionData) {
+    try {
+        const db = await initDatabase();
+        const tx = db.transaction('sessions', 'readwrite');
+        const store = tx.objectStore('sessions');
+        
+        const session = {
+            teacherId: teacherId,
+            lastLogin: new Date().toISOString(),
+            lastActivity: new Date().toISOString(),
+            deviceInfo: {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language
+            },
+            ...sessionData
+        };
+        
+        store.put(session);
+        
+        return new Promise((resolve, reject) => {
+            tx.oncomplete = () => {
+                console.log('✅ تم حفظ الجلسة في IndexedDB');
+                resolve(true);
+            };
+            tx.onerror = (event) => {
+                console.error('❌ فشل حفظ الجلسة:', event.target.error);
+                reject(event.target.error);
+            };
+        });
+    } catch (error) {
+        console.error('❌ خطأ في حفظ الجلسة:', error);
+        // Fallback إلى localStorage
+        localStorage.setItem(`session_${teacherId}`, JSON.stringify(sessionData));
+        return false;
+    }
+}
+
+// تحميل جلسة المعلم من IndexedDB
+async function loadTeacherSessionDB() {
+    try {
+        const db = await initDatabase();
+        const tx = db.transaction('sessions', 'readonly');
+        const store = tx.objectStore('sessions');
+        
+        return new Promise((resolve, reject) => {
+            const request = store.openCursor();
+            const sessions = [];
+            
+            request.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    sessions.push(cursor.value);
+                    cursor.continue();
+                } else {
+                    // إرجاع آخر جلسة
+                    if (sessions.length > 0) {
+                        sessions.sort((a, b) => 
+                            new Date(b.lastLogin) - new Date(a.lastLogin)
+                        );
+                        resolve(sessions[0]);
+                    } else {
+                        resolve(null);
+                    }
+                }
+            };
+            
+            request.onerror = (event) => {
+                reject(event.target.error);
+            };
+        });
+    } catch (error) {
+        console.error('❌ خطأ في تحميل الجلسة:', error);
+        // Fallback إلى localStorage
+        const keys = Object.keys(localStorage)
+            .filter(key => key.startsWith('session_'));
+        
+        if (keys.length > 0) {
+            const latestKey = keys.sort().pop();
+            return JSON.parse(localStorage.getItem(latestKey));
+        }
+        return null;
+    }
+}
+
+// حفظ الطلاب في IndexedDB
+async function saveStudentsToDB(students, teacherId) {
+    try {
+        const db = await initDatabase();
+        const tx = db.transaction('students', 'readwrite');
+        const store = tx.objectStore('students');
+        
+        // حفظ كل طالب مع تاريخ التعديل
+        const timestamp = new Date().toISOString();
+        
+        students.forEach(student => {
+            student.lastModified = timestamp;
+            student.teacherId = teacherId;
+            student.syncStatus = 'pending';
+            store.put(student);
+        });
+        
+        return new Promise((resolve, reject) => {
+            tx.oncomplete = () => {
+                console.log(`✅ تم حفظ ${students.length} طالب في IndexedDB`);
+                resolve(true);
+            };
+            tx.onerror = (event) => {
+                console.error('❌ فشل حفظ الطلاب:', event.target.error);
+                reject(event.target.error);
+            };
+        });
+    } catch (error) {
+        console.error('❌ خطأ في حفظ الطلاب:', error);
+        // Fallback إلى localStorage
+        localStorage.setItem(`students_${teacherId}`, JSON.stringify(students));
+        return false;
+    }
+}
+
+// تحميل الطلاب من IndexedDB
+async function loadStudentsFromDB(teacherId) {
+    try {
+        const db = await initDatabase();
+        const tx = db.transaction('students', 'readonly');
+        const store = tx.objectStore('students');
+        const index = store.index('teacherId');
+        
+        return new Promise((resolve, reject) => {
+            const request = index.getAll(teacherId);
+            
+            request.onsuccess = (event) => {
+                const students = event.target.result;
+                console.log(`✅ تم تحميل ${students.length} طالب من IndexedDB`);
+                resolve(students);
+            };
+            
+            request.onerror = (event) => {
+                reject(event.target.error);
+            };
+        });
+    } catch (error) {
+        console.error('❌ خطأ في تحميل الطلاب:', error);
+        // Fallback إلى localStorage
+        const students = localStorage.getItem(`students_${teacherId}`);
+        return students ? JSON.parse(students) : [];
+    }
+}
+
+// حفظ التعديلات في IndexedDB
+async function saveUpdateToDB(updateData) {
+    try {
+        const db = await initDatabase();
+        const tx = db.transaction('updates', 'readwrite');
+        const store = tx.objectStore('updates');
+        
+        const update = {
+            ...updateData,
+            timestamp: new Date().toISOString(),
+            status: 'pending',
+            synced: false
+        };
+        
+        store.add(update);
+        
+        return new Promise((resolve, reject) => {
+            tx.oncomplete = () => {
+                console.log('✅ تم حفظ التعديل في IndexedDB');
+                resolve(true);
+            };
+            tx.onerror = (event) => {
+                console.error('❌ فشل حفظ التعديل:', event.target.error);
+                reject(event.target.error);
+            };
+        });
+    } catch (error) {
+        console.error('❌ خطأ في حفظ التعديل:', error);
+        return false;
+    }
+}
+
+// تحميل التعديلات المعلقة من IndexedDB
+async function loadPendingUpdatesFromDB(teacherId) {
+    try {
+        const db = await initDatabase();
+        const tx = db.transaction('updates', 'readonly');
+        const store = tx.objectStore('updates');
+        const index = store.index('teacherId');
+        
+        return new Promise((resolve, reject) => {
+            const request = index.getAll(teacherId);
+            
+            request.onsuccess = (event) => {
+                const updates = event.target.result.filter(u => 
+                    u.status === 'pending' && !u.synced
+                );
+                console.log(`✅ تم تحميل ${updates.length} تعديل من IndexedDB`);
+                resolve(updates);
+            };
+            
+            request.onerror = (event) => {
+                reject(event.target.error);
+            };
+        });
+    } catch (error) {
+        console.error('❌ خطأ في تحميل التعديلات:', error);
+        return [];
+    }
+}
+// ========== نظام الحفظ التلقائي المحسّن ==========
+let autoSaveInterval;
+let lastSavedState = null;
+let isSaving = false;
+
+// بدء نظام الحفظ التلقائي
+function startAutoSaveSystem() {
+    console.log('🚀 بدء نظام الحفظ التلقائي...');
+    
+    // الحفظ الفوري عند أي تغيير
+    setupAutoSaveOnChange();
+    
+    // الحفظ الدوري كل 30 ثانية
+    autoSaveInterval = setInterval(autoSaveData, 30000);
+    
+    // الحفظ قبل مغادرة الصفحة
+    setupBeforeUnloadSave();
+    
+    // الحفظ عند تغيير حالة الشبكة
+    setupNetworkAwareSave();
+    
+    console.log('✅ نظام الحفظ التلقائي جاهز');
+}
+
+// إعداد الحفظ عند التغيير
+function setupAutoSaveOnChange() {
+    // مراقبة تغييرات في حقول التعديل
+    document.addEventListener('input', function(e) {
+        if (e.target.matches('input[type="number"], input[type="text"]')) {
+            debouncedAutoSave();
+        }
+    });
+    
+    // مراقبة تغييرات في الأزرار
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.edit-btn, .save-btn, [onclick*="save"]')) {
+            debouncedAutoSave();
+        }
+    });
+}
+
+// الحفظ المؤجل (debounce)
+const debouncedAutoSave = debounce(function() {
+    if (currentTeacherId && allStudents.length > 0) {
+        autoSaveData();
+    }
+}, 2000); // تأخير 2 ثانية بعد آخر تغيير
+
+// دالة debounce المساعدة
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// الحفظ التلقائي للبيانات
+async function autoSaveData(force = false) {
+    if (isSaving) return;
+    
+    const currentState = JSON.stringify({
+        students: allStudents,
+        pendingUpdates: pendingUpdates,
+        timestamp: Date.now()
+    });
+    
+    // التحقق إذا كان هناك تغيير فعلي
+    if (!force && currentState === lastSavedState) {
+        return;
+    }
+    
+    isSaving = true;
+    
+    try {
+        console.log('💾 الحفظ التلقائي للبيانات...');
+        
+        // حفظ متعدد الطبقات
+        await Promise.all([
+            saveToIndexedDB(),
+            saveToLocalStorage(),
+            saveToSessionStorage(),
+            createAutoBackup()
+        ]);
+        
+        lastSavedState = currentState;
+        
+        // تحديث واجهة المستخدم
+        updateSaveIndicator('success', 'تم الحفظ تلقائياً');
+        
+        console.log('✅ تم الحفظ التلقائي بنجاح');
+        
+    } catch (error) {
+        console.error('❌ فشل الحفظ التلقائي:', error);
+        updateSaveIndicator('error', 'فشل الحفظ - جاري المحاولة مرة أخرى');
+        
+        // محاولة مرة أخرى بعد 5 ثواني
+        setTimeout(() => autoSaveData(true), 5000);
+    } finally {
+        isSaving = false;
+    }
+}
+
+// الحفظ في IndexedDB
+async function saveToIndexedDB() {
+    if (!currentTeacherId || allStudents.length === 0) return;
+    
+    await Promise.all([
+        saveStudentsToDB(allStudents, currentTeacherId),
+        saveTeacherSessionDB(currentTeacherId, {
+            lastSave: new Date().toISOString(),
+            studentCount: allStudents.length,
+            pendingCount: pendingUpdates.length
+        })
+    ]);
+}
+
+// الحفظ في localStorage
+async function saveToLocalStorage() {
+    try {
+        // حفظ البيانات الرئيسية
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({
+            students: allStudents,
+            teacherId: currentTeacherId,
+            lastSave: new Date().toISOString(),
+            version: '2.0'
+        }));
+        
+        // حفظ التعديلات المعلقة
+        localStorage.setItem(PENDING_UPDATES_KEY, JSON.stringify(pendingUpdates));
+        
+        // حفظ السجل
+        localStorage.setItem('last_auto_save', new Date().toISOString());
+        
+    } catch (error) {
+        console.warn('⚠️ فشل الحفظ في localStorage:', error);
+        // محاولة تنظيف وتقليل حجم البيانات
+        cleanupLocalStorage();
+    }
+}
+
+// الحفظ في sessionStorage للوصول السريع
+async function saveToSessionStorage() {
+    try {
+        sessionStorage.setItem('current_session', JSON.stringify({
+            teacherId: currentTeacherId,
+            studentCount: allStudents.length,
+            lastUpdate: new Date().toISOString(),
+            currentMonth: currentMonth
+        }));
+    } catch (error) {
+        console.warn('⚠️ فشل الحفظ في sessionStorage:', error);
+    }
+}
+
+// إنشاء نسخة احتياطية تلقائية
+async function createAutoBackup() {
+    if (allStudents.length === 0) return;
+    
+    const backupKey = `auto_backup_${currentTeacherId}_${Date.now()}`;
+    
+    const backupData = {
+        timestamp: new Date().toISOString(),
+        teacherId: currentTeacherId,
+        students: allStudents.slice(), // نسخة من البيانات
+        pendingUpdates: pendingUpdates.slice(),
+        source: 'auto_save'
+    };
+    
+    try {
+        // حفظ في IndexedDB
+        const db = await initDatabase();
+        const tx = db.transaction('backups', 'readwrite');
+        const store = tx.objectStore('backups');
+        store.put(backupData);
+        
+        // حفظ في localStorage كمثيل احتياطي
+        localStorage.setItem(backupKey, JSON.stringify(backupData));
+        
+        // تنظيف النسخ القديمة
+        cleanupOldBackups();
+        
+    } catch (error) {
+        console.warn('⚠️ فشل إنشاء النسخة الاحتياطية:', error);
+    }
+}
+
+// إعداد الحفظ قبل مغادرة الصفحة
+function setupBeforeUnloadSave() {
+    window.addEventListener('beforeunload', async (event) => {
+        if (pendingUpdates.length > 0 || hasUnsavedChanges()) {
+            // محاولة الحفظ الفوري
+            await forceSaveBeforeUnload();
+            
+            // إظهار تحذير للمستخدم
+            event.preventDefault();
+            event.returnValue = 'لديك تغييرات غير محفوظة. هل تريد حقاً مغادرة الصفحة؟';
+            return event.returnValue;
+        }
+    });
+    
+    window.addEventListener('pagehide', async (event) => {
+        // الحفظ عند إخفاء الصفحة (للأجهزة المحمولة)
+        await autoSaveData(true);
+    });
+    
+    window.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            // الحفظ عندما تكون الصفحة غير مرئية
+            autoSaveData();
+        }
+    });
+}
+
+// الحفظ الإجباري قبل الخروج
+async function forceSaveBeforeUnload() {
+    console.log('🚨 حفظ إجباري قبل الخروج...');
+    
+    // إيقاف مؤقت لضمان الحفظ
+    const savePromise = autoSaveData(true);
+    
+    // الانتظار لمدة 1 ثانية كحد أقصى
+    const timeoutPromise = new Promise(resolve => 
+        setTimeout(resolve, 1000)
+    );
+    
+    await Promise.race([savePromise, timeoutPromise]);
+}
+
+// إعداد الحفظ حسب حالة الشبكة
+function setupNetworkAwareSave() {
+    window.addEventListener('online', () => {
+        console.log('🌐 اتصال بالإنترنت - جاري المزامنة...');
+        autoSaveData();
+        syncPendingUpdates(true);
+    });
+    
+    window.addEventListener('offline', () => {
+        console.log('📴 انقطع الاتصال - جاري الحفظ المحلي...');
+        autoSaveData();
+        updateSaveIndicator('warning', 'العمل دون اتصال - سيتم المزامنة عند العودة');
+    });
+}
+
+// التحقق من وجود تغييرات غير محفوظة
+function hasUnsavedChanges() {
+    const savedStudents = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!savedStudents) return true;
+    
+    try {
+        const saved = JSON.parse(savedStudents);
+        return JSON.stringify(saved.students) !== JSON.stringify(allStudents);
+    } catch {
+        return true;
+    }
+}
+
+// تحديث مؤشر الحفظ في الواجهة
+function updateSaveIndicator(status, message) {
+    const indicator = document.getElementById('saveIndicator') || createSaveIndicator();
+    
+    const colors = {
+        success: '#27ae60',
+        error: '#e74c3c',
+        warning: '#f39c12',
+        saving: '#3498db'
+    };
+    
+    indicator.innerHTML = `
+        <span class="save-status" style="color: ${colors[status] || '#666'}">
+            ${status === 'saving' ? '⏳' : status === 'success' ? '✅' : '⚠️'}
+            ${message}
+        </span>
+    `;
+    
+    indicator.style.display = 'block';
+    
+    if (status === 'success') {
+        setTimeout(() => {
+            indicator.style.display = 'none';
+        }, 3000);
+    }
+}
+
+// إنشاء مؤشر الحفظ إذا لم يكن موجوداً
+function createSaveIndicator() {
+    const indicator = document.createElement('div');
+    indicator.id = 'saveIndicator';
+    indicator.style.cssText = `
+        position: fixed;
+        bottom: 60px;
+        right: 20px;
+        background: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        font-size: 12px;
+        z-index: 9999;
+        display: none;
+    `;
+    document.body.appendChild(indicator);
+    return indicator;
+}
+// ========== نظام استعادة البيانات المحسّن ==========
+async function enhancedRestoreData(teacherId) {
+    console.log('🔍 استعادة بيانات محسنة...');
+    
+    try {
+        // محاولة الاستعادة من مصادر متعددة بترتيب الأولوية
+        const restoreMethods = [
+            restoreFromIndexedDB,
+            restoreFromLocalStorage,
+            restoreFromAutoBackup,
+            restoreFromSession
+        ];
+        
+        for (const method of restoreMethods) {
+            const result = await method(teacherId);
+            if (result.success) {
+                console.log(`✅ تم الاستعادة من ${result.source}`);
+                return result;
+            }
+        }
+        
+        throw new Error('فشل في استعادة البيانات من جميع المصادر');
+        
+    } catch (error) {
+        console.error('❌ فشل استعادة البيانات:', error);
+        return {
+            success: false,
+            source: 'none',
+            error: error.message
+        };
+    }
+}
+
+// الاستعادة من IndexedDB
+async function restoreFromIndexedDB(teacherId) {
+    try {
+        const students = await loadStudentsFromDB(teacherId);
+        const session = await loadTeacherSessionDB();
+        
+        if (students.length > 0 && session) {
+            allStudents = students;
+            currentTeacherId = teacherId;
+            
+            // تحميل التعديلات المعلقة
+            pendingUpdates = await loadPendingUpdatesFromDB(teacherId);
+            
+            // التحقق من سلامة البيانات
+            const integrity = verifyDataIntegrity();
+            if (integrity.valid) {
+                return {
+                    success: true,
+                    source: 'indexeddb',
+                    studentCount: students.length,
+                    lastSave: session.lastSave
+                };
+            }
+        }
+        
+        return { success: false, source: 'indexeddb' };
+        
+    } catch (error) {
+        return { success: false, source: 'indexeddb', error: error.message };
+    }
+}
+
+// الاستعادة من localStorage
+async function restoreFromLocalStorage(teacherId) {
+    try {
+        // البيانات الرئيسية
+        const mainData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (mainData) {
+            const parsed = JSON.parse(mainData);
+            
+            if (parsed.teacherId === teacherId && parsed.students) {
+                allStudents = parsed.students;
+                currentTeacherId = teacherId;
+                
+                // التعديلات المعلقة
+                pendingUpdates = loadPendingUpdates();
+                
+                return {
+                    success: true,
+                    source: 'localstorage',
+                    studentCount: parsed.students.length,
+                    lastSave: parsed.lastSave
+                };
+            }
+        }
+        
+        return { success: false, source: 'localstorage' };
+        
+    } catch (error) {
+        return { success: false, source: 'localstorage', error: error.message };
+    }
+}
+
+// الاستعادة من النسخ الاحتياطية التلقائية
+async function restoreFromAutoBackup(teacherId) {
+    try {
+        const backupKeys = Object.keys(localStorage)
+            .filter(key => key.startsWith(`auto_backup_${teacherId}`))
+            .sort()
+            .reverse(); // الأحدث أولاً
+        
+        for (const key of backupKeys.slice(0, 3)) { // آخر 3 نسخ
+            const backup = JSON.parse(localStorage.getItem(key));
+            
+            if (backup && backup.teacherId === teacherId && backup.students) {
+                allStudents = backup.students;
+                currentTeacherId = teacherId;
+                pendingUpdates = backup.pendingUpdates || [];
+                
+                return {
+                    success: true,
+                    source: 'autobackup',
+                    studentCount: backup.students.length,
+                    backupDate: backup.timestamp
+                };
+            }
+        }
+        
+        return { success: false, source: 'autobackup' };
+        
+    } catch (error) {
+        return { success: false, source: 'autobackup', error: error.message };
+    }
+}
+
+// الاستعادة من sessionStorage
+async function restoreFromSession(teacherId) {
+    try {
+        const session = sessionStorage.getItem('current_session');
+        if (session) {
+            const parsed = JSON.parse(session);
+            if (parsed.teacherId === teacherId) {
+                // محاولة تحميل البيانات من مصادر أخرى
+                const result = await restoreFromLocalStorage(teacherId);
+                if (result.success) {
+                    currentMonth = parsed.currentMonth || 1;
+                    return {
+                        ...result,
+                        source: 'session',
+                        restoredSession: true
+                    };
+                }
+            }
+        }
+        
+        return { success: false, source: 'session' };
+        
+    } catch (error) {
+        return { success: false, source: 'session', error: error.message };
+    }
+}
+
+// تنظيف التخزين المحلي
+function cleanupLocalStorage() {
+    try {
+        // حفظ المساحة المستخدمة
+        const usedSpace = JSON.stringify(localStorage).length;
+        console.log(`💾 المساحة المستخدمة: ${(usedSpace / 1024).toFixed(2)} KB`);
+        
+        if (usedSpace > 5 * 1024 * 1024) { // أكثر من 5MB
+            console.log('🧹 تنظيف التخزين المحلي...');
+            
+            // حفظ البيانات الحالية أولاً
+            if (currentTeacherId && allStudents.length > 0) {
+                saveToLocalStorage();
+            }
+            
+            // حذف البيانات القديمة
+            const keys = Object.keys(localStorage);
+            const now = Date.now();
+            
+            keys.forEach(key => {
+                if (key.startsWith('temp_') || key.startsWith('old_')) {
+                    localStorage.removeItem(key);
+                }
+                
+                // حذف النسخ الاحتياطية القديمة جداً (أكثر من 30 يوم)
+                if (key.startsWith('grades_backup_') || key.startsWith('auto_backup_')) {
+                    try {
+                        const item = localStorage.getItem(key);
+                        if (item) {
+                            const data = JSON.parse(item);
+                            const age = now - new Date(data.timestamp).getTime();
+                            if (age > 30 * 24 * 60 * 60 * 1000) {
+                                localStorage.removeItem(key);
+                            }
+                        }
+                    } catch (e) {
+                        localStorage.removeItem(key);
+                    }
+                }
+            });
+            
+            console.log('✅ تم تنظيف التخزين المحلي');
+        }
+    } catch (error) {
+        console.error('❌ خطأ في تنظيف التخزين:', error);
+    }
+}
+
+// تنظيف النسخ الاحتياطية القديمة
+function cleanupOldBackups() {
+    const backupKeys = Object.keys(localStorage)
+        .filter(key => key.startsWith('auto_backup_'))
+        .sort()
+        .reverse();
+    
+    // حفظ آخر 5 نسخ فقط
+    if (backupKeys.length > 5) {
+        backupKeys.slice(5).forEach(key => {
+            localStorage.removeItem(key);
+        });
+    }
+}
+async function initializeSession() {
+    console.log('🔒 تهيئة جلسة آمنة مع استعادة البيانات...');
+    
+    try {
+        // أولاً: التحقق من IndexedDB
+        await initDatabase();
+        
+        // ثانياً: محاولة استعادة الجلسة الأخيرة
+        const session = await loadTeacherSessionDB();
+        
+        if (session && session.teacherId) {
+            currentTeacherId = session.teacherId;
+            teacherIdInput.value = currentTeacherId;
+            
+            // استعادة البيانات بطرق متعددة
+            const restoreResult = await enhancedRestoreData(currentTeacherId);
+            
+            if (restoreResult.success) {
+                console.log(`✅ تم استعادة ${allStudents.length} طالب`);
+                
+                // تحديث الواجهة
+                completeLogin();
+                
+                // بدء نظام الحفظ التلقائي
+                startAutoSaveSystem();
+                
+                // بدء مراقبة المزامنة
+                startSyncMonitoring();
+                
+                // إظهار رسالة الاستعادة
+                showSuccessWithDetails(restoreResult);
+                
+                return true;
+            }
+        }
+        
+        // إذا لم تنجح الاستعادة، عرض نموذج الدخول
+        showLoginForm();
+        
+    } catch (error) {
+        console.error('❌ خطأ في تهيئة الجلسة:', error);
+        
+        // Fallback: محاولة الاستعادة من localStorage فقط
+        const localSession = loadTeacherSession();
+        if (localSession && localSession.teacherId) {
+            currentTeacherId = localSession.teacherId;
+            teacherIdInput.value = currentTeacherId;
+            
+            if (tryRestoreLocalData()) {
+                completeLogin();
+                startAutoSaveSystem();
+                return true;
+            }
+        }
+        
+        showLoginForm();
+    }
+    
+    return false;
+}
+
+// إظهار رسالة تفصيلية عن الاستعادة
+function showSuccessWithDetails(restoreResult) {
+    const messages = {
+        'indexeddb': 'من قاعدة البيانات المحلية',
+        'localstorage': 'من التخزين المحلي',
+        'autobackup': 'من النسخة الاحتياطية',
+        'session': 'من الجلسة السابقة'
+    };
+    
+    const source = messages[restoreResult.source] || restoreResult.source;
+    const date = restoreResult.lastSave || restoreResult.backupDate;
+    
+    let message = `👋 مرحباً بعودتك!<br>`;
+    message += `تم استعادة ${restoreResult.studentCount} طالب ${source}.`;
+    
+    if (date) {
+        message += `<br>آخر تحديث: ${new Date(date).toLocaleString('ar-SA')}`;
+    }
+    
+    if (pendingUpdates.length > 0) {
+        message += `<br>يوجد ${pendingUpdates.length} تعديل معلق للمزامنة.`;
+    }
+    
+    alertWithHTML('استعادة البيانات', `
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 15px;">✅</div>
+            <h4 style="color: #27ae60;">تم استعادة البيانات بنجاح</h4>
+            <p>${message}</p>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-success" onclick="this.parentElement.parentElement.parentElement.remove()" style="width: 100%;">
+                    متابعة العمل
+                </button>
+            </div>
+        </div>
+    `);
+}
+
+// إظهار نموذج الدخول
+function showLoginForm() {
+    if (loginSection) {
+        loginSection.classList.remove('hidden');
+        loginSection.style.display = 'flex';
+    }
+    if (monthSelectionSection) {
+        monthSelectionSection.classList.add('hidden');
+    }
+}
+async function saveAllEdits() {
+    const studentId = document.getElementById('editStudentId')?.value;
+    const currentMonth = document.getElementById('currentEditMonth')?.value;
+    
+    if (!studentId) {
+        showError('❌ خطأ: لم يتم العثور على معرف الطالب');
+        return;
+    }
+    
+    const idToFind = studentId.toString().trim(); 
+    const student = allStudents.find(s => s.id && s.id.toString().trim() === idToFind);
+
+    if (!student) {
+        showError('❌ خطأ: لم يتم العثور على الطالب');
+        return;
+    }
+
+    const updateData = {
+        row: student.originalRowIndex, 
+        id: student.id,
+        teacherId: currentTeacherId,
+        timestamp: new Date().toISOString()
+    };
+
+    let changesMade = false;
+
+    let fieldsToCheck = [];
+    if (currentMonth === 'all') {
+        fieldsToCheck = [
+            'attendance1', 'oral1', 'homework1', 'written1',
+            'attendance2', 'oral2', 'homework2', 'written2', 
+            'attendance3', 'homework3', 'oral3', 'written3'
+        ];
+    } else {
+        const monthFields = {
+            1: ['attendance1', 'oral1', 'homework1', 'written1'],
+            2: ['attendance2', 'oral2', 'homework2', 'written2'],
+            3: ['attendance3', 'homework3', 'oral3', 'written3']
+        };
+        fieldsToCheck = monthFields[currentMonth];
+    }
+
+    fieldsToCheck.forEach(field => {
+        const inputElement = document.getElementById(`edit${field}`);
+        if (inputElement) {
+            const oldValue = student[field]; 
+            const newValue = inputElement.value;
+            
+            const newFormatted = newValue.toString().trim();
+            const oldFormatted = oldValue ? oldValue.toString().trim() : '';
+            
+            if (oldFormatted !== newFormatted) {
+                student[field] = newFormatted;
+                updateData[field] = newFormatted; 
+                changesMade = true;
+            }
+        }
+    });
+
+    // إعادة حساب المجاميع
+    for(let i = 1; i <= 3; i++) {
+        student[`total${i}`] = calculateTotal(student, i);
+        student[`result${i}`] = calculateResult(student[`total${i}`]);
+    }
+
+    if (changesMade) {
+        // تحديث مؤشر الحفظ
+        updateSaveIndicator('saving', 'جاري حفظ التعديلات...');
+        
+        // إضافة التعديل للقائمة المعلقة
+        pendingUpdates = pendingUpdates.filter(update => update.id !== student.id);
+        pendingUpdates.push(updateData);
+        
+        // حفظ متعدد الطبقات
+        await Promise.all([
+            saveUpdateToDB(updateData),
+            savePendingUpdates(),
+            saveDataToLocalStorage(),
+            autoSaveData(true) // حفظ فوري
+        ]);
+        
+        // تحديث العرض
+        updateDisplayedStudents(); 
+        updatePendingCount();
+        
+        // إغلاق النافذة
+        closeModal('editModal');
+        
+        // رسالة نجاح
+        showSuccess('✅ تم حفظ التعديلات بنجاح');
+        
+        // بدء المزامنة التلقائية إذا كان هناك اتصال
+        if (navigator.onLine) {
+            setTimeout(() => attemptAutoSync(), 2000);
+        }
+        
+    } else {
+        closeModal('editModal');
+        showSuccess('👍 لم يتم إجراء تعديلات جديدة');
+    }
+}
+// ========== نظام التحقق من سلامة الحفظ ==========
+function setupSaveVerification() {
+    // التحقق الدوري من سلامة البيانات المحفوظة
+    setInterval(async () => {
+        if (currentTeacherId && allStudents.length > 0) {
+            await verifySavedData();
+        }
+    }, 60000); // كل دقيقة
+    
+    // التحقق عند بدء التشغيل
+    setTimeout(async () => {
+        if (currentTeacherId) {
+            await verifySavedData();
+        }
+    }, 5000);
+}
+
+async function verifySavedData() {
+    try {
+        console.log('🔍 التحقق من سلامة البيانات المحفوظة...');
+        
+        // المقارنة بين الذاكرة والمخزن المحلي
+        const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (localData) {
+            const saved = JSON.parse(localData);
+            
+            if (saved.teacherId === currentTeacherId) {
+                const memoryHash = JSON.stringify(allStudents);
+                const savedHash = JSON.stringify(saved.students);
+                
+                if (memoryHash !== savedHash) {
+                    console.warn('⚠️ اختلاف بين الذاكرة والمخزن المحلي');
+                    
+                    // محاولة إصلاح
+                    await repairDataDiscrepancy();
+                } else {
+                    console.log('✅ البيانات متطابقة');
+                }
+            }
+        }
+        
+        // التحقق من IndexedDB
+        const dbStudents = await loadStudentsFromDB(currentTeacherId);
+        if (dbStudents.length !== allStudents.length) {
+            console.warn(`⚠️ اختلاف في العدد: الذاكرة=${allStudents.length}, DB=${dbStudents.length}`);
+            
+            // مزامنة DB مع الذاكرة
+            await saveStudentsToDB(allStudents, currentTeacherId);
+        }
+        
+    } catch (error) {
+        console.error('❌ خطأ في التحقق:', error);
+    }
+}
+
+async function repairDataDiscrepancy() {
+    console.log('🔧 محاولة إصلاح البيانات...');
+    
+    // إنشاء نسخة احتياطية قبل الإصلاح
+    await createAutoBackup();
+    
+    // إعادة حفظ جميع البيانات
+    await autoSaveData(true);
+    
+    console.log('✅ تم إصلاح البيانات');
+}
     // ========== زر النسخ الاحتياطي اليدوي ==========
     function createBackupButton() {
         // حذف الزر القديم إذا كان موجوداً
@@ -5241,6 +6299,47 @@ function completeLogout() {
     
     showSuccess('تم تسجيل الخروج بنجاح.');
 }
+async function completeLogout() {
+    console.log('🚪 تسجيل الخروج مع الحفظ النهائي...');
+    
+    // 1. حفظ جميع البيانات قبل الخروج
+    updateSaveIndicator('saving', 'جاري الحفظ قبل الخروج...');
+    await forceSaveBeforeUnload();
+    
+    // 2. إخفاء جميع الأقسام
+    document.querySelectorAll('.month-workspace').forEach(workspace => {
+        workspace.classList.remove('active');
+    });
+    
+    // 3. إخفاء قسم اختيار الشهر
+    if (monthSelectionSection) monthSelectionSection.classList.add('hidden');
+    
+    // 4. إظهار قسم تسجيل الدخول
+    if (loginSection) {
+        loginSection.classList.remove('hidden');
+        loginSection.style.display = 'flex';
+    }
+    
+    // 5. إعادة تعيين حقل معرف المعلم
+    if (teacherIdInput) teacherIdInput.value = '';
+    
+    // 6. إخفاء زر النسخ الاحتياطي
+    const backupBtn = document.getElementById('manualBackupBtn');
+    if (backupBtn) backupBtn.style.display = 'none';
+    
+    // 7. إيقاف نظام الحفظ التلقائي
+    if (autoSaveInterval) {
+        clearInterval(autoSaveInterval);
+    }
+    
+    // 8. رسالة النجاح
+    showSuccess('✅ تم تسجيل الخروج وحفظ جميع البيانات');
+    
+    // 9. إعادة تعيين المتغيرات
+    currentTeacherId = '';
+    
+    console.log('✅ تم تسجيل الخروج بنجاح مع الحفظ');
+}
 // ========== دوال إضافية للمزامنة ==========
 function addToSyncHistory(type, status, count, details = '') {
     const record = {
@@ -5961,55 +7060,100 @@ window.addEventListener('beforeunload', () => {
 // في دالة document.addEventListener('DOMContentLoaded', () => {
 // أضف هذا:
 function initializeApp() {
-    console.log('🚀 بدء تشغيل التطبيق...');
+    console.log('🚀 بدء تشغيل التطبيق المحسّن...');
     
-    // إنشاء زر النسخ الاحتياطي أولاً
-    createBackupButton();
-    
-    // تهيئة أنظمة الأساسية
     try {
-        localStorage.setItem('storage_test', 'test');
-        localStorage.removeItem('storage_test');
-        console.log('✅ التخزين المحلي يعمل بشكل صحيح');
-    } catch (e) {
-        console.error('❌ مشكلة في التخزين المحلي:', e);
-        showError('⚠️ التخزين المحلي غير متوفر. قد لا يتم حفظ البيانات.');
+        // 1. تهيئة أنظمة التخزين
+        initializeStorageSystems();
+        
+        // 2. استعادة الجلسة
+        initializeSession();
+        
+        // 3. تهيئة PWA
+        initializePWA();
+        
+        // 4. إنشاء أزرار النسخ الاحتياطي
+        createBackupButton();
+        
+        // 5. تهيئة باقي الأنظمة
+        initializeMonthSystem();
+        initializeQRScanner();
+        initializeStatistics();
+        initializeSyncManagement();
+        
+        // 6. ربط الأحداث العامة
+        setupGlobalEvents();
+        
+        // 7. بدء نظام التحقق
+        setupSaveVerification();
+        
+        // 8. تحميل البيانات الأولية
+        loadInitialData();
+        
+        console.log('✅ تم تهيئة التطبيق المحسّن بنجاح');
+        
+        // إظهار حالة التخزين
+        setTimeout(() => showStorageStatus(), 3000);
+        
+    } catch (error) {
+        console.error('❌ خطأ في تهيئة التطبيق:', error);
+        showError('خطأ في التهيئة: ' + error.message);
     }
-    
-    // محاولة استعادة الجلسة والبيانات
-    const sessionRestored = initializeSession();
-    
-    // تهيئة PWA
-    initializePWA();
-    
-    // تهيئة نظام النسخ الاحتياطي
-    initializeBackupSystem();
-    
-    // تهيئة باقي الأنظمة
-    initializeMonthSystem();
-    initializeQRScanner();
-    initializeStatistics();
-    initializeSyncManagement();
-    
-    // ربط الأحداث العامة
-    setupGlobalEvents();
-    
-    // تحميل البيانات الأولية
-    loadInitialData();
-    
-    // إعداد النسخ الاحتياطي التلقائي
-    setupAutoBackup();
-    
-    console.log('✅ تم تهيئة التطبيق بنجاح');
-    updateDebugInfo('✅ التطبيق جاهز للاستخدام');
-    
-    // تحديث حالة زر النسخ الاحتياطي بعد 3 ثوانٍ
-    setTimeout(() => {
-        updateBackupButtonState();
-        updateBackupList();
-    }, 3000);
 }
 
+function initializeStorageSystems() {
+    console.log('💾 تهيئة أنظمة التخزين...');
+    
+    // اختبار جميع أنواع التخزين
+    testStorageCapabilities();
+    
+    // تنظيف التخزين القديم
+    cleanupLocalStorage();
+    
+    console.log('✅ أنظمة التخزين جاهزة');
+}
+
+function testStorageCapabilities() {
+    const tests = {
+        localStorage: testLocalStorage(),
+        sessionStorage: testSessionStorage(),
+        indexedDB: 'pending' // سيتم اختباره لاحقاً
+    };
+    
+    console.log('🧪 نتائج اختبار التخزين:', tests);
+}
+
+function testLocalStorage() {
+    try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        return 'working';
+    } catch (e) {
+        return 'failed: ' + e.message;
+    }
+}
+
+function testSessionStorage() {
+    try {
+        sessionStorage.setItem('test', 'test');
+        sessionStorage.removeItem('test');
+        return 'working';
+    } catch (e) {
+        return 'failed: ' + e.message;
+    }
+}
+
+// إظهار حالة التخزين
+function showStorageStatus() {
+    const status = {
+        students: allStudents.length,
+        pendingUpdates: pendingUpdates.length,
+        lastSave: localStorage.getItem('last_auto_save'),
+        storageUsed: (JSON.stringify(localStorage).length / 1024).toFixed(2) + 'KB'
+    };
+    
+    console.log('📊 حالة التخزين الحالية:', status);
+}
 // استبدل document.addEventListener بدالة initializeApp
 document.addEventListener('DOMContentLoaded', initializeApp);
 // ========== نظام تصدير واستيراد Excel ==========
