@@ -5925,42 +5925,86 @@ function createMonthSection(student, month) {
 }
 
 function saveAllEdits() {
-    try {
-        const studentId = document.getElementById('editStudentId').value;
+    const studentId = document.getElementById('editStudentId')?.value;
+    const currentMonth = document.getElementById('currentEditMonth')?.value;
 
-        // اجمع كل الحقول داخل نافذة التعديل
-        const inputs = document.querySelectorAll('#editFormContainer input');
+    if (!studentId) {
+        showError('❌ خطأ: لم يتم العثور على معرف الطالب');
+        return;
+    }
 
-        inputs.forEach(input => {
-            const fieldName = input.name;   // مثل: "math", "science", "month1"
-            const newValue = input.value;
+    const idToFind = studentId.toString().trim();
+    const student = allStudents.find(s => s.id && s.id.toString().trim() === idToFind);
 
-            // خزّن التعديل في الذاكرة
-            const student = allStudents.find(s => s.id == studentId);
-            if (student) {
-                student[fieldName] = newValue;
+    if (!student) {
+        showError('❌ خطأ: لم يتم العثور على الطالب في البيانات المحلية للحفظ. (ID: ' + idToFind + ')');
+        return;
+    }
+
+    const updateData = {
+        row: student.originalRowIndex,
+        id: student.id,
+    };
+
+    let changesMade = false;
+
+    // الحقول حسب الشهر
+    let fieldsToCheck = [];
+    if (currentMonth === 'all') {
+        fieldsToCheck = [
+            'attendance1', 'oral1', 'homework1', 'written1',
+            'attendance2', 'oral2', 'homework2', 'written2',
+            'attendance3', 'oral3', 'homework3', 'written3'
+        ];
+    } else {
+        const monthFields = {
+            1: ['attendance1', 'oral1', 'homework1', 'written1'],
+            2: ['attendance2', 'oral2', 'homework2', 'written2'],
+            3: ['attendance3', 'oral3', 'homework3', 'written3']
+        };
+        fieldsToCheck = monthFields[currentMonth];
+    }
+
+    // البحث عن الحقول بالـ id مثل editattendance1
+    fieldsToCheck.forEach(field => {
+        const inputElement = document.getElementById(`edit${field}`);
+        if (inputElement) {
+            const oldValue = student[field];
+            const newValue = inputElement.value;
+
+            const newFormatted = newValue.toString().trim();
+            const oldFormatted = oldValue ? oldValue.toString().trim() : '';
+
+            if (oldFormatted !== newFormatted) {
+                student[field] = newFormatted;
+                updateData[field] = newFormatted;
+                changesMade = true;
             }
+        }
+    });
 
-            // أضف التعديل إلى قائمة التعديلات المعلقة
-            pendingUpdates.push({
-                studentId,
-                field: fieldName,
-                newValue,
-                timestamp: new Date().toISOString()
-            });
-        });
+    // تحديث المجاميع والنتائج
+    for (let i = 1; i <= 3; i++) {
+        student[`total${i}`] = calculateTotal(student, i);
+        student[`result${i}`] = calculateResult(student[`total${i}`]);
+    }
 
-        // الحفظ الفوري في التخزين المحلي
+    if (changesMade) {
+        pendingUpdates = pendingUpdates.filter(update => update.id !== student.id);
+        pendingUpdates.push(updateData);
+
         savePendingUpdates();
         saveDataToLocalStorage();
-        saveTeacherSession(currentTeacherId);
 
-        console.log("✅ تم حفظ جميع التعديلات محليًا بنجاح.");
+        updateDisplayedStudents();
+
         closeModal('editModal');
-        return true;
-    } catch (error) {
-        showError("فشل في حفظ التعديلات: " + error.message);
-        return false;
+        showSuccess('✅ تم حفظ التعديلات للطالب محلياً وإضافتها للمزامنة.');
+
+        attemptAutoSync();
+    } else {
+        closeModal('editModal');
+        showSuccess('👍 لم يتم إجراء تعديلات جديدة لحفظها.');
     }
 }
 
