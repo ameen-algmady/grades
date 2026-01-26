@@ -3675,102 +3675,165 @@ function showLoginForm() {
 async function saveAllEdits() {
     const studentId = document.getElementById('editStudentId')?.value;
     const currentMonth = document.getElementById('currentEditMonth')?.value;
-    
+
     if (!studentId) {
         showError('❌ خطأ: لم يتم العثور على معرف الطالب');
         return;
     }
-    
-    const idToFind = studentId.toString().trim(); 
+
+    const idToFind = studentId.toString().trim();
     const student = allStudents.find(s => s.id && s.id.toString().trim() === idToFind);
 
     if (!student) {
-        showError('❌ خطأ: لم يتم العثور على الطالب');
+        showError('❌ خطأ: لم يتم العثور على الطالب في البيانات المحلية للحفظ. (ID: ' + idToFind + ')');
         return;
     }
 
     const updateData = {
-        row: student.originalRowIndex, 
+        row: student.originalRowIndex,
         id: student.id,
-        teacherId: currentTeacherId,
-        timestamp: new Date().toISOString()
     };
 
     let changesMade = false;
 
+    // الحقول حسب الشهر
     let fieldsToCheck = [];
     if (currentMonth === 'all') {
         fieldsToCheck = [
             'attendance1', 'oral1', 'homework1', 'written1',
-            'attendance2', 'oral2', 'homework2', 'written2', 
-            'attendance3', 'homework3', 'oral3', 'written3'
+            'attendance2', 'oral2', 'homework2', 'written2',
+            'attendance3', 'oral3', 'homework3', 'written3'
         ];
     } else {
         const monthFields = {
             1: ['attendance1', 'oral1', 'homework1', 'written1'],
             2: ['attendance2', 'oral2', 'homework2', 'written2'],
-            3: ['attendance3', 'homework3', 'oral3', 'written3']
+            3: ['attendance3', 'oral3', 'homework3', 'written3']
         };
         fieldsToCheck = monthFields[currentMonth];
     }
 
+    // تحديث القيم
     fieldsToCheck.forEach(field => {
         const inputElement = document.getElementById(`edit${field}`);
         if (inputElement) {
-            const oldValue = student[field]; 
+            const oldValue = student[field];
             const newValue = inputElement.value;
-            
+
             const newFormatted = newValue.toString().trim();
             const oldFormatted = oldValue ? oldValue.toString().trim() : '';
-            
+
             if (oldFormatted !== newFormatted) {
                 student[field] = newFormatted;
-                updateData[field] = newFormatted; 
+                updateData[field] = newFormatted;
                 changesMade = true;
             }
         }
     });
 
-    // إعادة حساب المجاميع
-    for(let i = 1; i <= 3; i++) {
+    // تحديث المجاميع والنتائج
+    for (let i = 1; i <= 3; i++) {
         student[`total${i}`] = calculateTotal(student, i);
         student[`result${i}`] = calculateResult(student[`total${i}`]);
     }
 
     if (changesMade) {
-        // تحديث مؤشر الحفظ
-        updateSaveIndicator('saving', 'جاري حفظ التعديلات...');
-        
-        // إضافة التعديل للقائمة المعلقة
-        pendingUpdates = pendingUpdates.filter(update => update.id !== student.id);
-        pendingUpdates.push(updateData);
-        
-        // حفظ متعدد الطبقات
-        await Promise.all([
-            saveUpdateToDB(updateData),
-            savePendingUpdates(),
-            saveDataToLocalStorage(),
-            autoSaveData(true) // حفظ فوري
-        ]);
-        
-        // تحديث العرض
-        updateDisplayedStudents(); 
-        updatePendingCount();
-        
-        // إغلاق النافذة
+        // حفظ في IndexedDB بدلًا من localStorage
+        await saveStudentToDB(student);
+        await savePendingUpdateToDB(updateData);
+
+        updateDisplayedStudents();
         closeModal('editModal');
-        
-        // رسالة نجاح
-        showSuccess('✅ تم حفظ التعديلات بنجاح');
-        
-        // بدء المزامنة التلقائية إذا كان هناك اتصال
-        if (navigator.onLine) {
-            setTimeout(() => attemptAutoSync(), 2000);
-        }
-        
+        showSuccess('✅ تم حفظ التعديلات للطالب محلياً في IndexedDB وإضافتها للمزامنة.');
+
+        attemptAutoSync();
     } else {
         closeModal('editModal');
-        showSuccess('👍 لم يتم إجراء تعديلات جديدة');
+        showSuccess('👍 لم يتم إجراء تعديلات جديدة لحفظها.');
+    }
+}
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("SchoolDB", 1);
+
+        request.onupgradeneeded = function(event) {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains("students")) {
+                db.createObjectStore("students", { keyPath: "id" });
+            }
+            if (!db.objectStoreNames.contains("pendingUpdates")) {
+                db.createObjectStore("pendingUpdates", { autoIncrement: true });
+            }
+        };
+
+        request.onsuccess = event => resolve(event.target.result);
+        request.onerror = event => reject("خطأ في فتح قاعدة البيانات: " + event.target.errorCode);
+    });
+}
+
+async function saveStudentToDB(student) {
+    const db = await openDB();
+    const tx = db.transaction("students", "readwrite");
+    tx.objectStore("students").put(student);
+    return tx.complete;
+}
+
+async function savePendingUpdateToDB(update) {
+    const db = await openDB();
+    const tx = db.transaction("pendingUpdates", "readwrite");
+    tx.objectStore("pendingUpdates").add(update);
+    return tx.complete;
+}
+async function verifySavedData() {
+    try {
+        const db = await openDB();
+
+        // تحميل الطلاب من IndexedDB
+        const tx = db.transaction("students", "readonly");
+        const store = tx.objectStore("students");
+        const request = store.getAll();
+
+        const studentsFromDB = await new Promise((resolve, reject) => {
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject("فشل في قراءة الطلاب من IndexedDB");
+        });
+
+        // تحميل الطلاب من localStorage
+        const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        const studentsFromLocal = localData ? JSON.parse(localData).students || [] : [];
+
+        // مقارنة مع بيانات الذاكرة (allStudents)
+        let mismatches = [];
+        allStudents.forEach(student => {
+            const dbStudent = studentsFromDB.find(s => s.id === student.id);
+            const localStudent = studentsFromLocal.find(s => s.id === student.id);
+
+            if (!dbStudent || JSON.stringify(dbStudent) !== JSON.stringify(student)) {
+                mismatches.push({ source: "IndexedDB", id: student.id });
+            }
+            if (!localStudent || JSON.stringify(localStudent) !== JSON.stringify(student)) {
+                mismatches.push({ source: "localStorage", id: student.id });
+            }
+        });
+
+        if (mismatches.length === 0) {
+            console.log("✅ تحقق ناجح: جميع البيانات متطابقة بين الذاكرة و IndexedDB و localStorage.");
+            updateSaveIndicator("verified", "✅ البيانات محفوظة ومتطابقة");
+        } else {
+            console.warn("⚠️ اختلاف في البيانات:", mismatches);
+            updateSaveIndicator("warning", "⚠️ تم العثور على اختلاف في البيانات، جاري إصلاحها...");
+
+            // إصلاح: إعادة حفظ نسخة الذاكرة في جميع الطبقات
+            await Promise.all([
+                saveDataToLocalStorage(),
+                ...allStudents.map(s => saveStudentToDB(s))
+            ]);
+
+            showSuccess("🔄 تم إصلاح الاختلاف وإعادة مزامنة البيانات.");
+        }
+    } catch (error) {
+        console.error("❌ خطأ أثناء التحقق من البيانات:", error);
+        updateSaveIndicator("error", "❌ فشل التحقق من البيانات");
     }
 }
 // ========== نظام التحقق من سلامة الحفظ ==========
